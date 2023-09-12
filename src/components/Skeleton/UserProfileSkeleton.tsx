@@ -8,19 +8,13 @@ const UserProfileSkeleton = () => {
 
       <div className="mt-20 lg:mt-28 space-y-10">
         <div className="space-y-1">
-          <label htmlFor="user-name-skeleton">Tên</label>
-          <div
-            id="user-name-skeleton"
-            className="h-10 rounded-md animate-pulse dark:bg-zinc-900"
-          />
+          <p>Tên</p>
+          <div className="h-10 rounded-md animate-pulse dark:bg-zinc-900" />
         </div>
 
         <div>
-          <label htmlFor="badge-select-skeleton">Huy hiệu</label>
-          <div
-            id="badge-select-skeleton"
-            className="h-10 rounded-md animate-pulse dark:bg-zinc-900"
-          />
+          <p>Huy hiệu</p>
+          <div className="h-10 rounded-md animate-pulse dark:bg-zinc-900" />
         </div>
 
         <div className="py-10 pb-20 flex flex-wrap items-center gap-6">

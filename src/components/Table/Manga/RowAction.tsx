@@ -40,20 +40,26 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
   const { mutate: publish, isLoading: isPublishLoading } = useMutation({
     mutationKey: ['publish-manga', manga.id],
     mutationFn: async (id: number) => {
-      const { data } = await axios.patch(`/api/manga/${id}/publish`);
+      const { data } = await axios.put(`/api/manga/${id}`);
 
       return data as string;
     },
     onError: (e) => {
       if (e instanceof AxiosError) {
         if (e.response?.status === 401) return loginToast();
-        if (e.response?.status === 403)
+        if (e.response?.status === 404) return notFoundToast();
+        if (e.response?.status === 406)
           return toast({
             title: 'Không thể publish',
             description: 'Yêu cầu manga phải có ít nhất 1 chapter',
             variant: 'destructive',
           });
-        if (e.response?.status === 404) return notFoundToast();
+        if (e.response?.status === 409)
+          return toast({
+            title: 'Đã publish',
+            description: 'Bạn đã publish Manga này trước đó rồi',
+            variant: 'destructive',
+          });
       }
 
       return serverErrorToast();

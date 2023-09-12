@@ -114,7 +114,7 @@ const Sidebar: FC<SidebarProps> = ({ session }) => {
 
               <SheetClose asChild>
                 <Link
-                  href="/setting"
+                  href="/settings"
                   className={cn(
                     buttonVariants({ variant: 'ghost' }),
                     'w-full py-6 space-x-2'

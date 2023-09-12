@@ -1,6 +1,5 @@
 'use client';
 
-import { columns } from './Column';
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/Table';
 import type {
@@ -19,9 +18,9 @@ import {
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useState } from 'react';
-import { MangaColumn } from './Column';
 import TableDataHeader from '../TableHeader';
 import TablePagination from '../TablePagination';
+import { MangaColumn, columns } from './Column';
 
 const DataToolbar = dynamic(() => import('./Toolbar'), {
   ssr: false,

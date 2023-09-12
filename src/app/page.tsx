@@ -10,7 +10,7 @@ const UserProfile = dynamic(() => import('@/components/UserProfile'), {
 
 const page = async () => {
   const session = await getAuthSession();
-  if (!session) return redirect('/sign-in');
+  if (!session) return redirect(`${process.env.MAIN_URL}/sign-in`);
 
   const user = await db.user.findUnique({
     where: {
@@ -27,7 +27,7 @@ const page = async () => {
   if (!user) return notFound();
 
   return (
-    <main className="container lg:w-2/3 p-2 rounded-md dark:bg-zinc-900/60">
+    <main className="container lg:w-2/3 p-2 mb-10 rounded-md dark:bg-zinc-900/60">
       <UserProfile user={user} />
     </main>
   );

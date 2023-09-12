@@ -39,7 +39,7 @@ export const MangaUploadValidator = z.object({
       if (value) {
         return value.length <= 32 && /[a-z0-9-]/.test(value);
       } else return true;
-    }),
+    }, 'Tối đa 32 kí tự. Kí tự thuộc alphanumeric, dấu gạch ngang'),
   description: z.any() as ZodType<SerializedEditorState<SerializedLexicalNode>>,
   review: z.string().min(5, 'Tối thiểu 5 kí tự').max(256, 'Tối đa 256 kí tự'),
   altName: z

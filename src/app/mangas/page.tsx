@@ -11,7 +11,7 @@ const MangaTable = dynamic(() => import('@/components/Table/Manga'), {
 
 const page = async () => {
   const session = await getAuthSession();
-  if (!session) return redirect('/');
+  if (!session) return redirect(`${process.env.MAIN_URL}/sign-in`);
 
   const manga = await db.user
     .findUnique({
@@ -30,12 +30,10 @@ const page = async () => {
   if (!manga) return notFound();
 
   return (
-    <main className="container max-sm:px-2">
+    <main className="container max-sm:px-2 mb-10">
       <section className="p-2 rounded-md dark:bg-zinc-900/60">
         {!!manga.length ? (
-          <>
-            <MangaTable data={manga} />
-          </>
+          <MangaTable data={manga} />
         ) : (
           <p>Bạn chưa có manga nào. Hãy upload một bộ ngay thôi nhé</p>
         )}

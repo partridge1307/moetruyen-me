@@ -2,9 +2,7 @@ import { buttonVariants } from '@/components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { dailyViewGroupByHour, weeklyViewGroupByDay } from '@/lib/query';
-import { cn, filterView } from '@/lib/utils';
-import { getDay, getHours } from 'date-fns';
+import { cn, formatTimeToNow } from '@/lib/utils';
 import {
   ArrowUpRightFromCircle,
   Edit,
@@ -20,14 +18,14 @@ import { FC } from 'react';
 
 const MTEditor = dynamic(
   () => import('@/components/Editor/MoetruyenEditorOutput'),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-72 rounded-md animate-pulse dark:bg-zinc-900" />
+    ),
+  }
 );
-const DailyView = dynamic(() => import('@/components/Chart/Daily'), {
-  ssr: false,
-});
-const WeeklyView = dynamic(() => import('@/components/Chart/Weekly'), {
-  ssr: false,
-});
+const Chart = dynamic(() => import('@/components/Chart'));
 
 interface pageProps {
   params: {
@@ -37,7 +35,7 @@ interface pageProps {
 
 const page: FC<pageProps> = async ({ params }) => {
   const session = await getAuthSession();
-  if (!session) return redirect('/');
+  if (!session) return redirect(`${process.env.MAIN_URL}/sign-in`);
 
   const manga = await db.manga.findUnique({
     where: {
@@ -65,80 +63,8 @@ const page: FC<pageProps> = async ({ params }) => {
   });
   if (!manga) return notFound();
 
-  const {
-    filteredDailyView,
-    filteredWeeklyView,
-    highestDailyView,
-    highestWeeklyView,
-  } = await Promise.all([
-    dailyViewGroupByHour(manga.id),
-    weeklyViewGroupByDay(manga.id),
-    db.chapter.findFirst({
-      where: {
-        mangaId: manga.id,
-      },
-      orderBy: {
-        dailyView: {
-          _count: 'desc',
-        },
-      },
-      select: {
-        _count: {
-          select: {
-            dailyView: true,
-          },
-        },
-        chapterIndex: true,
-        volume: true,
-      },
-    }),
-    db.chapter.findFirst({
-      where: {
-        mangaId: manga.id,
-      },
-      orderBy: {
-        weeklyView: {
-          _count: 'desc',
-        },
-      },
-      select: {
-        _count: {
-          select: {
-            weeklyView: true,
-          },
-        },
-        chapterIndex: true,
-        volume: true,
-      },
-    }),
-  ]).then(([dailyView, weeklyView, highestDailyView, highestWeeklyView]) => {
-    const filteredDailyView = filterView({
-      target: dailyView.map((dv) => ({
-        time: getHours(dv.viewTimeCreatedAt[0]),
-        view: dv.view,
-      })),
-      timeRange: [0, 1, 3, 6, 12, 22],
-      currentTime: new Date(Date.now()).getHours(),
-    });
-    const filteredWeeklyView = filterView({
-      target: weeklyView.map((wv) => ({
-        time: getDay(wv.viewTimeCreatedAt[0]),
-        view: wv.view,
-      })),
-      timeRange: [0, 1, 3, 5, 7],
-      currentTime: new Date(Date.now()).getDay(),
-    });
-
-    return {
-      filteredDailyView,
-      filteredWeeklyView,
-      highestDailyView,
-      highestWeeklyView,
-    };
-  });
-
   return (
-    <main className="container lg:w-3/4 p-3 rounded-md dark:bg-zinc-900/60">
+    <main className="container lg:w-3/4 p-3 mb-10 rounded-md dark:bg-zinc-900/60">
       <Tabs defaultValue="info">
         <TabsList className="grid grid-cols-2 gap-4 dark:bg-zinc-800">
           <TabsTrigger value="info" className="flex items-center gap-2">
@@ -211,7 +137,7 @@ const page: FC<pageProps> = async ({ params }) => {
               Chỉnh sửa
             </Link>
             <Link
-              href={`/mangas/${manga.id}`}
+              href={`${process.env.MAIN_URL}/manga/${manga.slug}`}
               className={cn(buttonVariants(), 'gap-2')}
             >
               <ArrowUpRightFromCircle className="w-5 h-5" /> Manga
@@ -276,53 +202,29 @@ const page: FC<pageProps> = async ({ params }) => {
                 )}
               </div>
             ))}
-        </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-10">
-          <div className="space-y-4">
-            <label htmlFor="daily" className="text-lg lg:text-xl font-semibold">
-              Ngày
-            </label>
+          <div className="flex flex-wrap justify-between items-center">
+            <dl className="flex items-center gap-2">
+              <dt>Ngày tạo:</dt>
+              <dd>
+                <time dateTime={manga.createdAt.toDateString()}>
+                  {formatTimeToNow(new Date(manga.createdAt))}
+                </time>
+              </dd>
+            </dl>
 
-            <div id="daily">
-              {!!highestDailyView && (
-                <div>
-                  <label htmlFor="highestView">
-                    Chapter nhiều lượt xem nhất
-                  </label>
-                  <dl id="highestView">
-                    <dt>
-                      <span>Vol.</span> {highestDailyView.volume}
-                      <span>Ch.</span> {highestDailyView.chapterIndex}
-                    </dt>
-                    <dd>{highestDailyView._count.dailyView} Lượt xem</dd>
-                  </dl>
-                </div>
-              )}
-
-              <div className="space-y-1">
-                <p>Biểu đồ</p>
-                <DailyView filteredView={filteredDailyView} />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <label
-              htmlFor="weekly"
-              className="text-lg lg:text-xl font-semibold"
-            >
-              Tuần
-            </label>
-
-            <div id="weekly">
-              <div className="space-y-1">
-                <p>Biểu đồ</p>
-                <WeeklyView filteredView={filteredDailyView} />
-              </div>
-            </div>
+            <dl className="flex items-center gap-2">
+              <dt>Chỉnh lần cuối:</dt>
+              <dd>
+                <time dateTime={manga.updatedAt.toDateString()}>
+                  {formatTimeToNow(new Date(manga.updatedAt))}
+                </time>
+              </dd>
+            </dl>
           </div>
         </TabsContent>
+
+        <Chart manga={manga} />
       </Tabs>
     </main>
   );

@@ -2,6 +2,7 @@
 
 import '@/styles/mteditor.css';
 import { CharacterLimitPlugin } from '@lexical/react/LexicalCharacterLimitPlugin';
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { ClearEditorPlugin } from '@lexical/react/LexicalClearEditorPlugin';
 import {
   LexicalComposer,
@@ -14,19 +15,17 @@ import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { Prisma } from '@prisma/client';
-import type { EditorState, LexicalEditor } from 'lexical';
+import type { EditorState } from 'lexical';
 import { nodes } from './Node';
 import { theme } from './Theme';
 import AutoEmbedPlugin from './plugins/AutoEmbed';
 import AutoLink from './plugins/AutoLink';
-import EditorPlugin from './plugins/EditorPlugin';
 import ImagesPlugin from './plugins/Image';
 import MaxLengthPlugin from './plugins/MaxLength';
+import MentionsPlugin from './plugins/Mention';
+import SteamPlugin from './plugins/Steam';
 import Toolbar from './plugins/Toolbar';
 import YouTubePlugin from './plugins/Youtube';
-import SteamPlugin from './plugins/Steam';
-import MentionsPlugin from './plugins/Mention';
-import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 
 function onError(error: Error): void {
   // eslint-disable-next-line no-console
@@ -40,21 +39,20 @@ const editorConfig: InitialConfigType = {
   nodes: [...nodes],
 };
 
-const Editor = ({
-  placeholder = 'Nói lên cảm nghĩ của bạn...',
-  maxLength = 1024,
-  initialContent,
-  editor,
-  onChange,
-}: {
+interface EditorProps {
   placeholder?: string;
   maxLength?: number;
   initialContent?: JSON | Prisma.JsonValue;
   // eslint-disable-next-line no-unused-vars
-  editor?: (editor: LexicalEditor) => void;
-  // eslint-disable-next-line no-unused-vars
   onChange?: (editorState: EditorState) => void;
-}): JSX.Element => {
+}
+
+const Editor = ({
+  placeholder = 'Nói lên cảm nghĩ của bạn...',
+  maxLength = 1024,
+  initialContent,
+  onChange,
+}: EditorProps) => {
   return (
     <LexicalComposer
       initialConfig={
@@ -94,9 +92,6 @@ const Editor = ({
       <YouTubePlugin />
       <OnChangePlugin
         onChange={(editorState) => !!onChange && onChange(editorState)}
-      />
-      <EditorPlugin
-        editor={(lexicalEditor) => !!editor && editor(lexicalEditor)}
       />
     </LexicalComposer>
   );

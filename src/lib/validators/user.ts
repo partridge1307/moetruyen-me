@@ -85,3 +85,18 @@ export const UserFormUpdateValidator = zfd.formData({
     .nullish()
     .optional(),
 });
+
+export const UserPasswordChangeValidator = z
+  .object({
+    oldPassword: z.string(),
+    newPassword: z.string(),
+    confirmNewPassword: z.string(),
+  })
+  .refine((values) => values.newPassword === values.confirmNewPassword, {
+    message: 'Xác nhận mật khẩu phải giống mật khẩu mới',
+    path: ['newPassword', 'confirmNewPassword'],
+  });
+
+export type UserPasswordChangePayload = z.infer<
+  typeof UserPasswordChangeValidator
+>;

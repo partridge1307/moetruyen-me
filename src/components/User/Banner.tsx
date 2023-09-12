@@ -1,12 +1,14 @@
+import { cn } from '@/lib/utils';
 import type { User } from '@prisma/client';
 import Image from 'next/image';
 import { FC } from 'react';
 
 interface BannerProps {
   user: Pick<User, 'name' | 'banner'>;
+  className?: string;
 }
 
-const Banner: FC<BannerProps> = ({ user }) => {
+const Banner: FC<BannerProps> = ({ user, className }) => {
   return (
     <div className="aspect-video">
       {user.banner ? (
@@ -19,7 +21,12 @@ const Banner: FC<BannerProps> = ({ user }) => {
           alt={`${user.name} Banner`}
         />
       ) : (
-        <div className="absolute inset-0 rounded-md dark:bg-zinc-800" />
+        <div
+          className={cn(
+            'absolute inset-0 rounded-md dark:bg-zinc-800',
+            className
+          )}
+        />
       )}
     </div>
   );
