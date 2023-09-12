@@ -12,6 +12,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { Prisma } from '@prisma/client';
@@ -85,6 +86,7 @@ const Editor = ({
       <CheckListPlugin />
       <HistoryPlugin />
       <LinkPlugin />
+      <ListPlugin />
       <MaxLengthPlugin maxLength={maxLength} />
       <MentionsPlugin />
       <ImagesPlugin />
