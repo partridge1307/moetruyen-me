@@ -32,9 +32,9 @@ export const authOptionsWrapper = (
     {
       adapter: PrismaAdapter(db),
       pages: {
-        signIn: `${process.env.MAIN_URL}/sign-in`,
-        error: `${process.env.MAIN_URL}/auth-error`,
-        verifyRequest: `${process.env.MAIN_URL}/verify-request`,
+        signIn: `/sign-in`,
+        error: `/auth-error`,
+        verifyRequest: `/verify-request`,
       },
       session: { strategy: 'database' },
       secret: process.env.NEXTAUTH_SECRET,

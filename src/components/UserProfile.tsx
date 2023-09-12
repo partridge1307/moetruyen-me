@@ -81,7 +81,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
       form.append('name', name);
       color !== null && form.append('color', JSON.stringify(color));
 
-      const { data } = await axios.patch(`/api/user`, form);
+      const { data } = await axios.put(`/api/user`, form);
 
       return data as UserProfileEditPayload;
     },
