@@ -1,4 +1,3 @@
-import { socketServer } from '@/config';
 import { getAuthSession } from '@/lib/auth';
 import { EditChapterImage, UploadChapterImage } from '@/lib/contabo';
 import { db } from '@/lib/db';
@@ -260,7 +259,7 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
         roleId: channel.roleId,
       });
 
-      fetch(`${socketServer}/api/v1/server`, {
+      fetch(`${process.env.SOCKET_URL}/api/v1/server`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

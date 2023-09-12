@@ -1,4 +1,3 @@
-import { socketServer } from '@/config';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { z } from 'zod';
@@ -20,7 +19,7 @@ export async function GET() {
     if (!account) return new Response('Not found', { status: 404 });
 
     const data = await fetch(
-      `${socketServer}/api/v1/server/${account.providerAccountId}`
+      `${process.env.SOCKET_URL}/api/v1/server/${account.providerAccountId}`
     ).then((res) => res.json());
 
     return new Response(JSON.stringify(data));
@@ -58,7 +57,7 @@ export async function POST(req: Request) {
     if (!user.account.length) return new Response('Not found', { status: 404 });
 
     const res = await fetch(
-      `${socketServer}/api/v1/server/${channel.id}/${user.account[0].providerAccountId}`,
+      `${process.env.SOCKET_URL}/api/v1/server/${channel.id}/${user.account[0].providerAccountId}`,
       {
         method: 'POST',
       }

@@ -1,4 +1,3 @@
-import { socketServer } from '@/config';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { Prisma } from '@prisma/client';
@@ -19,7 +18,7 @@ export async function GET(req: Request, context: { params: { id: string } }) {
     });
 
     const res = await fetch(
-      `${socketServer}/api/v1/server/${context.params.id}/${user.providerAccountId}`
+      `${process.env.SOCKET_URL}/api/v1/server/${context.params.id}/${user.providerAccountId}`
     );
     if (!res.ok) return new Response('Not Acceptable', { status: 406 });
 
