@@ -11,16 +11,6 @@ export function sleep(second: number) {
   return new Promise((res) => setTimeout(res, second * 1000));
 }
 
-export const groupBy = <T>(
-  array: T[],
-  // eslint-disable-next-line no-unused-vars
-  predicate: (value: T, index: number, array: T[]) => any
-) =>
-  array.reduce((acc, value, index, array) => {
-    (acc[predicate(value, index, array)] ||= []).push(value);
-    return acc;
-  }, {} as { [key: string]: T[] });
-
 const formatDistanceLocale = {
   lessThanXSeconds: 'vừa xong',
   xSeconds: 'vừa xong',
@@ -137,12 +127,6 @@ export function dataUrlToBlob(dataUrl: string) {
 
   return new Blob([buffer], { type: typeStr });
 }
-
-export const groupArray = <T>(array: T[]) =>
-  array.reduce(
-    (acc, val) => ((acc[val] = (acc[val] || 0) + 1), acc),
-    {} as any
-  );
 
 const keyStr =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';

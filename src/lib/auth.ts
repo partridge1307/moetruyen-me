@@ -1,17 +1,12 @@
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { type AuthOptions, getServerSession } from 'next-auth';
+import { getServerSession, type AuthOptions } from 'next-auth';
 import { decode, encode } from 'next-auth/jwt';
-import Credentials from 'next-auth/providers/credentials';
 import Discord from 'next-auth/providers/discord';
-import Email from 'next-auth/providers/email';
 import { cookies, headers } from 'next/headers';
 import { NextRequest } from 'next/server';
 import { db } from './db';
-import { signInMail, textSignInMail, transporter } from './mail';
 import { generateRandomName } from './uniqueName';
-import { AuthSignInValidator } from './validators/auth';
 
 export interface AuthContext {
   params: { nextauth: string[] };
@@ -37,87 +32,13 @@ export const authOptionsWrapper = (
     {
       adapter: PrismaAdapter(db),
       pages: {
-        signIn: '/sign-in',
-        error: '/auth-error',
-        verifyRequest: '/verify-request',
+        signIn: `${process.env.MAIN_URL}/sign-in`,
+        error: `${process.env.MAIN_URL}/auth-error`,
+        verifyRequest: `${process.env.MAIN_URL}/verify-request`,
       },
       session: { strategy: 'database' },
       secret: process.env.NEXTAUTH_SECRET,
       providers: [
-        // Credentials({
-        //   name: 'Credentials',
-        //   credentials: {
-        //     email: { label: 'Email', type: 'email' },
-        //     password: { label: 'Password', type: 'password' },
-        //   },
-        //   authorize: async (credentials) => {
-        //     try {
-        //       const { email, password } =
-        //         AuthSignInValidator.parse(credentials);
-
-        //       const userExists = await db.user.findFirstOrThrow({
-        //         where: {
-        //           email,
-        //         },
-        //         select: {
-        //           id: true,
-        //           name: true,
-        //           image: true,
-        //           banner: true,
-        //           color: true,
-        //           password: true,
-        //           muteExpires: true,
-        //           isBanned: true,
-        //         },
-        //       });
-
-        //       if (await bcrypt.compare(password, userExists.password)) {
-        //         return {
-        //           id: userExists.id,
-        //           name: userExists.name,
-        //           image: userExists.image,
-        //           banner: userExists.banner,
-        //           color: userExists.color as
-        //             | { color: string }
-        //             | { from: string; to: string }
-        //             | null,
-        //           muteExpires: userExists.muteExpires,
-        //           isBanned: userExists.isBanned,
-        //         };
-        //       } else throw Error();
-        //     } catch (error) {
-        //       return null;
-        //     }
-        //   },
-        // }),
-        // Email({
-        //   server: {
-        //     host: process.env.MAIL_HOST,
-        //     port: Number(process.env.MAIL_PORT),
-        //     auth: {
-        //       user: process.env.MAIL_USER,
-        //       pass: process.env.MAIL_PASS,
-        //     },
-        //   },
-        //   from: `Moetruyen<${process.env.MAIL_USER}>`,
-        //   maxAge: 1 * 60 * 60,
-        //   sendVerificationRequest: async ({ identifier, url, provider }) => {
-        //     const result = await transporter.sendMail({
-        //       to: identifier,
-        //       from: provider.from,
-        //       subject: 'Đăng nhập',
-        //       html: signInMail(url),
-        //       text: textSignInMail(url),
-        //     });
-
-        //     const failed = result.rejected
-        //       .concat(result.pending)
-        //       .filter(Boolean);
-        //     if (failed.length) {
-        //       throw new Error(`Không thể gửi Email: (${failed.join(', ')})`);
-        //     }
-        //   },
-        // }),
         Discord({
           clientId: process.env.DISC_CLIENT_ID!,
           clientSecret: process.env.DISC_CLIENT_SECRET!,
@@ -134,7 +55,7 @@ export const authOptionsWrapper = (
             domain:
               HOST_URL.hostname === 'localhost'
                 ? HOST_URL.hostname
-                : `.moetruyen.net`,
+                : `.${new URL(process.env.MAIN_URL!).host}`,
             secure: useSecureCookies,
           },
         },
@@ -166,7 +87,7 @@ export const authOptionsWrapper = (
                   domain:
                     HOST_URL.hostname === 'localhost'
                       ? HOST_URL.hostname
-                      : `.moetruyen.net`,
+                      : `.${new URL(process.env.MAIN_URL!).host}`,
                   secure: useSecureCookies,
                 }
               );
