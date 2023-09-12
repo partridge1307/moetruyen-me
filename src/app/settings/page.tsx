@@ -1,10 +1,16 @@
-import DiscordLink from '@/components/Settings/DiscordLink';
-import NotifyDiscChannel from '@/components/Settings/NotifyDiscChannel';
 import { buttonVariants } from '@/components/ui/Button';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const NotifyDiscChannel = dynamic(
+  () => import('@/components/Settings/NotifyDiscChannel')
+);
+const DiscordLink = dynamic(() => import('@/components/Settings/DiscordLink'), {
+  ssr: false,
+});
 
 const page = async () => {
   const session = await getAuthSession();
