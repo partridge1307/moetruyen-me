@@ -1,17 +1,5 @@
 'use client';
 
-import { useCustomToast } from '@/hooks/use-custom-toast';
-import { cn } from '@/lib/utils';
-import { UserProfileEditPayload } from '@/lib/validators/user';
-import { Badge, User } from '@prisma/client';
-import { useMutation } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
-import { ImagePlus } from 'lucide-react';
-import { useSession } from 'next-auth/react';
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { FC, useEffect, useState } from 'react';
 import { AspectRatio } from '@/components/ui/AspectRatio';
 import {
   HoverCard,
@@ -26,10 +14,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/Select';
-
-const ImageCropModal = dynamic(() => import('@/components/ImageCropModal'), {
-  ssr: false,
-});
+import { useCustomToast } from '@/hooks/use-custom-toast';
+import { cn } from '@/lib/utils';
+import { UserProfileEditPayload } from '@/lib/validators/user';
+import { Badge, User } from '@prisma/client';
+import { useMutation } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios';
+import { ImagePlus } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { FC, useEffect, useRef, useState } from 'react';
+import ImageCropModal from './ImageCropModal';
 
 interface UserProfileProps {
   user: Pick<User, 'name' | 'color' | 'image' | 'banner'> & {
@@ -42,6 +38,10 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
   const router = useRouter();
   const { loginToast, notFoundToast, serverErrorToast, successToast } =
     useCustomToast();
+
+  const avatarRef = useRef<HTMLInputElement>(null);
+  const bannerRef = useRef<HTMLInputElement>(null);
+  const imageCropRef = useRef<HTMLButtonElement>(null);
 
   const [avatarURL, setAvatarURL] = useState(user.image ?? '');
   const [bannerURL, setBannerURL] = useState(user.banner ?? '');
@@ -185,11 +185,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                 onClick={(e) => {
                   e.preventDefault();
 
-                  const target = document.getElementById(
-                    'add-banner-input'
-                  ) as HTMLInputElement;
-
-                  target.click();
+                  bannerRef.current?.click();
                 }}
               />
             ) : (
@@ -199,11 +195,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                 onClick={(e) => {
                   e.preventDefault();
 
-                  const target = document.getElementById(
-                    'add-banner-input'
-                  ) as HTMLInputElement;
-
-                  target.click();
+                  bannerRef.current?.click();
                 }}
               >
                 <ImagePlus className="w-8 h-8" />
@@ -226,11 +218,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    const target = document.getElementById(
-                      'add-avatar-input'
-                    ) as HTMLInputElement;
-
-                    target.click();
+                    avatarRef.current?.click();
                   }}
                 />
               ) : (
@@ -240,11 +228,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    const target = document.getElementById(
-                      'add-avatar-input'
-                    ) as HTMLInputElement;
-
-                    target.click();
+                    avatarRef.current?.click();
                   }}
                 >
                   <ImagePlus className="w-5 lg:w-6 h-5 lg:h-6" />
@@ -277,7 +261,9 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
               </label>
               <Select
                 value={JSON.stringify(userColor)}
-                onValueChange={(value) => setUserColor(JSON.parse(value))}
+                onValueChange={(value) =>
+                  !!value && setUserColor(JSON.parse(value))
+                }
               >
                 <SelectTrigger disabled={isUpdating} id="badge-select-button">
                   <SelectValue />
@@ -403,6 +389,8 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         {hasChange && (
           <div className="absolute bottom-0 inset-x-0 flex justify-end items-center gap-6 p-3 px-4 rounded-lg dark:bg-zinc-900/70">
             <button
+              tabIndex={0}
+              aria-label="cancel"
               type="button"
               disabled={isUpdating}
               className={cn('hover:underline underline-offset-2', {
@@ -413,6 +401,8 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
               Hủy
             </button>
             <button
+              tabIndex={1}
+              aria-label="submit"
               form="profile-update-form"
               disabled={isUpdating}
               type="submit"
@@ -431,7 +421,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
 
       <input
         disabled={isUpdating}
-        id="add-avatar-input"
+        ref={avatarRef}
         type="file"
         accept=".jpg, .jpeg, .png"
         className="hidden"
@@ -444,16 +434,13 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
             setAvatarURL(URL.createObjectURL(e.target.files[0]));
             e.target.value = '';
 
-            const target = document.getElementById(
-              'crop-modal-button'
-            ) as HTMLButtonElement;
-            target.click();
+            imageCropRef.current?.click();
           }
         }}
       />
       <input
         disabled={isUpdating}
-        id="add-banner-input"
+        ref={bannerRef}
         type="file"
         accept=".jpg, .jpeg, .png"
         className="hidden"
@@ -466,15 +453,13 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
             setBannerURL(URL.createObjectURL(e.target.files[0]));
             e.target.value = '';
 
-            const target = document.getElementById(
-              'crop-modal-button'
-            ) as HTMLButtonElement;
-            target.click();
+            imageCropRef.current?.click();
           }
         }}
       />
 
       <ImageCropModal
+        ref={imageCropRef}
         image={currentTarget === 'AVATAR' ? avatarURL : bannerURL}
         aspect={currentTarget === 'AVATAR' ? 1 / 1 : 16 / 9}
         setImageCropped={

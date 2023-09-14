@@ -1,6 +1,12 @@
 'use client';
 
-import { FC } from 'react';
+import ImageCropModal from '@/components/ImageCropModal';
+import { AspectRatio } from '@/components/ui/AspectRatio';
+import type { MangaUploadPayload } from '@/lib/validators/manga';
+import { ImagePlus } from 'lucide-react';
+import Image from 'next/image';
+import { FC, useRef } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 import {
   FormControl,
   FormField,
@@ -8,22 +14,14 @@ import {
   FormLabel,
   FormMessage,
 } from '../../ui/Form';
-import Image from 'next/image';
-import { ImagePlus } from 'lucide-react';
-import type { MangaUploadPayload } from '@/lib/validators/manga';
-import type { UseFormReturn } from 'react-hook-form';
-import { AspectRatio } from '@/components/ui/AspectRatio';
-import dynamic from 'next/dynamic';
-
-const ImageCropModal = dynamic(() => import('@/components/ImageCropModal'), {
-  ssr: false,
-});
 
 interface MangaImageFormFieldProps {
   form: UseFormReturn<MangaUploadPayload>;
 }
 
 const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
+  const imageCropRef = useRef<HTMLButtonElement>(null);
+
   return (
     <FormField
       control={form.control}
@@ -51,10 +49,7 @@ const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    const target = document.getElementById(
-                      'add-image-input'
-                    ) as HTMLInputElement;
-                    target.click();
+                    imageCropRef.current?.click();
                   }}
                 />
               ) : (

@@ -1,19 +1,12 @@
 import EditorSkeleton from './EditorSkeleton';
 import MangaAuthorSkeleton from './MangaAuthorSkeleton';
+import MangaImageSkeleton from './MangaImageSkeleton';
 import MangaTagSkeleton from './MangaTagSkeleton';
 
 const MangaUploadSkeleton = () => {
   return (
     <div className="space-y-6 text-sm">
-      <div className="space-y-2">
-        <p className="after:content-['*'] after:text-red-500 after:pl-0.5">
-          Ảnh bìa
-        </p>
-        <div
-          className="rounded-md animate-pulse dark:bg-zinc-900"
-          style={{ aspectRatio: 4 / 3 }}
-        />
-      </div>
+      <MangaImageSkeleton />
 
       <div className="space-y-2">
         <p>Tên truyện</p>

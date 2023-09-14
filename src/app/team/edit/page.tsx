@@ -1,8 +1,14 @@
 import TeamCreateRules from '@/components/Rules/TeamCreateRules';
-import EditTeam from '@/components/Upload/Team/Edit';
+import TeamUploadSkeleton from '@/components/Skeleton/TeamUploadSkeleton';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
+import dynamic from 'next/dynamic';
 import { notFound, redirect } from 'next/navigation';
+
+const EditTeam = dynamic(() => import('@/components/Upload/Team/Edit'), {
+  ssr: false,
+  loading: () => <TeamUploadSkeleton />,
+});
 
 const page = async () => {
   const session = await getAuthSession();

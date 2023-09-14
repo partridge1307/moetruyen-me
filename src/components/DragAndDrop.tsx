@@ -12,8 +12,8 @@ import { SortableContext, arrayMove, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Edit, Maximize2, X } from 'lucide-react';
 import Image from 'next/image';
-import type { Dispatch, FC, SetStateAction } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import type { Dispatch, FC, RefObject, SetStateAction } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Controlled as ControlledZoom } from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
 
@@ -37,6 +37,7 @@ const DnDChapterImage: FC<indexProps> = ({ items, setItems, isUpload }) => {
     })
   );
   const itemIds = useMemo(() => items.map((item) => item.src), [items]);
+  const editImageRef = useRef<HTMLInputElement>(null);
   const [currentIdx, setCurrentIdx] = useState<number>(-1);
 
   const onDragEnd = useCallback(
@@ -55,14 +56,17 @@ const DnDChapterImage: FC<indexProps> = ({ items, setItems, isUpload }) => {
     [setItems]
   );
 
-  function onEditImage(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files?.length) {
-      const target = e.target.files[0];
-      const src = URL.createObjectURL(target);
-      items[currentIdx] = { src, name: target.name };
-      setItems([...items]);
-    }
-  }
+  const onEditImage = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files?.length) {
+        const target = e.target.files[0];
+        const src = URL.createObjectURL(target);
+        items[currentIdx] = { src, name: target.name };
+        setItems([...items]);
+      }
+    },
+    [currentIdx, items, setItems]
+  );
 
   return (
     <DndContext
@@ -77,6 +81,7 @@ const DnDChapterImage: FC<indexProps> = ({ items, setItems, isUpload }) => {
               isUpload={isUpload}
               key={idx}
               index={idx}
+              editImageRef={editImageRef}
               setCurrentIdx={setCurrentIdx}
               setItems={setItems}
               img={item}
@@ -86,6 +91,7 @@ const DnDChapterImage: FC<indexProps> = ({ items, setItems, isUpload }) => {
       </SortableContext>
       <input
         id="edit-image"
+        ref={editImageRef}
         type="file"
         accept=".jpg, .png, .jpeg"
         className="hidden"
@@ -97,16 +103,18 @@ const DnDChapterImage: FC<indexProps> = ({ items, setItems, isUpload }) => {
 
 export default DnDChapterImage;
 
-function SortableItem({
+const SortableItem = memo(function SortableItem({
   img,
   index,
   isUpload,
+  editImageRef,
   setCurrentIdx,
   setItems,
 }: {
   img: { src: string; name: string };
   index: number;
   isUpload: boolean;
+  editImageRef: RefObject<HTMLInputElement>;
   setCurrentIdx: Dispatch<SetStateAction<number>>;
   setItems: Dispatch<SetStateAction<{ src: string; name: string }[]>>;
 }) {
@@ -151,10 +159,7 @@ function SortableItem({
               type="button"
               className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 p-1 rounded-full dark:bg-zinc-800/80"
               onClick={() => {
-                const target = document.getElementById(
-                  'edit-image'
-                ) as HTMLInputElement;
-                target.click();
+                editImageRef.current?.click();
                 setCurrentIdx(index);
               }}
             >
@@ -195,4 +200,4 @@ function SortableItem({
       </ControlledZoom>
     </div>
   );
-}
+});

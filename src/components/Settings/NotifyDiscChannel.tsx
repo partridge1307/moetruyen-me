@@ -1,6 +1,6 @@
-import type { DiscordChannel } from '@prisma/client';
-import { FC } from 'react';
+import type { Account, DiscordChannel } from '@prisma/client';
 import dynamic from 'next/dynamic';
+import { FC } from 'react';
 
 const StepperChannelLink = dynamic(() => import('./StepperChannelLink'), {
   ssr: false,
@@ -19,9 +19,13 @@ interface NotifyDiscChannelProps {
     | 'roleId'
     | 'roleName'
   > | null;
+  account: Pick<Account, 'providerAccountId'>[];
 }
 
-const NotifyDiscChannel: FC<NotifyDiscChannelProps> = ({ channel }) => {
+const NotifyDiscChannel: FC<NotifyDiscChannelProps> = ({
+  channel,
+  account,
+}) => {
   return (
     <section className="space-y-2">
       <h1 className="text-lg lg:text-xl font-semibold">Thông báo Discord</h1>
@@ -66,10 +70,14 @@ const NotifyDiscChannel: FC<NotifyDiscChannelProps> = ({ channel }) => {
               </div>
             )}
           </div>
+        ) : !!!account.length ? (
+          <p className="text-red-500">
+            Yêu cầu liên kết Discord để sử dụng tính năng này
+          </p>
         ) : (
           <p className="text-red-500">Chưa có liên kết</p>
         )}
-        <StepperChannelLink />
+        {!!channel && <StepperChannelLink />}
       </div>
     </section>
   );

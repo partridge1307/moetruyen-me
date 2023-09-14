@@ -10,6 +10,12 @@ const NotifyDiscChannel = dynamic(
 );
 const DiscordLink = dynamic(() => import('@/components/Settings/DiscordLink'), {
   ssr: false,
+  loading: () => (
+    <div className="space-y-1">
+      <h1 className="text-lg lg:text-xl font-semibold">Liên kết</h1>
+      <div className="h-12 rounded-md animate-pulse dark:bg-zinc-900" />
+    </div>
+  ),
 });
 
 const page = async () => {
@@ -51,7 +57,7 @@ const page = async () => {
 
       <DiscordLink account={user.account} />
 
-      <NotifyDiscChannel channel={user.discordChannel} />
+      <NotifyDiscChannel channel={user.discordChannel} account={user.account} />
     </main>
   );
 };

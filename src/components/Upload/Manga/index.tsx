@@ -1,5 +1,8 @@
 'use client';
 
+import MangaAuthorSkeleton from '@/components/Skeleton/MangaAuthorSkeleton';
+import MangaImageSkeleton from '@/components/Skeleton/MangaImageSkeleton';
+import MangaTagSkeleton from '@/components/Skeleton/MangaTagSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Form } from '@/components/ui/Form';
 import { useCustomToast } from '@/hooks/use-custom-toast';
@@ -19,13 +22,14 @@ import MangaAltNameForm from './MangaAltNameFormField';
 import MangaDescForm from './MangaDescFormField';
 import MangaDiscForm from './MangaDiscFormField';
 import MangaFBForm from './MangaFBFormField';
-import MangaImageForm from './MangaImageFormField';
 import MangaNameForm from './MangaNameFormField';
 import MangaReviewForm from './MangaReviewFormField';
 import MangaSlugForm from './MangaSlugFormField';
-import MangaTagSkeleton from '@/components/Skeleton/MangaTagSkeleton';
-import MangaAuthorSkeleton from '@/components/Skeleton/MangaAuthorSkeleton';
 
+const MangaImageForm = dynamic(() => import('./MangaImageFormField'), {
+  ssr: false,
+  loading: () => <MangaImageSkeleton />,
+});
 const MangaTagForm = dynamic(() => import('./MangaTagFormField'), {
   ssr: false,
   loading: () => <MangaTagSkeleton />,
@@ -155,14 +159,24 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
 
           <MangaDiscForm form={form} />
 
-          <Button
-            type="submit"
-            isLoading={isUploadManga}
-            disabled={isUploadManga}
-            className="w-full"
-          >
-            Đăng
-          </Button>
+          <div className="flex flex-wrap justify-end items-center gap-8">
+            <Button
+              type="button"
+              tabIndex={0}
+              variant={'destructive'}
+              onClick={() => router.back()}
+            >
+              Quay lại
+            </Button>
+            <Button
+              type="submit"
+              tabIndex={1}
+              isLoading={isUploadManga}
+              disabled={isUploadManga}
+            >
+              Đăng
+            </Button>
+          </div>
         </form>
       </Form>
     </>

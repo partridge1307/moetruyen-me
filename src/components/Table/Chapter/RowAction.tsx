@@ -99,12 +99,12 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
 
         {chapter.isPublished ? (
           <DropdownMenuItem>
-            <Link
+            <a
               href={`${mainURL}/chapter/${chapter.id}`}
               className="w-full h-full transition-colors hover:cursor-pointer hover:dark:bg-zinc-800"
             >
               Xem chapter
-            </Link>
+            </a>
           </DropdownMenuItem>
         ) : (
           <AlertDialog>

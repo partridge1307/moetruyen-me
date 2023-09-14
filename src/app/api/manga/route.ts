@@ -47,13 +47,8 @@ export async function POST(req: Request) {
       discordLink,
     } = MangaFormValidator.parse(await req.formData());
 
-    if (slug) {
-      const target = await db.manga.findUnique({
-        where: {
-          slug,
-        },
-      });
-      if (target) return new Response('Existing Slug', { status: 406 });
+    if (slug && (await db.manga.findUnique({ where: { slug } }))) {
+      return new Response('Existing Slug', { status: 406 });
     }
 
     const mangaCreated = await db.manga.create({
@@ -94,14 +89,14 @@ export async function POST(req: Request) {
       },
       data: {
         image: uploadedImage,
-        slug: slug
-          ? slug.trim()
-          : `${normalizeText(mangaCreated.name)
-              .toLowerCase()
-              .slice(0, 32)
-              .trim()
-              .split(' ')
-              .join('-')}-${mangaCreated.id}`,
+        slug:
+          slug?.trim() ??
+          `${normalizeText(mangaCreated.name)
+            .toLowerCase()
+            .slice(0, 32)
+            .trim()
+            .split(' ')
+            .join('-')}-${mangaCreated.id}`,
       },
     });
 

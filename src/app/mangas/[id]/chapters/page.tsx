@@ -3,7 +3,7 @@ import { buttonVariants } from '@/components/ui/Button';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { cn } from '@/lib/utils';
-import { UploadCloud } from 'lucide-react';
+import { ArrowLeft, UploadCloud } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -44,7 +44,17 @@ const page: FC<pageProps> = async ({ params }) => {
   if (!chapters) return notFound();
 
   return (
-    <main className="container max-sm:px-2 mb-10">
+    <main className="container max-sm:px-2 mb-10 space-y-4">
+      <section>
+        <Link
+          href="/mangas"
+          className={cn(buttonVariants({ variant: 'link' }), 'px-0 space-x-2')}
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span>Quay lại</span>
+        </Link>
+      </section>
+
       <section className="p-3 rounded-md dark:bg-zinc-900/60">
         {!!chapters.length ? (
           <div className="flex flex-col">

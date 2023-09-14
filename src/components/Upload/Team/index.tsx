@@ -1,5 +1,6 @@
 'use client';
 
+import TeamImageSkeleton from '@/components/Skeleton/TeamImageSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Form } from '@/components/ui/Form';
 import { useCustomToast } from '@/hooks/use-custom-toast';
@@ -8,11 +9,16 @@ import { TeamPayload, TeamValidator } from '@/lib/validators/team';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import TeamDescFormField from './TeamDescFormField';
-import TeamImageFormField from './TeamImageFormField';
 import TeamNameFormField from './TeamNameFormField';
+
+const TeamImageFormField = dynamic(() => import('./TeamImageFormField'), {
+  ssr: false,
+  loading: () => <TeamImageSkeleton />,
+});
 
 const CreateTeam = () => {
   const { loginToast, serverErrorToast, successToast } = useCustomToast();
@@ -74,14 +80,24 @@ const CreateTeam = () => {
 
         <TeamDescFormField form={form} />
 
-        <Button
-          type="submit"
-          disabled={isCreating}
-          isLoading={isCreating}
-          className="w-full"
-        >
-          Tạo Team
-        </Button>
+        <div className="flex flex-wrap justify-end items-center gap-8">
+          <Button
+            type="button"
+            tabIndex={0}
+            variant={'destructive'}
+            onClick={() => router.back()}
+          >
+            Quay lại
+          </Button>
+          <Button
+            type="submit"
+            tabIndex={1}
+            disabled={isCreating}
+            isLoading={isCreating}
+          >
+            Tạo Team
+          </Button>
+        </div>
       </form>
     </Form>
   );

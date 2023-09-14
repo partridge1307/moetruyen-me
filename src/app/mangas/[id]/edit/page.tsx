@@ -47,7 +47,7 @@ const page: FC<pageProps> = async ({ params }) => {
   if (!manga) return notFound();
 
   return (
-    <main className="container lg:w-2/3 p-1 space-y-10 mb-10">
+    <main className="container lg:w-2/3 p-1 mb-10 space-y-10">
       <section className="p-3 rounded-md dark:bg-zinc-900/60">
         <EditManga manga={manga} tags={tags} />
       </section>

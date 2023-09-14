@@ -1,7 +1,6 @@
 import { getAuthSession } from '@/lib/auth';
 import { UploadMangaImage } from '@/lib/contabo';
 import { db } from '@/lib/db';
-import { normalizeText } from '@/lib/utils';
 import { MangaFormValidator } from '@/lib/validators/manga';
 import { Prisma } from '@prisma/client';
 
@@ -41,17 +40,8 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
     } else {
       image = img;
     }
-    let userSlug;
-    if (slug) {
-      userSlug = slug.trim();
-    } else {
-      userSlug = `${normalizeText(name)
-        .toLowerCase()
-        .slice(0, 32)
-        .trim()
-        .split(' ')
-        .join('-')}-${targetManga.id}`;
-    }
+
+    const userSlug = slug?.trim() ?? targetManga.slug;
 
     await db.manga.update({
       where: {

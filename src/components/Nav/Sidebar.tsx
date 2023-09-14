@@ -50,13 +50,13 @@ const Sidebar: FC<SidebarProps> = ({ session }) => {
           </section>
 
           <section className="space-y-10">
-            <Link
+            <a
               href={process.env.MAIN_URL!}
               className="flex justify-center items-center space-x-2 p-2 font-semibold text-lg rounded-md dark:bg-zinc-800"
             >
               <Home className="w-5 h-5" />
               <span>Trang chủ</span>
-            </Link>
+            </a>
 
             <SheetClose asChild>
               <Link

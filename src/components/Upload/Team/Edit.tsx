@@ -1,5 +1,6 @@
 'use client';
 
+import TeamImageSkeleton from '@/components/Skeleton/TeamImageSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Form } from '@/components/ui/Form';
 import { useCustomToast } from '@/hooks/use-custom-toast';
@@ -8,12 +9,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { Team } from '@prisma/client';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import TeamDescFormField from './TeamDescFormField';
-import TeamImageFormField from './TeamImageFormField';
 import TeamNameFormField from './TeamNameFormField';
+
+const TeamImageFormField = dynamic(() => import('./TeamImageFormField'), {
+  ssr: false,
+  loading: () => <TeamImageSkeleton />,
+});
 
 interface EditTeamProps {
   team: Pick<Team, 'image' | 'name' | 'description'>;
@@ -78,14 +84,24 @@ const EditTeam: FC<EditTeamProps> = ({ team }) => {
         <TeamNameFormField form={form} />
         <TeamDescFormField form={form} />
 
-        <Button
-          type="submit"
-          disabled={isEditing}
-          isLoading={isEditing}
-          className="w-full"
-        >
-          Chỉnh sửa
-        </Button>
+        <div className="flex flex-wrap justify-end items-center gap-8">
+          <Button
+            type="button"
+            tabIndex={0}
+            variant={'destructive'}
+            onClick={() => router.back()}
+          >
+            Quay lại
+          </Button>
+          <Button
+            type="submit"
+            tabIndex={1}
+            disabled={isEditing}
+            isLoading={isEditing}
+          >
+            Chỉnh sửa
+          </Button>
+        </div>
       </form>
     </Form>
   );

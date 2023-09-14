@@ -1,5 +1,10 @@
 'use client';
 
+import MangaAuthorSkeleton from '@/components/Skeleton/MangaAuthorSkeleton';
+import MangaImageSkeleton from '@/components/Skeleton/MangaImageSkeleton';
+import MangaTagSkeleton from '@/components/Skeleton/MangaTagSkeleton';
+import { Button } from '@/components/ui/Button';
+import { Form } from '@/components/ui/Form';
 import { useCustomToast } from '@/hooks/use-custom-toast';
 import { toast } from '@/hooks/use-toast';
 import { Tags } from '@/lib/query';
@@ -15,19 +20,18 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/Button';
-import { Form } from '@/components/ui/Form';
 import MangaAltNameForm from './MangaAltNameFormField';
 import MangaDescForm from './MangaDescFormField';
 import MangaDiscForm from './MangaDiscFormField';
 import MangaFBForm from './MangaFBFormField';
 import MangaNameForm from './MangaNameFormField';
 import MangaReviewForm from './MangaReviewFormField';
-import MangaImageFormField from './MangaImageFormField';
 import MangaSlugForm from './MangaSlugFormField';
-import MangaTagSkeleton from '@/components/Skeleton/MangaTagSkeleton';
-import MangaAuthorSkeleton from '@/components/Skeleton/MangaAuthorSkeleton';
 
+const MangaImageFormField = dynamic(() => import('./MangaImageFormField'), {
+  ssr: false,
+  loading: () => <MangaImageSkeleton />,
+});
 const MangaTagForm = dynamic(() => import('./MangaTagFormField'), {
   ssr: false,
   loading: () => <MangaTagSkeleton />,
@@ -170,14 +174,24 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
 
         <MangaDiscForm form={form} />
 
-        <Button
-          type="submit"
-          isLoading={isUpdatingManga}
-          disabled={isUpdatingManga}
-          className="w-full"
-        >
-          Cập nhật
-        </Button>
+        <div className="flex flex-wrap justify-end items-center gap-8">
+          <Button
+            type="button"
+            tabIndex={0}
+            variant={'destructive'}
+            onClick={() => router.back()}
+          >
+            Quay lại
+          </Button>
+          <Button
+            type="submit"
+            tabIndex={1}
+            isLoading={isUpdatingManga}
+            disabled={isUpdatingManga}
+          >
+            Cập nhật
+          </Button>
+        </div>
       </form>
     </Form>
   );

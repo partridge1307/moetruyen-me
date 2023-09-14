@@ -19,7 +19,7 @@ import {
   Trash,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 const DnDChapterImage = dynamic(() => import('@/components/DragAndDrop'), {
@@ -37,6 +37,9 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
   isUploading,
   initialImages = [],
 }) => {
+  const zipInputFef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
   const [images, setImages] =
     useState<{ src: string; name: string }[]>(initialImages);
 
@@ -68,10 +71,7 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
                     onClick={(e) => {
                       e.preventDefault();
 
-                      const target = document.getElementById(
-                        'add-image'
-                      ) as HTMLInputElement;
-                      target.click();
+                      imageInputRef.current?.click();
                     }}
                   >
                     <PlusCircle className="w-4 h-4" />
@@ -107,10 +107,7 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
                   onClick={(e) => {
                     e.preventDefault();
 
-                    const target = document.getElementById(
-                      'add-image'
-                    ) as HTMLInputElement;
-                    target.click();
+                    imageInputRef.current?.click();
                   }}
                 >
                   <PlusCircle className="w-5 h-5" />
@@ -123,10 +120,7 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
                   onClick={(e) => {
                     e.preventDefault();
 
-                    const target = document.getElementById(
-                      'add-zip-file'
-                    ) as HTMLInputElement;
-                    target.click();
+                    zipInputFef.current?.click();
                   }}
                 >
                   <FileArchive className="w-5 h-5" />
@@ -137,8 +131,11 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
 
             <FormControl>
               <input
-                id="add-image"
-                ref={field.ref}
+                ref={(e) => {
+                  field.ref(e);
+                  // @ts-ignore
+                  imageInputRef.current = e;
+                }}
                 multiple
                 type="file"
                 accept=".jpg, .png, .jpeg"
@@ -174,7 +171,7 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
       />
 
       <input
-        id="add-zip-file"
+        ref={zipInputFef}
         type="file"
         accept=".zip"
         className="hidden"

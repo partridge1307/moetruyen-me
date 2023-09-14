@@ -1,7 +1,13 @@
-import CreateTeam from '@/components/Upload/Team';
+import TeamUploadSkeleton from '@/components/Skeleton/TeamUploadSkeleton';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
+import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
+
+const CreateTeam = dynamic(() => import('@/components/Upload/Team'), {
+  ssr: false,
+  loading: () => <TeamUploadSkeleton />,
+});
 
 const page = async () => {
   const session = await getAuthSession();

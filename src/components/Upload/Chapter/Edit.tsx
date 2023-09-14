@@ -131,14 +131,24 @@ const ChapterEdit: FC<EditProps> = ({ chapter }) => {
             <Progress value={updateProgress} />
           ))}
 
-        <Button
-          type="submit"
-          isLoading={isEditting}
-          disabled={isEditting}
-          className="w-full"
-        >
-          Đăng
-        </Button>
+        <div className="flex flex-wrap justify-end items-center gap-8">
+          <Button
+            type="button"
+            tabIndex={0}
+            variant={'destructive'}
+            onClick={() => router.back()}
+          >
+            Quay lại
+          </Button>
+          <Button
+            type="submit"
+            tabIndex={1}
+            isLoading={isEditting}
+            disabled={isEditting}
+          >
+            Đăng
+          </Button>
+        </div>
       </form>
     </Form>
   );

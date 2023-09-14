@@ -1,3 +1,6 @@
+'use client';
+
+import ImageCropModal from '@/components/ImageCropModal';
 import {
   FormControl,
   FormField,
@@ -10,11 +13,6 @@ import { ImagePlus } from 'lucide-react';
 import Image from 'next/image';
 import { FC, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import dynamic from 'next/dynamic';
-
-const ImageCropModal = dynamic(() => import('@/components/ImageCropModal'), {
-  ssr: false,
-});
 
 interface TeamImageFormFieldProps {
   form: UseFormReturn<TeamPayload>;
@@ -22,6 +20,7 @@ interface TeamImageFormFieldProps {
 
 const TeamImageFormField: FC<TeamImageFormFieldProps> = ({ form }) => {
   const ref = useRef<HTMLInputElement>(null);
+  const imageCropRef = useRef<HTMLButtonElement>(null);
 
   return (
     <FormField
@@ -71,16 +70,14 @@ const TeamImageFormField: FC<TeamImageFormFieldProps> = ({ form }) => {
               ) {
                 field.onChange(URL.createObjectURL(e.target.files[0]));
 
-                const target = document.getElementById(
-                  'crop-modal-button'
-                ) as HTMLButtonElement;
-                target.click();
+                imageCropRef.current?.click();
                 e.target.value = '';
               }
             }}
           />
 
           <ImageCropModal
+            ref={imageCropRef}
             image={field.value}
             aspect={1 / 1}
             setImageCropped={field.onChange}

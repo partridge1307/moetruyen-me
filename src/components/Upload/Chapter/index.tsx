@@ -117,14 +117,24 @@ const ChapterUpload = ({ id }: { id: number }) => {
             <Progress value={uploadProgress} />
           ))}
 
-        <Button
-          type="submit"
-          isLoading={isChapterUpload}
-          disabled={isChapterUpload}
-          className="w-full"
-        >
-          Đăng
-        </Button>
+        <div className="flex flex-wrap justify-end items-center gap-8">
+          <Button
+            type="button"
+            tabIndex={0}
+            variant={'destructive'}
+            onClick={() => router.back()}
+          >
+            Quay lại
+          </Button>
+          <Button
+            type="submit"
+            tabIndex={1}
+            isLoading={isChapterUpload}
+            disabled={isChapterUpload}
+          >
+            Đăng
+          </Button>
+        </div>
       </form>
     </Form>
   );
