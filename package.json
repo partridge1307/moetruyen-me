@@ -28,7 +28,7 @@
     "@mantine/dropzone": "^6.0.20",
     "@mantine/hooks": "^6.0.20",
     "@plaiceholder/next": "^3.0.0",
-    "@prisma/client": "^5.2.0",
+    "@prisma/client": "^5.3.1",
     "@radix-ui/react-alert-dialog": "^1.0.4",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
     "@radix-ui/react-avatar": "^1.0.3",
@@ -60,7 +60,7 @@
     "jszip": "^3.10.1",
     "lexical": "^0.12.2",
     "lucide-react": "^0.274.0",
-    "next": "13.4.19",
+    "next": "^13.5.2",
     "next-auth": "^4.23.1",
     "plaiceholder": "^3.0.0",
     "postcss": "8.4.29",
@@ -86,7 +86,7 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "eslint": "8.49.0",
-    "prisma": "^5.2.0",
+    "prisma": "^5.3.1",
     "typescript": "5.2.2"
   }
 }
