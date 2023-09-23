@@ -101,6 +101,7 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
           <DropdownMenuItem>
             <a
               href={`${mainURL}/chapter/${chapter.id}`}
+              target="_blank"
               className="w-full h-full transition-colors hover:cursor-pointer hover:dark:bg-zinc-800"
             >
               Xem chapter

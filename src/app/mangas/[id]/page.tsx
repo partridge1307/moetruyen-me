@@ -148,6 +148,7 @@ const page: FC<pageProps> = async ({ params }) => {
               </Link>
               <a
                 href={`${process.env.MAIN_URL}/manga/${manga.slug}`}
+                target="_blank"
                 className={cn(buttonVariants(), 'gap-2')}
               >
                 <ArrowUpRightFromCircle className="w-5 h-5" /> Manga
