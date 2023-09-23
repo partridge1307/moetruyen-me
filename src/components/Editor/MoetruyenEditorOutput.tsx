@@ -16,7 +16,7 @@ import { FC } from 'react';
 import { theme } from '../Editor/Theme';
 import { ImageNode } from './nodes/Image';
 import { MentionNode } from './nodes/Mention';
-import { SteamNode } from './nodes/Steam';
+import { TiktokNode } from './nodes/Tiktok';
 import { YouTubeNode } from './nodes/Youtube';
 
 function onError(err: Error): void {
@@ -46,7 +46,7 @@ const MoetruyenEditorOutput: FC<MoetruyenEditorOutputProps> = ({
       MentionNode,
       QuoteNode,
       ImageNode,
-      SteamNode,
+      TiktokNode,
       YouTubeNode,
       LinkNode,
     ],

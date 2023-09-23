@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     const mangaCreated = await db.manga.create({
       data: {
         name,
-        slug: '',
+        slug: name,
         description: { ...description },
         review,
         image: '',

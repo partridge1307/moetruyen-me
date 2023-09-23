@@ -1,3 +1,7 @@
+import {
+  $createTiktokNode,
+  TiktokNode,
+} from '@/components/Editor/nodes/Tiktok';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
 import {
@@ -6,25 +10,24 @@ import {
   type LexicalCommand,
 } from 'lexical';
 import { useEffect } from 'react';
-import { $createSteamNode, SteamNode } from '../../nodes/Steam';
 
-export const INSERT_STEAM_COMMAND: LexicalCommand<string> = createCommand(
-  'INSERT_STEAM_COMMAND'
+export const INSERT_TIKTOK_COMMAND: LexicalCommand<string> = createCommand(
+  'INSERT_TIKTOK_COMMAND'
 );
 
-export default function SteamPlugin(): JSX.Element | null {
+export default function TiktokPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    if (!editor.hasNodes([SteamNode])) {
-      throw new Error('YouTubePlugin: YouTubeNode not registered on editor');
+    if (!editor.hasNodes([TiktokNode])) {
+      throw new Error('TiktokPlugin: TiktokNode not registered on editor');
     }
 
     return editor.registerCommand<string>(
-      INSERT_STEAM_COMMAND,
+      INSERT_TIKTOK_COMMAND,
       (payload) => {
-        const steamNode = $createSteamNode(payload);
-        $insertNodeToNearestRoot(steamNode);
+        const tiktokNode = $createTiktokNode(payload);
+        $insertNodeToNearestRoot(tiktokNode);
 
         return true;
       },

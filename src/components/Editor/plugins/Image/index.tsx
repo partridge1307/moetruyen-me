@@ -111,7 +111,6 @@ export function InsertImageUploaded({
     <>
       <Input
         type="file"
-        className="file:dark:bg-white file:rounded-md"
         accept=".jpg, .jpeg, .png"
         onChange={(e) => LoadImage(e.target.files)}
       />
@@ -190,7 +189,7 @@ export function ImageInputBody({
       <DropdownMenuTrigger type="button">
         <ImageIcon className="w-5 h-5" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex flex-col items-center gap-3 p-2 dark:bg-zinc-900 text-white">
+      <DropdownMenuContent className="flex flex-col items-center gap-3 dark:bg-zinc-900 text-white">
         <AlertDialog>
           <AlertDialogTrigger
             type="button"

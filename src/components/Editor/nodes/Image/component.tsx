@@ -39,36 +39,6 @@ function useSuspenseImage(src: string) {
   }
 }
 
-// matches ? (
-//   // eslint-disable-next-line @next/next/no-img-element
-//   <img
-//     className={className || undefined}
-//     src={src}
-//     alt={altText}
-//     ref={imageRef}
-//     style={{
-//       maxWidth: '100%',
-//       objectFit: 'contain',
-//     }}
-//     draggable="false"
-//   />
-// ) : (
-//   // eslint-disable-next-line @next/next/no-img-element
-//   <img
-//     className={className || undefined}
-//     src={src}
-//     alt={altText}
-//     ref={imageRef}
-//     style={{
-//       width,
-//       height,
-//       maxWidth: '100%',
-//       objectFit: 'contain',
-//     }}
-//     draggable="false"
-//   />
-// );
-
 function LazyImage({
   altText,
   className,
@@ -88,18 +58,19 @@ function LazyImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      width={width}
+      height={height}
       className={className || undefined}
       src={src}
       alt={altText}
       ref={imageRef}
       loading="lazy"
+      draggable={false}
       style={{
-        width,
-        height,
+        height: 'fit-content',
         maxWidth: '100%',
         objectFit: 'contain',
       }}
-      draggable="false"
     />
   );
 }

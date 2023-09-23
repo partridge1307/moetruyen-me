@@ -32,17 +32,27 @@ export function getSelectedNode(selection: RangeSelection) {
   }
 }
 
-function positionEditorElement(editor: any, rect: any) {
-  if (rect === null) {
-    editor.style.opacity = '0';
-    editor.style.top = '-1000px';
-    editor.style.left = '-1000px';
+function positionEditorElement(
+  editor: HTMLDivElement,
+  rect: DOMRect | undefined | null
+) {
+  if (rect === null || typeof rect === 'undefined') {
+    editor.style.display = 'none';
   } else {
-    editor.style.opacity = '1';
+    editor.style.display = 'block';
+
     editor.style.top = `${rect.top + rect.height + window.scrollY + 10}px`;
-    editor.style.left = `${
-      rect.left + window.scrollX - editor.offsetWidth / 2 + rect.width / 2
-    }px`;
+
+    const bodyClientDivided = document.body.clientWidth / 3;
+    const editorMarginLeftDivided = rect.left / 3 + editor.offsetWidth;
+
+    bodyClientDivided > editorMarginLeftDivided
+      ? (editor.style.left = `${
+          rect.left + window.scrollX - editor.offsetWidth / 2 + rect.width / 2
+        }px`)
+      : (editor.style.left = `${
+          rect.left - editor.offsetWidth + rect.width + window.scrollX
+        }px`);
   }
 }
 

@@ -26,9 +26,13 @@ export default function MaxLengthPlugin({
       }
       const prevEditorState = editor.getEditorState();
       const prevTextContentSize = prevEditorState.read(() =>
-        rootNode.getTextContentSize()
+        Buffer.byteLength(rootNode.getTextContent(), 'utf-8')
       );
-      const textContentSize = rootNode.getTextContentSize();
+      const textContentSize = Buffer.byteLength(
+        rootNode.getTextContent(),
+        'utf-8'
+      );
+
       if (prevTextContentSize !== textContentSize) {
         const delCount = textContentSize - maxLength;
         const anchor = selection.anchor;

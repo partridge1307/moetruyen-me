@@ -6,8 +6,8 @@ import {
 } from '@lexical/react/LexicalAutoEmbedPlugin';
 import { LexicalEditor } from 'lexical';
 import { createPortal } from 'react-dom';
+import { INSERT_TIKTOK_COMMAND } from '../Tiktok';
 import { INSERT_YOUTUBE_COMMAND } from '../Youtube';
-import { INSERT_STEAM_COMMAND } from '../Steam';
 
 interface MoetruyenEmbedConfig extends EmbedConfig {
   // Human readable name of the embeded content e.g. Tweet or Google Map.
@@ -41,17 +41,19 @@ const YoutubeEmbedConfig: MoetruyenEmbedConfig = {
   type: 'youtube-video',
 };
 
-const SteamEmbedConfig: MoetruyenEmbedConfig = {
-  contentName: 'Steam Game',
+const TiktokEmbedConfig: MoetruyenEmbedConfig = {
+  contentName: 'Video Tiktok',
 
   insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
-    editor.dispatchCommand(INSERT_STEAM_COMMAND, result.id);
+    editor.dispatchCommand(INSERT_TIKTOK_COMMAND, result.id);
   },
 
   // Determine if a given URL is a match and return url data.
   parseUrl: async (url: string) => {
     const match =
-      /^.*(https:\/\/)?store.steampowered.com\/app\/([0-9]*).*/.exec(url);
+      /^.*https:\/\/(?:m|www)\.tiktok\.com\/.*\b(?:(usr|v|embed|user|video)\/|\?shareId=)(\d+)/.exec(
+        url
+      );
 
     const id = match ? (match?.[2].length > 0 ? match[2] : null) : null;
 
@@ -65,10 +67,10 @@ const SteamEmbedConfig: MoetruyenEmbedConfig = {
     return null;
   },
 
-  type: 'steam-app',
+  type: 'tiktok-video',
 };
 
-const EmbedConfigs = [YoutubeEmbedConfig, SteamEmbedConfig];
+const EmbedConfigs = [YoutubeEmbedConfig, TiktokEmbedConfig];
 
 function AutoEmbedMenuItem({
   index,
