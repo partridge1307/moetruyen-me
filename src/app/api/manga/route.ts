@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { normalizeText } from '@/lib/utils';
 import { MangaFormValidator } from '@/lib/validators/manga';
 import { Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import { ZodError } from 'zod';
 
 export async function POST(req: Request) {
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
     const mangaCreated = await db.manga.create({
       data: {
         name,
-        slug: name,
+        slug: randomUUID(),
         description: { ...description },
         review,
         image: '',
