@@ -69,19 +69,21 @@ const TeamImageFormField: FC<TeamImageFormFieldProps> = ({ form }) => {
                 e.target.files[0].size < 4 * 1000 * 1000
               ) {
                 field.onChange(URL.createObjectURL(e.target.files[0]));
-
-                imageCropRef.current?.click();
                 e.target.value = '';
+
+                setTimeout(() => imageCropRef.current?.click(), 0);
               }
             }}
           />
 
-          <ImageCropModal
-            ref={imageCropRef}
-            image={field.value}
-            aspect={1 / 1}
-            setImageCropped={field.onChange}
-          />
+          {!!field.value && (
+            <ImageCropModal
+              ref={imageCropRef}
+              image={field.value}
+              aspect={1 / 1}
+              setImageCropped={field.onChange}
+            />
+          )}
         </FormItem>
       )}
     />

@@ -434,7 +434,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
             setAvatarURL(URL.createObjectURL(e.target.files[0]));
             e.target.value = '';
 
-            imageCropRef.current?.click();
+            setTimeout(() => imageCropRef.current?.click(), 0);
           }
         }}
       />
@@ -453,19 +453,21 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
             setBannerURL(URL.createObjectURL(e.target.files[0]));
             e.target.value = '';
 
-            imageCropRef.current?.click();
+            setTimeout(() => imageCropRef.current?.click(), 0);
           }
         }}
       />
 
-      <ImageCropModal
-        ref={imageCropRef}
-        image={currentTarget === 'AVATAR' ? avatarURL : bannerURL}
-        aspect={currentTarget === 'AVATAR' ? 1 / 1 : 16 / 9}
-        setImageCropped={
-          currentTarget === 'AVATAR' ? setAvatarURL : setBannerURL
-        }
-      />
+      {(!!avatarURL || !!bannerURL) && (
+        <ImageCropModal
+          ref={imageCropRef}
+          image={currentTarget === 'AVATAR' ? avatarURL : bannerURL}
+          aspect={currentTarget === 'AVATAR' ? 1 / 1 : 16 / 9}
+          setImageCropped={
+            currentTarget === 'AVATAR' ? setAvatarURL : setBannerURL
+          }
+        />
+      )}
     </>
   );
 };

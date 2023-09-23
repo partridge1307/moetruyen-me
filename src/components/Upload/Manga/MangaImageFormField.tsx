@@ -20,6 +20,7 @@ interface MangaImageFormFieldProps {
 }
 
 const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const imageCropRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -49,7 +50,7 @@ const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    imageCropRef.current?.click();
+                    imageInputRef.current?.click();
                   }}
                 />
               ) : (
@@ -59,10 +60,7 @@ const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    const target = document.getElementById(
-                      'add-image-input'
-                    ) as HTMLInputElement;
-                    target.click();
+                    imageInputRef.current?.click();
                   }}
                 >
                   <ImagePlus className="w-8 h-8" />
@@ -71,7 +69,7 @@ const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
             </AspectRatio>
           </FormControl>
           <input
-            id="add-image-input"
+            ref={imageInputRef}
             type="file"
             accept=".jpg, .jpeg, .png"
             className="hidden"
@@ -81,20 +79,20 @@ const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
                 e.target.files[0].size < 4 * 1000 * 1000
               ) {
                 field.onChange(URL.createObjectURL(e.target.files[0]));
-
-                const target = document.getElementById(
-                  'crop-modal-button'
-                ) as HTMLButtonElement;
-                target.click();
                 e.target.value = '';
+
+                setTimeout(() => imageCropRef.current?.click(), 0);
               }
             }}
           />
-          <ImageCropModal
-            image={field.value}
-            aspect={4 / 3}
-            setImageCropped={(value) => field.onChange(value)}
-          />
+          {!!field.value && (
+            <ImageCropModal
+              ref={imageCropRef}
+              image={field.value}
+              aspect={4 / 3}
+              setImageCropped={(value) => field.onChange(value)}
+            />
+          )}
         </FormItem>
       )}
     />
