@@ -73,7 +73,7 @@ function cropImage(image: HTMLImageElement, crop: PixelCrop) {
     image.naturalWidth,
     image.naturalHeight
   );
-  const res = canvas.toDataURL('image/jpeg');
+  const res = canvas.toDataURL('image/png');
   canvas.remove();
 
   return res;
