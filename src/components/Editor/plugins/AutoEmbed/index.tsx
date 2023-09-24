@@ -173,8 +173,11 @@ export default function AutoEmbedPlugin(): JSX.Element {
                 <div
                   className="typeahead-popover auto-embed-menu"
                   style={{
-                    marginLeft: anchorElementRef.current.style.width,
-                    width: 200,
+                    marginLeft: `${anchorElementRef.current.clientWidth / 2}px`,
+                    marginTop: `${
+                      anchorElementRef.current.clientHeight + 10
+                    }px`,
+                    width: 'max-content',
                   }}
                 >
                   <AutoEmbedMenu

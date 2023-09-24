@@ -61,7 +61,7 @@ export function FloatingLinkEditor({
 }: {
   editor: LexicalEditor;
 }): JSX.Element {
-  const editorRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mouseDownRef = useRef(false);
   const [linkUrl, setLinkUrl] = useState<string>('');
@@ -90,7 +90,6 @@ export function FloatingLinkEditor({
     if (editorElement === null) {
       return;
     }
-
     const rootElement = editor.getRootElement();
     if (
       selection !== null &&

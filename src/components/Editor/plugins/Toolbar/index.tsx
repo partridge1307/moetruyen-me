@@ -60,12 +60,6 @@ import { FloatingLinkEditor, getSelectedNode } from '../Link';
 
 const lowPriority = 1;
 
-export function FillURL() {
-  const srcfile = prompt('Enter the URL of the image:', '');
-
-  return srcfile;
-}
-
 const blockTypeToBlockName = {
   paragraph: 'Normal',
   quote: 'Quote',
@@ -196,6 +190,7 @@ const Toolbar = () => {
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1">
           <button
+            aria-label="bold format button"
             type="button"
             title="Ctrl + B"
             className={cn('p-1 rounded-md transition-colors', {
@@ -203,9 +198,10 @@ const Toolbar = () => {
             })}
             onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
           >
-            <Bold className="w-5 h-5" />
+            <Bold className="w-11 h-11 lg:w-5 lg:h-5" />
           </button>
           <button
+            aria-label="italic format button"
             type="button"
             title="Ctrl + I"
             className={cn('p-1 rounded-md transition-colors', {
@@ -215,9 +211,10 @@ const Toolbar = () => {
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')
             }
           >
-            <Italic className="w-5 h-5" />
+            <Italic className="w-11 h-11 lg:w-5 lg:h-5" />
           </button>
           <button
+            aria-label="underline format button"
             type="button"
             title="Ctrl + U"
             className={cn('p-1 rounded-md transition-colors', {
@@ -227,9 +224,10 @@ const Toolbar = () => {
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')
             }
           >
-            <Underline className="w-5 h-5" />
+            <Underline className="w-11 h-11 lg:w-5 lg:h-5" />
           </button>
           <button
+            aria-label="strikethrough format button"
             type="button"
             className={cn('p-1 rounded-md transition-colors', {
               'dark:bg-zinc-700': selectedInlineStyle.includes('strikethrough'),
@@ -238,11 +236,12 @@ const Toolbar = () => {
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
             }
           >
-            <Strikethrough className="w-5 h-5" />
+            <Strikethrough className="w-11 h-11 lg:w-5 lg:h-5" />
           </button>
           {blockType in blockTypeToBlockName && (
             <>
               <button
+                aria-label="list check format button"
                 type="button"
                 className={`p-1 rounded-md transition-colors ${
                   blockType === 'check' && 'dark:bg-zinc-700'
@@ -258,9 +257,10 @@ const Toolbar = () => {
                   }
                 }}
               >
-                <ListChecks className="w-5 h-5" />
+                <ListChecks className="w-11 h-11 lg:w-5 lg:h-5" />
               </button>
               <button
+                aria-label="quote format button"
                 type="button"
                 className={`p-1 rounded-md transition-colors ${
                   blockType === 'quote' && 'dark:bg-zinc-700'
@@ -276,7 +276,7 @@ const Toolbar = () => {
                   }
                 }}
               >
-                <Quote className="w-5 h-5" />
+                <Quote className="w-11 h-11 lg:w-5 lg:h-5" />
               </button>
             </>
           )}
@@ -285,7 +285,7 @@ const Toolbar = () => {
           <SelectTrigger
             aria-label="align button"
             type="button"
-            className="w-fit px-1 bg-transparent border-none focus:ring-transparent ring-offset-transparent"
+            className="max-sm:w-11 max-sm:h-12 w-fit px-1 bg-none border-none focus:ring-transparent ring-offset-transparent"
           >
             <SelectValue />
           </SelectTrigger>
@@ -297,7 +297,7 @@ const Toolbar = () => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
               }}
             >
-              <AlignLeft className="w-5 h-5" />
+              <AlignLeft className="w-12 h-12 lg:w-5 lg:h-5" />
             </SelectItem>
             <SelectItem
               value="center-align"
@@ -306,7 +306,7 @@ const Toolbar = () => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
               }}
             >
-              <AlignCenter className="w-5 h-5" />
+              <AlignCenter className="w-12 h-12 lg:w-5 lg:h-5" />
             </SelectItem>
             <SelectItem
               value="right-align"
@@ -315,18 +315,22 @@ const Toolbar = () => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
               }}
             >
-              <AlignRight className="w-5 h-5" />
+              <AlignRight className="w-12 h-12 lg:w-5 lg:h-5" />
             </SelectItem>
           </SelectContent>
         </Select>
         <ImageInputBody editor={editor} />
         <DropdownMenu>
           <DropdownMenuTrigger
+            aria-label="link insert button"
             type="button"
-            className={cn('transition-opacity', isLinkDisabled && 'opacity-50')}
+            className={cn(
+              'p-1 transition-opacity',
+              isLinkDisabled && 'opacity-50'
+            )}
             disabled={isLinkDisabled}
           >
-            <LinkIcon className="w-5 h-5" />
+            <LinkIcon className="w-11 h-11 lg:w-5 lg:h-5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <div className="flex items-center p-1 gap-2">
@@ -354,23 +358,25 @@ const Toolbar = () => {
 
       <div className="flex items-center gap-2 pr-2">
         <button
+          aria-label="undo button"
           type="button"
           title="Ctrl + Z"
           disabled={!canUndo}
-          className={cn('transition-opacity', !canUndo && 'opacity-50')}
+          className={cn('p-1 transition-opacity', !canUndo && 'opacity-50')}
           onClick={() => {
             editor.dispatchCommand(UNDO_COMMAND, undefined);
           }}
         >
-          <Undo className="w-5 h-5" />
+          <Undo className="w-11 h-11 lg:w-5 lg:h-5" />
         </button>
         <button
+          aria-label="redo button"
           type="button"
           disabled={!canRedo}
-          className={cn('transition-opacity', !canRedo && 'opacity-50')}
+          className={cn('p-1 transition-opacity', !canRedo && 'opacity-50')}
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         >
-          <Redo className="w-5 h-5" />
+          <Redo className="w-11 h-11 lg:w-5 lg:h-5" />
         </button>
       </div>
     </div>
