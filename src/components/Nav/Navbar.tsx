@@ -43,7 +43,7 @@ const Navbar = ({ session }: { session: Session }) => {
               <a
                 target="_blank"
                 href={`${process.env.MAIN_URL}/social`}
-                className={buttonVariants({ size: 'sm' })}
+                className={buttonVariants({ size: 'sm', variant: 'ghost' })}
               >
                 Cộng đồng
               </a>
