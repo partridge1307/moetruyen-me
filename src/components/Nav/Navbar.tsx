@@ -1,10 +1,11 @@
-import { FacebookIcon, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import type { Session } from 'next-auth';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Icons } from '../Icons';
-import ThemeChangeClient from '../ThemeChangeClient';
 import SignOutButton from '../SignOutButton';
+import ThemeChangeClient from '../ThemeChangeClient';
+import { buttonVariants } from '../ui/Button';
 
 const Sidebar = dynamic(() => import('./Sidebar'), {
   loading: () => <Menu aria-label="sidebar button" className="h-8 w-8" />,
@@ -39,12 +40,12 @@ const Navbar = ({ session }: { session: Session }) => {
 
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-4">
-              <a target="_blank" href="https://www.facebook.com/Bfangteam">
-                <FacebookIcon className="w-6 h-6" />
-              </a>
-
-              <a target="_blank" href="https://discord.gg/dongmoe">
-                <Icons.discord className="w-6 h-6 dark:fill-white" />
+              <a
+                target="_blank"
+                href={`${process.env.MAIN_URL}/social`}
+                className={buttonVariants({ size: 'sm' })}
+              >
+                Cộng đồng
               </a>
             </div>
             <SignOutButton />
