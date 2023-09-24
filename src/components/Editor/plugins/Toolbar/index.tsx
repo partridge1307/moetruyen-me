@@ -285,7 +285,7 @@ const Toolbar = () => {
           <SelectTrigger
             aria-label="align button"
             type="button"
-            className="max-sm:w-8 max-sm:h-8 w-fit px-1 bg-transparent border-none focus:ring-transparent ring-offset-transparent"
+            className="max-sm:h-8 w-fit px-1 bg-transparent border-none focus:ring-transparent ring-offset-transparent"
           >
             <SelectValue />
           </SelectTrigger>
@@ -293,7 +293,7 @@ const Toolbar = () => {
             <SelectItem
               value="left-align"
               className="cursor-pointer"
-              onMouseDown={() => {
+              onClick={() => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
               }}
             >
@@ -302,7 +302,7 @@ const Toolbar = () => {
             <SelectItem
               value="center-align"
               className="cursor-pointer"
-              onMouseDown={() => {
+              onClick={() => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
               }}
             >
@@ -311,7 +311,7 @@ const Toolbar = () => {
             <SelectItem
               value="right-align"
               className="cursor-pointer"
-              onMouseDown={() => {
+              onClick={() => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
               }}
             >
@@ -319,7 +319,9 @@ const Toolbar = () => {
             </SelectItem>
           </SelectContent>
         </Select>
+
         <ImageInputBody editor={editor} />
+
         <DropdownMenu>
           <DropdownMenuTrigger
             aria-label="link insert button"
@@ -341,7 +343,7 @@ const Toolbar = () => {
               />
               <DropdownMenuItem
                 disabled={linkInput === ''}
-                onSelect={() => {
+                onClick={() => {
                   insertLink(linkInput);
                   setLinkInput('');
                 }}
