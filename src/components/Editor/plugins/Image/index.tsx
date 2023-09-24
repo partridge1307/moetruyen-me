@@ -187,7 +187,7 @@ export function ImageInputBody({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger aria-label="image insert button" type="button">
-        <ImageIcon className="w-12 h-12 lg:w-5 lg:h-5" />
+        <ImageIcon className="w-8 h-8 md:w-5 md:h-5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="flex flex-col items-center gap-3 dark:bg-zinc-900 text-white">
         <AlertDialog>

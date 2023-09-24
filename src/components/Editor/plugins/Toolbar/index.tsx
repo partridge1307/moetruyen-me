@@ -186,7 +186,7 @@ const Toolbar = () => {
   );
 
   return (
-    <div className="overflow-auto flex justify-between gap-2">
+    <div className="overflow-auto flex justify-between gap-4 lg:gap-2">
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1">
           <button
@@ -198,7 +198,7 @@ const Toolbar = () => {
             })}
             onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
           >
-            <Bold className="w-11 h-11 lg:w-5 lg:h-5" />
+            <Bold className="w-8 h-8 md:w-5 md:h-5" />
           </button>
           <button
             aria-label="italic format button"
@@ -211,7 +211,7 @@ const Toolbar = () => {
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')
             }
           >
-            <Italic className="w-11 h-11 lg:w-5 lg:h-5" />
+            <Italic className="w-8 h-8 md:w-5 md:h-5" />
           </button>
           <button
             aria-label="underline format button"
@@ -224,7 +224,7 @@ const Toolbar = () => {
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')
             }
           >
-            <Underline className="w-11 h-11 lg:w-5 lg:h-5" />
+            <Underline className="w-8 h-8 md:w-5 md:h-5" />
           </button>
           <button
             aria-label="strikethrough format button"
@@ -236,7 +236,7 @@ const Toolbar = () => {
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
             }
           >
-            <Strikethrough className="w-11 h-11 lg:w-5 lg:h-5" />
+            <Strikethrough className="w-8 h-8 md:w-5 md:h-5" />
           </button>
           {blockType in blockTypeToBlockName && (
             <>
@@ -257,7 +257,7 @@ const Toolbar = () => {
                   }
                 }}
               >
-                <ListChecks className="w-11 h-11 lg:w-5 lg:h-5" />
+                <ListChecks className="w-8 h-8 md:w-5 md:h-5" />
               </button>
               <button
                 aria-label="quote format button"
@@ -276,7 +276,7 @@ const Toolbar = () => {
                   }
                 }}
               >
-                <Quote className="w-11 h-11 lg:w-5 lg:h-5" />
+                <Quote className="w-8 h-8 md:w-5 md:h-5" />
               </button>
             </>
           )}
@@ -285,7 +285,7 @@ const Toolbar = () => {
           <SelectTrigger
             aria-label="align button"
             type="button"
-            className="max-sm:w-11 max-sm:h-12 w-fit px-1 bg-none border-none focus:ring-transparent ring-offset-transparent"
+            className="max-sm:w-8 max-sm:h-8 w-fit px-1 bg-transparent border-none focus:ring-transparent ring-offset-transparent"
           >
             <SelectValue />
           </SelectTrigger>
@@ -297,7 +297,7 @@ const Toolbar = () => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
               }}
             >
-              <AlignLeft className="w-12 h-12 lg:w-5 lg:h-5" />
+              <AlignLeft className="w-8 h-8 md:w-5 md:h-5" />
             </SelectItem>
             <SelectItem
               value="center-align"
@@ -306,7 +306,7 @@ const Toolbar = () => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
               }}
             >
-              <AlignCenter className="w-12 h-12 lg:w-5 lg:h-5" />
+              <AlignCenter className="w-8 h-8 md:w-5 md:h-5" />
             </SelectItem>
             <SelectItem
               value="right-align"
@@ -315,7 +315,7 @@ const Toolbar = () => {
                 editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
               }}
             >
-              <AlignRight className="w-12 h-12 lg:w-5 lg:h-5" />
+              <AlignRight className="w-8 h-8 md:w-5 md:h-5" />
             </SelectItem>
           </SelectContent>
         </Select>
@@ -330,7 +330,7 @@ const Toolbar = () => {
             )}
             disabled={isLinkDisabled}
           >
-            <LinkIcon className="w-11 h-11 lg:w-5 lg:h-5" />
+            <LinkIcon className="w-8 h-8 md:w-5 md:h-5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <div className="flex items-center p-1 gap-2">
@@ -367,7 +367,7 @@ const Toolbar = () => {
             editor.dispatchCommand(UNDO_COMMAND, undefined);
           }}
         >
-          <Undo className="w-11 h-11 lg:w-5 lg:h-5" />
+          <Undo className="w-8 h-8 md:w-5 md:h-5" />
         </button>
         <button
           aria-label="redo button"
@@ -376,7 +376,7 @@ const Toolbar = () => {
           className={cn('p-1 transition-opacity', !canRedo && 'opacity-50')}
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         >
-          <Redo className="w-11 h-11 lg:w-5 lg:h-5" />
+          <Redo className="w-8 h-8 md:w-5 md:h-5" />
         </button>
       </div>
     </div>
