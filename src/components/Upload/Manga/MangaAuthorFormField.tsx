@@ -108,13 +108,13 @@ const MangaAuthorForm: FC<MangaAuthorFormProps> = ({ form, existAuthors }) => {
           <ul className="flex flex-wrap items-center gap-2">
             {!!authorInput.length && (
               <li
-                className={`flex items-center gap-x-2 rounded-md ${
+                className={`flex items-center gap-x-2 ${
                   authorSelected.some((a) => a.name === authorInput) && 'hidden'
                 }`}
               >
                 Thêm:{' '}
                 <span
-                  className="cursor-pointer bg-zinc-800 p-1"
+                  className="cursor-pointer p-1 rounded-md dark:bg-zinc-800"
                   onClick={() => {
                     if (!authorSelected.some((a) => a.name === authorInput)) {
                       form.setValue('author', [

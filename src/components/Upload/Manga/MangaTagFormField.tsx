@@ -1,8 +1,3 @@
-import { cn } from '@/lib/utils';
-import type { MangaUploadPayload, tagInfoProps } from '@/lib/validators/manga';
-import { Check, X } from 'lucide-react';
-import { FC, useState } from 'react';
-import type { UseFormReturn } from 'react-hook-form';
 import {
   Command,
   CommandEmpty,
@@ -18,12 +13,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/Form';
-import { Input } from '@/components/ui/Input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/Popover';
+import { cn } from '@/lib/utils';
+import type { MangaUploadPayload, tagInfoProps } from '@/lib/validators/manga';
+import { Check, X } from 'lucide-react';
+import { FC, useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 
 type Tags = {
   category: string;
@@ -76,7 +75,11 @@ const MangaTagForm: FC<MangaTagFormProps> = ({ form, tag, existTags }) => {
             </ul>
             <PopoverTrigger className="w-full">
               <FormControl>
-                <Input placeholder="Thể loại" />
+                <div className="relative h-10 rounded-md bg-background">
+                  <span className="absolute text-sm top-1/2 -translate-y-1/2 left-3 opacity-70">
+                    Thể loại
+                  </span>
+                </div>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent>

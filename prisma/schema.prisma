@@ -61,7 +61,7 @@ model User {
   id              String            @id @default(cuid())
   email           String            @unique
   password        String
-  role            Role              @default(USER)
+  permissions     Permission[]
   name            String?           @unique(sort: Asc)
   image           String?
   banner          String?
@@ -101,6 +101,7 @@ model User {
   @@index([followToId])
   @@index([email], type: Hash)
   @@index([name])
+  @@index([permissions])
 }
 
 model Badge {
@@ -507,4 +508,14 @@ enum Role {
   ADMIN
   MOD
   USER
+}
+
+enum Permission {
+  ADMINISTRATOR
+  MANAGE_MANGA
+  MANAGE_CHAPTER
+  MANAGE_FORUM
+  MANAGE_USER
+  MANAGE_BADGE
+  MANAGE_TEAM
 }
