@@ -34,7 +34,11 @@ export async function POST(req: Request, context: { params: { id: string } }) {
           id: session.user.id,
         },
         select: {
-          memberOnTeam: true,
+          team: {
+            select: {
+              id: true,
+            },
+          },
         },
       }),
     ]);
@@ -75,7 +79,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
     }
 
     let createdChapter;
-    if (user.memberOnTeam) {
+    if (user.team) {
       createdChapter = await db.chapter.create({
         data: {
           chapterIndex: index,
@@ -87,7 +91,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
             connect: { id: manga.id },
           },
           team: {
-            connect: { id: user.memberOnTeam.teamId },
+            connect: { id: user.team.id },
           },
         },
       });
@@ -206,7 +210,7 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     const session = await getAuthSession();
     if (!session) return new Response('Unauthorized', { status: 401 });
 
-    const [chapter, channel, member] = await db.$transaction([
+    const [chapter, channel] = await db.$transaction([
       db.chapter.findUniqueOrThrow({
         where: {
           id: +context.params.id,
@@ -234,6 +238,15 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
                       id: true,
                     },
                   },
+                  team: {
+                    select: {
+                      follows: {
+                        select: {
+                          id: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -249,27 +262,6 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
           roleId: true,
         },
       }),
-      db.memberOnTeam.findUnique({
-        where: {
-          userId: session.user.id,
-        },
-        select: {
-          team: {
-            select: {
-              follows: {
-                where: {
-                  NOT: {
-                    id: session.user.id,
-                  },
-                },
-                select: {
-                  id: true,
-                },
-              },
-            },
-          },
-        },
-      }),
     ]);
 
     if (chapter.isPublished)
@@ -281,7 +273,9 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     const chapterFollowUsersId = [
       ...chapter.manga.followedBy.map((user) => user.id),
       ...chapter.manga.creator.followedBy.map((user) => user.id),
-      ...(member ? member.team.follows.map((user) => user.id) : []),
+      ...(chapter.manga.creator.team
+        ? chapter.manga.creator.team.follows.map((user) => user.id)
+        : []),
     ];
 
     await db.$transaction([
