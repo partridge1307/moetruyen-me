@@ -26,6 +26,7 @@ model Account {
   user User @relation(fields: [userId], references: [id])
 
   @@unique([provider, providerAccountId])
+  @@index([provider, providerAccountId])
   @@index([userId])
 }
 
@@ -50,8 +51,9 @@ model VerificationToken {
 
 model VerifyList {
   userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
