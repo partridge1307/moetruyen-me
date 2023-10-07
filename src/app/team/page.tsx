@@ -3,10 +3,10 @@ import { buttonVariants } from '@/components/ui/Button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
 
 const TeamMember = dynamic(() => import('@/components/Team/TeamMember'), {
   loading: () => <Loader2 className="w-10 h-10 animate-spin" />,
@@ -25,39 +25,45 @@ const page = async () => {
   const session = await getAuthSession();
   if (!session) return redirect(`${process.env.MAIN_URL}/sign-in`);
 
-  const team = await db.memberOnTeam
-    .findUnique({
-      where: {
-        userId: session.user.id,
-      },
-    })
-    .team({
-      select: {
-        id: true,
-        image: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        owner: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-            color: true,
+  const user = await db.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      team: {
+        select: {
+          id: true,
+          image: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              color: true,
+            },
+          },
+          _count: {
+            select: {
+              member: true,
+              chapter: {
+                where: {
+                  isPublished: true,
+                },
+              },
+            },
           },
         },
-        _count: {
-          select: {
-            member: true,
-            chapter: true,
-          },
-        },
       },
-    });
+    },
+  });
+  if (!user) return notFound();
 
   return (
     <main className="container lg:w-2/3 p-2 rounded-md mb-6 dark:bg-zinc-900/60">
-      {!team ? (
+      {!user.team ? (
         <section className="min-h-[200px] flex flex-col justify-center items-center space-y-3">
           <p>
             Bạn chưa có Team nào. Hãy{' '}
@@ -75,17 +81,17 @@ const page = async () => {
             <TabsTrigger value="member">Thành viên</TabsTrigger>
             <TabsTrigger value="manga">Manga</TabsTrigger>
             <TabsTrigger value="chapter">Chapter</TabsTrigger>
-            {session.user.id === team.owner.id && (
+            {session.user.id === user.team.owner.id && (
               <TabsTrigger value="request">Request</TabsTrigger>
             )}
           </TabsList>
 
-          <TeamInfo team={team} sessionUserId={session.user.id} />
-          <TeamMember teamId={team.id} sessionUserId={session.user.id} />
-          <TeamManga teamId={team.id} />
-          <TeamChapter teamId={team.id} />
-          {session.user.id === team.owner.id && (
-            <JoinRequest teamId={team.id} ownerId={session.user.id} />
+          <TeamInfo team={user.team} sessionUserId={session.user.id} />
+          <TeamMember teamId={user.team.id} sessionUserId={session.user.id} />
+          <TeamManga teamId={user.team.id} />
+          <TeamChapter teamId={user.team.id} />
+          {session.user.id === user.team.owner.id && (
+            <JoinRequest teamId={user.team.id} ownerId={session.user.id} />
           )}
         </Tabs>
       )}

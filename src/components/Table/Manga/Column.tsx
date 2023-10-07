@@ -18,7 +18,7 @@ const DataTableRowAction = dynamic(() => import('./RowAction'), {
 
 export type MangaColumn = Pick<
   Manga,
-  'id' | 'name' | 'isPublished' | 'updatedAt'
+  'id' | 'name' | 'isPublished' | 'canPin' | 'updatedAt'
 >;
 
 export const columns: ColumnDef<MangaColumn>[] = [

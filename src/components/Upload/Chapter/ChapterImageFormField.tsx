@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/Form';
 import { ChapterUploadPayload } from '@/lib/validators/chapter';
 import { Dropzone } from '@mantine/dropzone';
+import type JSZip from 'jszip';
 import {
   ArrowUpFromLine,
   CircleOff,
@@ -19,7 +20,7 @@ import {
   Trash,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 const DnDChapterImage = dynamic(() => import('@/components/DragAndDrop'), {
@@ -39,6 +40,8 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
 }) => {
   const zipInputFef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const jszipRef = useRef<JSZip>(null);
+  const [isMounted, setMounted] = useState(false);
 
   const [images, setImages] =
     useState<{ src: string; name: string }[]>(initialImages);
@@ -46,6 +49,26 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
   useEffect(() => {
     form.setValue('image', images);
   }, [form, images]);
+
+  const initJSZip = useCallback(async () => {
+    const jszip = (await import('jszip')).default;
+    // @ts-expect-error
+    jszipRef.current = jszip;
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      await initJSZip();
+    };
+
+    if (isMounted) {
+      init();
+    }
+  }, [initJSZip, isMounted]);
 
   return (
     <>
@@ -177,27 +200,33 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
         className="hidden"
         onChange={async (e) => {
           if (e.target.files?.length) {
-            const JSZip = (await import('jszip')).default;
+            if (!jszipRef.current) return;
 
-            const blobFiles = await JSZip.loadAsync(e.target.files[0]).then(
-              async (zip) =>
-                await Promise.all(
-                  Object.keys(zip.files)
-                    .filter(
-                      (file) =>
-                        file.endsWith('.jpg') ||
-                        file.endsWith('.jpeg') ||
-                        file.endsWith('.png')
-                    )
-                    .map(async (fileName) => ({
-                      name: fileName,
-                      blob: new Blob(
-                        [await zip.files[fileName].async('blob')],
-                        { type: `image/${fileName.split('.').pop() ?? 'jpeg'}` }
-                      ),
-                    }))
-                )
-            );
+            const blobFiles = await jszipRef.current
+              .loadAsync(e.target.files[0])
+              .then(
+                async (zip) =>
+                  await Promise.all(
+                    Object.keys(zip.files)
+                      .filter(
+                        (file) =>
+                          file.endsWith('.jpg') ||
+                          file.endsWith('.jpeg') ||
+                          file.endsWith('.png')
+                      )
+                      .map(async (fileName) => ({
+                        name: fileName,
+                        blob: new Blob(
+                          [await zip.files[fileName].async('blob')],
+                          {
+                            type: `image/${
+                              fileName.split('.').pop() ?? 'jpeg'
+                            }`,
+                          }
+                        ),
+                      }))
+                  )
+              );
 
             setImages(
               blobFiles
@@ -219,31 +248,37 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
         accept={['image/png', 'image/jpeg', 'image/jpg', 'application/zip']}
         onDrop={async (files) => {
           if (files.some((file) => file.type === 'application/zip')) {
+            if (!jszipRef.current) return;
+
             const zipFiles = files.filter(
               (file) => file.type === 'application/zip'
             );
 
-            const JSZip = (await import('jszip')).default;
-
-            const blobFiles = await JSZip.loadAsync(zipFiles[0]).then(
-              async (zip) =>
-                await Promise.all(
-                  Object.keys(zip.files)
-                    .filter(
-                      (file) =>
-                        file.endsWith('.jpg') ||
-                        file.endsWith('.jpeg') ||
-                        file.endsWith('.png')
-                    )
-                    .map(async (fileName) => ({
-                      name: fileName,
-                      blob: new Blob(
-                        [await zip.files[fileName].async('blob')],
-                        { type: `image/${fileName.split('.').pop() ?? 'jpeg'}` }
-                      ),
-                    }))
-                )
-            );
+            const blobFiles = await jszipRef.current
+              .loadAsync(zipFiles[0])
+              .then(
+                async (zip) =>
+                  await Promise.all(
+                    Object.keys(zip.files)
+                      .filter(
+                        (file) =>
+                          file.endsWith('.jpg') ||
+                          file.endsWith('.jpeg') ||
+                          file.endsWith('.png')
+                      )
+                      .map(async (fileName) => ({
+                        name: fileName,
+                        blob: new Blob(
+                          [await zip.files[fileName].async('blob')],
+                          {
+                            type: `image/${
+                              fileName.split('.').pop() ?? 'jpeg'
+                            }`,
+                          }
+                        ),
+                      }))
+                  )
+              );
 
             setImages(
               blobFiles

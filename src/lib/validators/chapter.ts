@@ -70,6 +70,7 @@ export const ChapterFormEditValidator = zfd.formData({
         )
     )
     .refine((files) => files.length >= 1, 'Tối thiểu 1 ảnh'),
+  order: zfd.repeatableOfType(zfd.numeric(z.number().min(0))),
   volume: zfd.numeric(z.number().min(1, 'Volume phải lớn hơn 0')),
   chapterName: zfd
     .text(z.string().min(3, 'Tối thiểu 3 kí tự').max(125, 'Tối đa 125 kí tự'))

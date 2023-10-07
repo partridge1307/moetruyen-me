@@ -24,6 +24,7 @@ const page = async () => {
         id: true,
         name: true,
         isPublished: true,
+        canPin: true,
         updatedAt: true,
       },
     });

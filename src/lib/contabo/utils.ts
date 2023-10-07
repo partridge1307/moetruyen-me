@@ -1,24 +1,17 @@
-import type {
-  DeleteObjectCommand,
-  PutObjectCommand,
-  PutObjectCommandOutput,
-  S3Client,
-} from '@aws-sdk/client-s3';
 import type sharp from 'sharp';
 import { sleep } from '../utils';
 
-const sendCommand = async (
-  client: S3Client,
-  command: PutObjectCommand | DeleteObjectCommand,
+const sendCommand = async <T>(
+  func: () => Promise<T>,
   retry = 5
-): Promise<PutObjectCommandOutput> => {
+): Promise<T> => {
   try {
-    return await client.send(command);
+    return await func();
   } catch (error) {
-    if (retry && retry > 0) {
-      retry--;
+    if (retry || retry > 0) {
       await sleep(1.5);
-      return await sendCommand(client, command, retry);
+
+      return await sendCommand(func, retry - 1);
     } else throw error;
   }
 };
@@ -69,15 +62,13 @@ const generateName = (
   start: number,
   templateString: string
 ): string => {
-  let newName: string, num;
+  let num = start;
 
   if (isNaN(start)) {
     num = 1;
-    newName = `${currentName}_${num}`;
-  } else {
-    num = start;
-    newName = `${currentName}_${num}`;
   }
+
+  const newName = `${currentName}_${num}`;
 
   const existImage = existingImages.some((img) =>
     img.startsWith(`${templateString}/${newName}.webp`)

@@ -13,7 +13,7 @@ export async function getBase64(url: string) {
     const buffer = await res.arrayBuffer();
     const { base64 } = await getPlaiceholder(Buffer.from(buffer), {
       brightness: 0.4,
-      format: ['jpeg'],
+      format: ['webp'],
     });
 
     return base64;

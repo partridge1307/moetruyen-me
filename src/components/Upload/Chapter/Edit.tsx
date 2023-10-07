@@ -65,14 +65,18 @@ const ChapterEdit: FC<EditProps> = ({ chapter }) => {
       form.append('volume', `${volume}`);
       !!chapterName && form.append('chapterName', chapterName);
 
-      for (const img of image) {
-        if (!img.src.startsWith('blob')) {
-          form.append('images', img.src);
-        } else {
-          const blob = await fetch(img.src).then((res) => res.blob());
-          form.append('images', blob, img.name);
-        }
-      }
+      await Promise.all(
+        image.map(async (img, idx) => {
+          if (!img.src.startsWith('blob')) {
+            form.append('images', img.src);
+            form.append('order', `${idx}`);
+          } else {
+            const blob = await fetch(img.src).then((res) => res.blob());
+            form.append('images', blob, img.name);
+            form.append('order', `${idx}`);
+          }
+        })
+      );
 
       await axios.patch(`/api/chapter/${chapter.id}`, form, {
         onDownloadProgress(progressEvent) {

@@ -49,6 +49,7 @@ const DiscordLink: FC<DiscordLinkProps> = ({ account }) => {
   return (
     <section className="space-y-2">
       <h1 className="text-lg lg:text-xl font-semibold">Liên kết</h1>
+
       <div
         className={cn('flex items-center space-x-10 p-2 w-fit rounded-md', {
           'bg-red-700': !account.length,

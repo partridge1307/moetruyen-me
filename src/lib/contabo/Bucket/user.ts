@@ -1,7 +1,7 @@
-import sharp from 'sharp';
-import { generateKey, resizeImage, sendCommand } from '../utils';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
 import { contabo } from '../client';
+import { generateKey, resizeImage, sendCommand } from '../utils';
 
 const UploadUserImage = async (
   image: Blob,
@@ -10,7 +10,11 @@ const UploadUserImage = async (
   type: 'banner' | 'avatar'
 ) => {
   const arrayBuffer = await new Blob([image]).arrayBuffer();
-  const sharpImage = sharp(arrayBuffer).toFormat('webp').webp({ quality: 40 });
+  let sharpImage = sharp(arrayBuffer).toFormat('png').png({ quality: 40 });
+  sharpImage =
+    type === 'avatar'
+      ? sharpImage.toFormat('png').png({ quality: 40 })
+      : sharpImage.toFormat('webp').webp({ quality: 40 });
 
   const { width, height } = await sharpImage.metadata();
 
@@ -20,16 +24,20 @@ const UploadUserImage = async (
     height
   ).toBuffer();
 
-  const command = new PutObjectCommand({
-    Body: optimizedImage,
-    Bucket: 'user',
-    Key: `${type}/${userId}.webp`,
-  });
-
-  await sendCommand(contabo, command, 5);
+  await sendCommand(() =>
+    contabo.send(
+      new PutObjectCommand({
+        Body: optimizedImage,
+        Bucket: process.env.CB_BUCKET,
+        Key: `user/${type}/${userId}.${type === 'avatar' ? 'png' : 'webp'}`,
+      })
+    )
+  );
 
   const Key = generateKey(
-    `${process.env.IMG_DOMAIN}/user/${type}/${userId}.webp`,
+    `${process.env.IMG_DOMAIN}/user/${type}/${userId}.${
+      type === 'avatar' ? 'png' : 'webp'
+    }`,
     prevImage
   );
 

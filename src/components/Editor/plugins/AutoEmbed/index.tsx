@@ -28,7 +28,7 @@ const YoutubeEmbedConfig: MoetruyenEmbedConfig = {
 
     const id = match ? (match?.[2].length === 11 ? match[2] : null) : null;
 
-    if (id != null) {
+    if (id !== null) {
       return {
         id,
         url,
@@ -51,13 +51,13 @@ const TiktokEmbedConfig: MoetruyenEmbedConfig = {
   // Determine if a given URL is a match and return url data.
   parseUrl: async (url: string) => {
     const match =
-      /^.*https:\/\/(?:m|www)\.tiktok\.com\/.*\b(?:(usr|v|embed|user|video)\/|\?shareId=)(\d+)/.exec(
+      /^.*(?:https:\/\/)?(?:(?:m|www)\.)?tiktok\.com\/.*(?:(?:usr|v|embed|user|video)\/|\?shareId=|\&item_id=)(\d+)/.exec(
         url
       );
 
-    const id = match ? (match?.[2].length > 0 ? match[2] : null) : null;
+    const id = match ? (match?.[1].length > 0 ? match[1] : null) : null;
 
-    if (id != null) {
+    if (id !== null) {
       return {
         id,
         url,

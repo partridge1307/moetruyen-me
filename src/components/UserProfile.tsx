@@ -1,11 +1,6 @@
 'use client';
 
 import { AspectRatio } from '@/components/ui/AspectRatio';
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/HoverCard';
 import { Input } from '@/components/ui/Input';
 import {
   Select,
@@ -26,12 +21,22 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FC, useEffect, useRef, useState } from 'react';
 import ImageCropModal from './ImageCropModal';
+import UserBadge from './User/Badge';
 
 interface UserProfileProps {
   user: Pick<User, 'name' | 'color' | 'image' | 'banner'> & {
     badge: Badge[];
   };
 }
+
+type GradientColor = {
+  from: string;
+  to: string;
+};
+
+type NormalColor = {
+  color: string;
+};
 
 const UserProfile: FC<UserProfileProps> = ({ user }) => {
   const { update } = useSession();
@@ -52,14 +57,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
   const [username, setUsername] = useState<string>(user.name!);
 
   const [userColor, setUserColor] = useState(
-    user.color
-      ? (user.color as
-          | {
-              from: string;
-              to: string;
-            }
-          | { color: string })
-      : null
+    user.color ? (user.color as GradientColor | NormalColor) : null
   );
 
   const [hasChange, setHasChange] = useState(false);
@@ -214,7 +212,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                   src={avatarURL}
                   alt="Preview User Avatar"
                   role="button"
-                  className="object-cover object-top hover:cursor-pointer rounded-full border-4"
+                  className="object-cover object-top hover:cursor-pointer rounded-full border-4 dark:border-zinc-900 dark:bg-zinc-900"
                   onClick={(e) => {
                     e.preventDefault();
 
@@ -280,21 +278,18 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                         <span
                           className="block w-4 h-4 rounded-full animate-rainbow"
                           style={{
-                            backgroundImage:
-                              !!badge.color &&
-                              // @ts-ignore
-                              !!badge.color.from &&
-                              // @ts-ignore
-                              !!badge.color.to
-                                ? // @ts-ignore
-                                  `linear-gradient(to right, ${badge.color.from}, ${badge.color.to})`
-                                : undefined,
-                            backgroundColor:
-                              // @ts-ignore
-                              !!badge.color && !!badge.color.color
-                                ? // @ts-ignore
-                                  badge.color.color
-                                : undefined,
+                            ...(!!(badge.color as GradientColor).from &&
+                              !!(badge.color as GradientColor).to && {
+                                backgroundImage: `linear-gradient(to right, ${
+                                  (badge.color as GradientColor).from
+                                }, ${(badge.color as GradientColor).to}, ${
+                                  (badge.color as GradientColor).from
+                                }, ${(badge.color as GradientColor).to})`,
+                              }),
+                            ...(!!(badge.color as NormalColor).color && {
+                              backgroundColor: (badge.color as NormalColor)
+                                .color,
+                            }),
                           }}
                         />
                         <p>{badge.name}</p>
@@ -310,79 +305,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         <div className="py-10 pb-20 flex flex-wrap items-center gap-6">
           {!!user.badge.length &&
             user.badge.map((badge) => (
-              <HoverCard key={badge.id}>
-                <HoverCardTrigger
-                  aria-label="hover-badge-info"
-                  className="w-fit p-1 flex items-center gap-2 rounded-md dark:bg-zinc-800"
-                >
-                  <div className="w-10 h-10">
-                    <Image
-                      width={100}
-                      height={100}
-                      src={badge.image}
-                      alt={`${badge.name} Icon`}
-                    />
-                  </div>
-                  <p
-                    className="animate-rainbow bg-clip-text text-transparent"
-                    style={{
-                      backgroundImage:
-                        !!badge.color &&
-                        // @ts-ignore
-                        !!badge.color.from &&
-                        // @ts-ignore
-                        !!badge.color.to
-                          ? // @ts-ignore
-                            `linear-gradient(to right, ${badge.color.from}, ${badge.color.to})`
-                          : undefined,
-                      backgroundColor:
-                        // @ts-ignore
-                        !!badge.color && !!badge.color.color
-                          ? // @ts-ignore
-                            badge.color.color
-                          : undefined,
-                    }}
-                  >
-                    {badge.name}
-                  </p>
-                </HoverCardTrigger>
-
-                <HoverCardContent className="flex gap-4 p-2 dark:bg-zinc-800">
-                  <div className="w-16 h-16">
-                    <Image
-                      width={100}
-                      height={100}
-                      src={badge.image}
-                      alt={`${badge.name} Icon`}
-                    />
-                  </div>
-                  <div>
-                    <p
-                      className="animate-rainbow bg-clip-text text-transparent"
-                      style={{
-                        backgroundImage:
-                          !!badge.color &&
-                          // @ts-ignore
-                          !!badge.color.from &&
-                          // @ts-ignore
-                          !!badge.color.to
-                            ? // @ts-ignore
-                              `linear-gradient(to right, ${badge.color.from}, ${badge.color.to})`
-                            : undefined,
-                        backgroundColor:
-                          // @ts-ignore
-                          !!badge.color && !!badge.color.color
-                            ? // @ts-ignore
-                              badge.color.color
-                            : undefined,
-                      }}
-                    >
-                      {badge.name}
-                    </p>
-                    <p className="text-sm">{badge.description}</p>
-                  </div>
-                </HoverCardContent>
-              </HoverCard>
+              <UserBadge key={badge.id} badge={badge} />
             ))}
         </div>
 

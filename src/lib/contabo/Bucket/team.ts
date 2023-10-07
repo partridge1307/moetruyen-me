@@ -9,7 +9,7 @@ const UploadTeamImage = async (
   prevImage: string | null
 ) => {
   const arrayBuffer = await new Blob([image]).arrayBuffer();
-  const sharpImage = sharp(arrayBuffer).toFormat('webp').webp({ quality: 40 });
+  const sharpImage = sharp(arrayBuffer).toFormat('png').png({ quality: 40 });
 
   const { width, height } = await sharpImage.metadata();
 
@@ -19,16 +19,18 @@ const UploadTeamImage = async (
     height
   ).toBuffer();
 
-  const command = new PutObjectCommand({
-    Body: optimizedImage,
-    Bucket: 'team',
-    Key: `${teamId}.webp`,
-  });
-
-  await sendCommand(contabo, command, 5);
+  await sendCommand(() =>
+    contabo.send(
+      new PutObjectCommand({
+        Body: optimizedImage,
+        Bucket: process.env.CB_BUCKET,
+        Key: `team/${teamId}.png`,
+      })
+    )
+  );
 
   const Key = generateKey(
-    `${process.env.IMG_DOMAIN}/team/${teamId}.webp`,
+    `${process.env.IMG_DOMAIN}/team/${teamId}.png`,
     prevImage
   );
 

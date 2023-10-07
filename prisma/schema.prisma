@@ -53,55 +53,63 @@ model VerifyList {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 
-  @@id([userId])
   @@index([userId])
 }
 
 model User {
-  id              String            @id @default(cuid())
-  email           String            @unique
-  password        String
-  permissions     Permission[]
-  name            String?           @unique(sort: Asc)
-  image           String?
-  banner          String?
-  color           Json?
-  verified        Boolean           @default(false)
-  emailVerified   DateTime?
-  followToId      String?
-  isBanned        Boolean           @default(false)
-  muteExpires     DateTime?
-  createdAt       DateTime          @default(now())
+  id            String       @id @default(cuid())
+  email         String       @unique
+  password      String
+  permissions   Permission[]
+  name          String?      @unique(sort: Asc)
+  image         String?
+  banner        String?
+  color         Json?
+  verified      Boolean      @default(false)
+  emailVerified DateTime?
+  isBanned      Boolean      @default(false)
+  muteExpires   DateTime?
+  createdAt     DateTime     @default(now())
+  badge         Badge[]      @relation("BadgeToUser")
+  history       History[]
+  notifications Notify[]     @relation("toUser")
+  session       Session[]
+  account       Account[]
+
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
+
+  manga          Manga[]
+  mangaFollowing Manga[] @relation("userMangaFollow")
+
   subForum        SubForum[]
   subscription    Subscription[]
   post            Post[]
-  comment         Comment[]
-  commentVote     CommentVote[]
-  manga           Manga[]
-  memberOnTeam    MemberOnTeam?
-  messages        Message[]
-  notifications   Notify[]          @relation("toUser")
-  owner           Team?
-  follows         User[]            @relation("followTo")
-  badge           Badge[]           @relation("BadgeToUser")
-  conversation    Conversation[]    @relation("ConversationToUser")
-  history         History[]
-  mangaFollow     MangaFollow[]
-  isWaitVeify     VerifyList?
-  session         Session[]
-  teamJoinRequest TeamJoinRequest?
-  postComment     PostComment[]
   postVote        PostVote[]
+  postComment     PostComment[]
   postCommentVote PostCommentVote[]
-  account         Account[]
-  discordChannel  DiscordChannel?
 
-  followTo User? @relation("followTo", fields: [followToId], references: [id])
+  comment     Comment[]
+  commentVote CommentVote[]
 
-  @@index([followToId])
+  owner           Team?
+  teamFollowing   Team[]            @relation("userFollow")
+  teamId          Int?
+  team            Team?             @relation("teamMember", fields: [teamId], references: [id])
+  teamJoinRequest TeamJoinRequest[]
+
+  followedBy User[] @relation("userFollows")
+  following  User[] @relation("userFollows")
+
+  messages       Message[]
+  conversation   Conversation[]  @relation("ConversationToUser")
+  isWaitVeify    VerifyList?
+  discordChannel DiscordChannel?
+
   @@index([email], type: Hash)
   @@index([name])
   @@index([permissions])
+  @@index([teamId])
 }
 
 model Badge {
@@ -129,24 +137,14 @@ model Notify {
 
 // Team
 
-model MemberOnTeam {
-  userId String @unique
-  teamId Int
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id])
-
-  @@unique([userId, teamId])
-  @@index([teamId])
-  @@index([userId])
-}
-
 model TeamJoinRequest {
   id        Int      @id @default(autoincrement())
-  userId    String   @unique
+  userId    String
   teamId    Int
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  team      Team     @relation(fields: [teamId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
 
   @@unique([teamId, userId])
   @@index([userId])
@@ -154,19 +152,22 @@ model TeamJoinRequest {
 }
 
 model Team {
-  id              Int               @id @default(autoincrement())
-  image           String
-  name            String            @unique
-  description     String
-  ownerId         String            @unique
-  createdAt       DateTime          @default(now())
-  chapter         Chapter[]
-  member          MemberOnTeam[]
-  owner           User              @relation(fields: [ownerId], references: [id])
+  id          Int       @id @default(autoincrement())
+  image       String
+  name        String    @unique
+  description String
+  ownerId     String    @unique
+  createdAt   DateTime  @default(now())
+  chapter     Chapter[]
+
+  member          User[]            @relation("teamMember")
   teamJoinRequest TeamJoinRequest[]
+  follows         User[]            @relation("userFollow")
   dailyView       DailyView[]
   weeklyView      WeeklyView[]
   totalView       Int               @default(0)
+
+  owner User @relation(fields: [ownerId], references: [id])
 
   @@index([ownerId])
 }
@@ -181,6 +182,18 @@ model Tag {
   manga       Manga[] @relation("MangaToTag")
 }
 
+model MangaPin {
+  id        Int      @id @default(autoincrement())
+  mangaId   Int      @unique
+  chapterId Int
+  createdAt DateTime @default(now())
+
+  manga Manga @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+
+  @@unique([mangaId, chapterId])
+  @@index([mangaId, chapterId])
+}
+
 model Manga {
   id           Int           @id @default(autoincrement())
   slug         String        @unique
@@ -193,6 +206,7 @@ model Manga {
   discordLink  String?
   creatorId    String
   isPublished  Boolean       @default(false)
+  canPin       Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   chapter      Chapter[]
@@ -201,24 +215,16 @@ model Manga {
   author       MangaAuthor[] @relation("MangaToMangaAuthor")
   tags         Tag[]         @relation("MangaToTag")
   history      History[]
-  mangaFollow  MangaFollow[]
+  followedBy   User[]        @relation("userMangaFollow")
 
-  creator User @relation(fields: [creatorId], references: [id])
+  creator  User      @relation(fields: [creatorId], references: [id])
+  mangaPin MangaPin?
 
   @@unique([name, creatorId])
   @@index([creatorId])
   @@index([isPublished], type: Hash)
   @@index([slug])
   @@index([name])
-}
-
-model MangaFollow {
-  mangaId Int
-  userId  String
-  manga   Manga  @relation(fields: [mangaId], references: [id], onDelete: Cascade)
-  user    User   @relation(fields: [userId], references: [id])
-
-  @@id([mangaId, userId])
 }
 
 model MangaAuthor {
@@ -498,8 +504,7 @@ enum VoteType {
 }
 
 enum NotifyType {
-  CHAT
-  COMMENT
+  GENERAL
   FOLLOW
   SYSTEM
 }

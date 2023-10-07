@@ -74,17 +74,15 @@ export async function POST(req: Request, context: { params: { id: string } }) {
         return new Response('Forbidden', { status: 403 });
     }
 
-    const uploadedImages = await UploadChapterImage(images, manga.id, index);
-    const blurImages = await getImagesBase64(uploadedImages);
-
+    let createdChapter;
     if (user.memberOnTeam) {
-      await db.chapter.create({
+      createdChapter = await db.chapter.create({
         data: {
           chapterIndex: index,
           name: chapterName,
           volume,
-          images: uploadedImages,
-          blurImages,
+          images: [],
+          blurImages: [],
           manga: {
             connect: { id: manga.id },
           },
@@ -94,19 +92,36 @@ export async function POST(req: Request, context: { params: { id: string } }) {
         },
       });
     } else {
-      await db.chapter.create({
+      createdChapter = await db.chapter.create({
         data: {
           chapterIndex: index,
           name: chapterName,
           volume,
-          images: uploadedImages,
-          blurImages,
+          images: [],
+          blurImages: [],
           manga: {
             connect: { id: manga.id },
           },
         },
       });
     }
+
+    const uploadedImages = await UploadChapterImage(
+      images,
+      manga.id,
+      createdChapter.id
+    );
+    const blurImages = await getImagesBase64(uploadedImages);
+
+    await db.chapter.update({
+      where: {
+        id: createdChapter.id,
+      },
+      data: {
+        images: uploadedImages,
+        blurImages: blurImages,
+      },
+    });
 
     return new Response('OK');
   } catch (error) {
@@ -126,7 +141,7 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
     const session = await getAuthSession();
     if (!session) return new Response('Unauthorized', { status: 401 });
 
-    const { images, chapterIndex, chapterName, volume } =
+    const { images, order, chapterIndex, chapterName, volume } =
       ChapterFormEditValidator.parse(await req.formData());
 
     const chapter = await db.chapter.findUniqueOrThrow({
@@ -137,6 +152,7 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
         id: +context.params.id,
       },
       select: {
+        id: true,
         mangaId: true,
         images: true,
       },
@@ -144,10 +160,13 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
 
     const edittedImages = (
       await EditChapterImage(
-        images,
+        images.sort(
+          (a, b) =>
+            order.indexOf(images.indexOf(a)) - order.indexOf(images.indexOf(b))
+        ),
         chapter.images,
         chapter.mangaId,
-        chapterIndex
+        chapter.id
       )
     )
       .sort((a, b) => a.index - b.index)
@@ -187,7 +206,7 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     const session = await getAuthSession();
     if (!session) return new Response('Unauthorized', { status: 401 });
 
-    const [target, channel] = await db.$transaction([
+    const [chapter, channel, member] = await db.$transaction([
       db.chapter.findUniqueOrThrow({
         where: {
           id: +context.params.id,
@@ -203,6 +222,20 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
               id: true,
               name: true,
               isPublished: true,
+              followedBy: {
+                select: {
+                  id: true,
+                },
+              },
+              creator: {
+                select: {
+                  followedBy: {
+                    select: {
+                      id: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -216,45 +249,64 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
           roleId: true,
         },
       }),
+      db.memberOnTeam.findUnique({
+        where: {
+          userId: session.user.id,
+        },
+        select: {
+          team: {
+            select: {
+              follows: {
+                where: {
+                  NOT: {
+                    id: session.user.id,
+                  },
+                },
+                select: {
+                  id: true,
+                },
+              },
+            },
+          },
+        },
+      }),
     ]);
 
-    if (target.isPublished)
+    if (chapter.isPublished)
       return new Response('Already published', { status: 409 });
 
-    if (!target.manga.isPublished)
+    if (!chapter.manga.isPublished)
       return new Response('Manga must publish first', { status: 406 });
 
-    const [, usersFollow] = await db.$transaction([
+    const chapterFollowUsersId = [
+      ...chapter.manga.followedBy.map((user) => user.id),
+      ...chapter.manga.creator.followedBy.map((user) => user.id),
+      ...(member ? member.team.follows.map((user) => user.id) : []),
+    ];
+
+    await db.$transaction([
       db.chapter.update({
         where: {
-          id: target.id,
+          id: chapter.id,
         },
         data: {
           isPublished: true,
         },
       }),
-      db.mangaFollow.findMany({
-        where: {
-          mangaId: target.manga.id,
-        },
-        select: {
-          userId: true,
-        },
+      db.notify.createMany({
+        data: chapterFollowUsersId.map((toUserId) => ({
+          type: 'FOLLOW',
+          toUserId,
+          content: `${chapter.manga.name} đã ra Chapter mới rồi đó`,
+          endPoint: `${process.env.MAIN_URL}/chapter/${chapter.id}`,
+        })),
+        skipDuplicates: true,
       }),
     ]);
 
-    await db.notify.createMany({
-      data: usersFollow.map((user) => ({
-        type: 'FOLLOW',
-        toUserId: user.userId,
-        content: `${target.manga.name} đã ra Chapter mới rồi đó`,
-        endPoint: `/chapter/${target.id}`,
-      })),
-    });
-
     if (channel) {
       const token = signPublicToken({
-        id: target.id,
+        id: chapter.id,
         channelId: channel.channelId,
         roleId: channel.roleId,
       });

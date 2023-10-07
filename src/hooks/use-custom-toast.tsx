@@ -46,10 +46,10 @@ export const useCustomToast = () => {
         <a
           target="_blank"
           href="/verify-request"
-          className={cn(buttonVariants({ size: 'sm' }), 'p-2')}
+          className={cn(buttonVariants(), 'p-2')}
           onClick={() => dismiss()}
         >
-          <span className="text-sm w-16 text-center">Xác thực</span>
+          <span className="text-sm w-max">Xác thực</span>
         </a>
       ),
     });

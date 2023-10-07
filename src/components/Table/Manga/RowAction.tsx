@@ -28,7 +28,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 interface DataTableRowActionProps {
-  row: Row<Pick<Manga, 'id' | 'name' | 'isPublished' | 'updatedAt'>>;
+  row: Row<Pick<Manga, 'id' | 'name' | 'isPublished' | 'canPin' | 'updatedAt'>>;
 }
 
 function DataTableRowAction({ row }: DataTableRowActionProps) {
@@ -67,6 +67,42 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
     onSuccess: () => {
       refresh();
 
+      return successToast();
+    },
+  });
+
+  const { mutate: Pin, isLoading: isPinning } = useMutation({
+    mutationKey: ['pin-manga', manga.id],
+    mutationFn: async () => {
+      await axios.post(`/api/manga/${manga.id}`);
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 401) return loginToast();
+        if (err.response?.status === 404) return notFoundToast();
+        if (err.response?.status === 406)
+          return toast({
+            title: 'Không hợp lệ',
+            description: 'Phải có tối thiểu 1 chapter đã Publish',
+            variant: 'destructive',
+          });
+        if (err.response?.status === 405)
+          return toast({
+            title: 'Không hợp lệ',
+            description: 'Phải có Chapter đăng trong 2 ngày gần đây',
+            variant: 'destructive',
+          });
+        if (err.response?.status === 409)
+          return toast({
+            title: 'Không hợp lệ',
+            description: 'Vui lòng upload thêm Chapter để được ghim tiếp',
+            variant: 'destructive',
+          });
+      }
+
+      return serverErrorToast();
+    },
+    onSuccess: () => {
       return successToast();
     },
   });
@@ -112,6 +148,16 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
             Thông tin truyện
           </Link>
         </DropdownMenuItem>
+
+        {manga.canPin && (
+          <DropdownMenuItem
+            className="hover:cursor-pointer"
+            onClick={() => Pin()}
+            disabled={isPinning}
+          >
+            Ghim
+          </DropdownMenuItem>
+        )}
 
         {!manga.isPublished && (
           <AlertDialog>

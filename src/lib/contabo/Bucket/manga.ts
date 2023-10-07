@@ -19,13 +19,15 @@ const UploadMangaImage = async (
     height
   ).toBuffer();
 
-  const command = new PutObjectCommand({
-    Body: optimizedImage,
-    Bucket: 'manga',
-    Key: `${mangaId}/thumbnail.png`,
-  });
-
-  await sendCommand(contabo, command, 5);
+  await sendCommand(() =>
+    contabo.send(
+      new PutObjectCommand({
+        Body: optimizedImage,
+        Bucket: process.env.CB_BUCKET,
+        Key: `manga/${mangaId}/thumbnail.png`,
+      })
+    )
+  );
 
   const Key = generateKey(
     `${process.env.IMG_DOMAIN}/manga/${mangaId}/thumbnail.png`,

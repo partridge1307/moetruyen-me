@@ -81,11 +81,15 @@ module.exports = {
         },
         rainbow: {
           '0%, 100%': {
-            'background-size': '200% 200%',
-            'background-position': '0 0',
+            'background-size': '300% 100%',
+            'background-position': '200% 0',
           },
           '50%': {
-            'background-size': '200% 200%',
+            'background-size': '100% 100%',
+            'background-position': '0 0',
+          },
+          '25%, 75%': {
+            'background-size': '200% 100%',
             'background-position': '100% 0',
           },
         },

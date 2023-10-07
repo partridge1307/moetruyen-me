@@ -16,29 +16,31 @@ export async function POST(req: Request) {
       description,
     } = TeamFormValidator.parse(await req.formData());
 
-    const member = await db.memberOnTeam.findUnique({
-      where: {
-        userId: sesison.user.id,
-      },
-      select: {
-        userId: true,
-      },
-    });
-    if (member) return new Response('Existing Team', { status: 406 });
-
-    const createdTeam = await db.team.create({
-      data: {
-        image: '',
-        name,
-        description,
-        ownerId: sesison.user.id,
-        member: {
-          create: {
-            userId: sesison.user.id,
+    const [, createdTeam] = await db.$transaction([
+      db.user.findUniqueOrThrow({
+        where: {
+          id: sesison.user.id,
+          verified: true,
+          teamId: null,
+        },
+        select: {
+          id: true,
+        },
+      }),
+      db.team.create({
+        data: {
+          image: '',
+          name,
+          description,
+          ownerId: sesison.user.id,
+          member: {
+            connect: {
+              id: sesison.user.id,
+            },
           },
         },
-      },
-    });
+      }),
+    ]);
 
     let image;
     if (img instanceof File) {
@@ -58,6 +60,10 @@ export async function POST(req: Request) {
   } catch (error) {
     if (error instanceof ZodError) {
       return new Response('Invalid', { status: 422 });
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025')
+        return new Response('Not found', { status: 404 });
     }
 
     return new Response('Something went wrong', { status: 500 });
@@ -83,13 +89,16 @@ export async function PUT(req: Request) {
     });
 
     if (type === 'ACCEPT') {
-      const existingMember = await db.memberOnTeam.findUnique({
+      const user = await db.user.findUniqueOrThrow({
         where: {
-          userId,
+          id: userId,
+        },
+        select: {
+          teamId: true,
         },
       });
 
-      if (existingMember)
+      if (user.teamId)
         return new Response('User has joined to this or another Team', {
           status: 406,
         });
@@ -100,9 +109,11 @@ export async function PUT(req: Request) {
             userId,
           },
         }),
-        db.memberOnTeam.create({
+        db.user.update({
+          where: {
+            id: userId,
+          },
           data: {
-            userId,
             teamId: team.id,
           },
         }),

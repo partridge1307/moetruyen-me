@@ -7,28 +7,39 @@ interface UsernameProps extends HTMLAttributes<HTMLHeadElement> {
   className?: string;
 }
 
+type GrandientColor = {
+  from: string;
+  to: string;
+};
+
+type NormalColor = {
+  color: string;
+};
+
 const Username: FC<UsernameProps> = ({ user, className }) => {
+  const color = user.color as GrandientColor | NormalColor | null;
+
   return (
     <p
       className={cn(
         'font-semibold bg-clip-text animate-rainbow',
-        !!!user.color ? 'text-black dark:text-white' : 'text-transparent',
+        !color ? 'text-black dark:text-white' : 'text-transparent',
         className
       )}
       style={{
-        backgroundImage:
-          !!user.color && // @ts-ignore
-          !!user.color.from && // @ts-ignore
-          !!user.color.to
-            ? // @ts-ignore
-              `linear-gradient(to right, ${user.color.from}, ${user.color.to})`
-            : undefined,
-        backgroundColor:
-          !!user.color && // @ts-ignore
-          !!user.color.color
-            ? // @ts-ignore
-              user.color.color
-            : undefined,
+        ...(!!color &&
+          !!(color as GrandientColor).from &&
+          !!(color as GrandientColor).to && {
+            backgroundImage: `linear-gradient(to right, ${
+              (color as GrandientColor).from
+            }, ${(color as GrandientColor).to}, ${
+              (color as GrandientColor).from
+            }, ${(color as GrandientColor).to})`,
+          }),
+        ...(!!color &&
+          !!(color as NormalColor).color && {
+            backgroundColor: (color as NormalColor).color,
+          }),
       }}
     >
       {user.name}
