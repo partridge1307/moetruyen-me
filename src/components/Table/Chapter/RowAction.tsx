@@ -64,6 +64,12 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
             description: 'Bạn đã publish Chapter này rồi',
             variant: 'destructive',
           });
+        if (e.response?.status === 403)
+          return toast({
+            title: 'Không thể tìm thấy',
+            description: 'Không thể tìm thấy hoặc gửi tin nhắn tới Channel',
+            variant: 'destructive',
+          });
       }
 
       return serverErrorToast();

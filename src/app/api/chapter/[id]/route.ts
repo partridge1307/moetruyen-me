@@ -299,18 +299,30 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     ]);
 
     if (channel) {
-      const token = signPublicToken({
-        id: chapter.id,
+      const jwtKey = signPublicToken({
+        chapterId: chapter.id,
         channelId: channel.channelId,
         roleId: channel.roleId,
       });
 
-      fetch(`${process.env.SOCKET_URL}/api/v1/server`, {
+      const result = await fetch(`${process.env.BOT_SERVER}/discord/notify`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${jwtKey}`,
         },
       });
+
+      if (result.status !== 200) {
+        if (result.status === 401) throw new Error('Unauthozied jwt');
+        if (result.status === 403)
+          return new Response('Could not found target channel', {
+            status: 403,
+          });
+
+        return new Response('Something went wrong with Bot server', {
+          status: 503,
+        });
+      }
     }
 
     return new Response('OK');
