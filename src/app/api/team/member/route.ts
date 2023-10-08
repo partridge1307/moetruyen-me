@@ -16,23 +16,20 @@ export async function POST(req: Request) {
       },
     });
 
-    await db.memberOnTeam.findUniqueOrThrow({
-      where: {
-        userId_teamId: {
-          userId,
-          teamId: team.id,
+    await db.$transaction([
+      db.team.update({
+        where: {
+          id: team.id,
         },
-      },
-    });
-
-    await db.memberOnTeam.delete({
-      where: {
-        userId_teamId: {
-          userId,
-          teamId: team.id,
+        data: {
+          member: {
+            disconnect: {
+              id: userId,
+            },
+          },
         },
-      },
-    });
+      }),
+    ]);
 
     return new Response('OK');
   } catch (error) {
@@ -56,15 +53,6 @@ export async function PATCH(req: Request) {
     const team = await db.team.findUniqueOrThrow({
       where: {
         ownerId: session.user.id,
-      },
-    });
-
-    await db.memberOnTeam.findUniqueOrThrow({
-      where: {
-        userId_teamId: {
-          userId,
-          teamId: team.id,
-        },
       },
     });
 
@@ -94,9 +82,12 @@ export async function DELETE() {
     const session = await getAuthSession();
     if (!session) return new Response('Unauthorized', { status: 401 });
 
-    await db.memberOnTeam.delete({
+    await db.user.update({
       where: {
-        userId: session.user.id,
+        id: session.user.id,
+      },
+      data: {
+        teamId: null,
       },
     });
 

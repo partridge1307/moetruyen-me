@@ -28,7 +28,7 @@ const YoutubeEmbedConfig: MoetruyenEmbedConfig = {
 
     const id = match ? (match?.[2].length === 11 ? match[2] : null) : null;
 
-    if (id !== null) {
+    if (id != null) {
       return {
         id,
         url,
@@ -57,7 +57,7 @@ const TiktokEmbedConfig: MoetruyenEmbedConfig = {
 
     const id = match ? (match?.[1].length > 0 ? match[1] : null) : null;
 
-    if (id !== null) {
+    if (id != null) {
       return {
         id,
         url,

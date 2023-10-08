@@ -47,6 +47,7 @@ const roboto = Roboto({
   variable: '--font-roboto',
   preload: true,
   display: 'swap',
+  adjustFontFallback: true,
 });
 
 export default async function RootLayout({

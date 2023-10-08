@@ -3,6 +3,7 @@ import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import dynamic from 'next/dynamic';
 import { notFound, redirect } from 'next/navigation';
+
 const UserProfile = dynamic(() => import('@/components/UserProfile'), {
   ssr: false,
   loading: () => <UserProfileSkeleton />,
