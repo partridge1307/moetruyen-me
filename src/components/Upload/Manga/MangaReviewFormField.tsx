@@ -29,7 +29,11 @@ const MangaReviewForm: FC<MangaReviewFormProps> = ({ form }) => {
           </FormLabel>
           <FormMessage />
           <FormControl>
-            <Input placeholder="Nhập nội dung..." {...field} />
+            <Input
+              autoComplete="off"
+              placeholder="Nhập nội dung..."
+              {...field}
+            />
           </FormControl>
         </FormItem>
       )}
