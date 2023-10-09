@@ -16,31 +16,34 @@ export async function POST(req: Request) {
       description,
     } = TeamFormValidator.parse(await req.formData());
 
-    const [, createdTeam] = await db.$transaction([
-      db.user.findUniqueOrThrow({
-        where: {
-          id: sesison.user.id,
-          verified: true,
-          teamId: null,
-        },
-        select: {
-          id: true,
-        },
-      }),
-      db.team.create({
-        data: {
-          image: '',
-          name,
-          description,
-          ownerId: sesison.user.id,
-          member: {
-            connect: {
-              id: sesison.user.id,
-            },
+    const user = await db.user.findUniqueOrThrow({
+      where: {
+        id: sesison.user.id,
+        teamId: null,
+      },
+      select: {
+        id: true,
+        verified: true,
+      },
+    });
+
+    if (!user.verified) {
+      return new Response('Verify is required', { status: 409 });
+    }
+
+    const createdTeam = await db.team.create({
+      data: {
+        image: '',
+        name,
+        description,
+        ownerId: sesison.user.id,
+        member: {
+          connect: {
+            id: sesison.user.id,
           },
         },
-      }),
-    ]);
+      },
+    });
 
     let image;
     if (img instanceof File) {

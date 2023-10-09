@@ -4,7 +4,6 @@ import TeamImageSkeleton from '@/components/Skeleton/TeamImageSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Form } from '@/components/ui/Form';
 import { useCustomToast } from '@/hooks/use-custom-toast';
-import { toast } from '@/hooks/use-toast';
 import { TeamPayload, TeamValidator } from '@/lib/validators/team';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -21,7 +20,8 @@ const TeamImageFormField = dynamic(() => import('./TeamImageFormField'), {
 });
 
 const CreateTeam = () => {
-  const { loginToast, serverErrorToast, successToast } = useCustomToast();
+  const { loginToast, verifyToast, serverErrorToast, successToast } =
+    useCustomToast();
   const router = useRouter();
 
   const form = useForm<TeamPayload>({
@@ -49,12 +49,7 @@ const CreateTeam = () => {
     onError: (err) => {
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) return loginToast();
-        if (err.response?.status === 406)
-          return toast({
-            title: 'Không thể thực hiện',
-            description: 'Bạn đã Tạo hoặc Gia nhập Team khác rồi',
-            variant: 'destructive',
-          });
+        if (err.response?.status === 409) return verifyToast();
       }
 
       return serverErrorToast();

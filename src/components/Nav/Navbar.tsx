@@ -3,12 +3,16 @@ import type { Session } from 'next-auth';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Icons } from '../Icons';
-import SignOutButton from '../SignOutButton';
 import ThemeChangeClient from '../ThemeChangeClient';
 import { buttonVariants } from '../ui/Button';
 
 const Sidebar = dynamic(() => import('./Sidebar'), {
   loading: () => <Menu aria-label="sidebar button" className="h-8 w-8" />,
+});
+const SignOutDropdown = dynamic(() => import('@/components/SignOutDropdown'), {
+  loading: () => (
+    <div className="w-10 h-10 rounded-md animate-pulse bg-background" />
+  ),
 });
 
 const Navbar = ({ session }: { session: Session }) => {
@@ -39,16 +43,15 @@ const Navbar = ({ session }: { session: Session }) => {
           </div>
 
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-4">
-              <a
-                target="_blank"
-                href={`${process.env.MAIN_URL}/social`}
-                className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-              >
-                Cộng đồng
-              </a>
-            </div>
-            <SignOutButton />
+            <a
+              target="_blank"
+              href={`${process.env.MAIN_URL}/social`}
+              className={buttonVariants({ size: 'sm', variant: 'ghost' })}
+            >
+              Cộng đồng
+            </a>
+
+            <SignOutDropdown session={session} />
           </div>
         </div>
       </nav>

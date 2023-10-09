@@ -1,12 +1,19 @@
 'use client';
 
-import { LogOut } from 'lucide-react';
+import { mainURL } from '@/config';
 import { signOut } from 'next-auth/react';
+import { buttonVariants } from './ui/Button';
 
 const SignOutButton = () => {
   return (
-    <button onClick={() => signOut()}>
-      <LogOut className="w-6 h-6 text-red-500" />
+    <button
+      className={buttonVariants({
+        variant: 'destructive',
+        className: 'w-full',
+      })}
+      onClick={() => signOut({ callbackUrl: mainURL })}
+    >
+      Đăng xuất
     </button>
   );
 };
