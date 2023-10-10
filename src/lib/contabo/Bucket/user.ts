@@ -10,11 +10,7 @@ const UploadUserImage = async (
   type: 'banner' | 'avatar'
 ) => {
   const arrayBuffer = await new Blob([image]).arrayBuffer();
-  let sharpImage = sharp(arrayBuffer).toFormat('png').png({ quality: 40 });
-  sharpImage =
-    type === 'avatar'
-      ? sharpImage.toFormat('png').png({ quality: 40 })
-      : sharpImage.toFormat('webp').webp({ quality: 40 });
+  const sharpImage = sharp(arrayBuffer).toFormat('png').png({ quality: 40 });
 
   const { width, height } = await sharpImage.metadata();
 
@@ -29,15 +25,13 @@ const UploadUserImage = async (
       new PutObjectCommand({
         Body: optimizedImage,
         Bucket: process.env.CB_BUCKET,
-        Key: `user/${type}/${userId}.${type === 'avatar' ? 'png' : 'webp'}`,
+        Key: `user/${type}/${userId}.png`,
       })
     )
   );
 
   const Key = generateKey(
-    `${process.env.IMG_DOMAIN}/user/${type}/${userId}.${
-      type === 'avatar' ? 'png' : 'webp'
-    }`,
+    `${process.env.IMG_DOMAIN}/user/${type}/${userId}.png`,
     prevImage
   );
 
