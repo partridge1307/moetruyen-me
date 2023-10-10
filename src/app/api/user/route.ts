@@ -111,14 +111,17 @@ export async function PUT(req: Request) {
       },
     });
 
-    let avatar, banner;
+    let avatarPromise: Promise<string> | undefined,
+      bannerPromise: Promise<string> | undefined;
     if (avt instanceof File) {
-      avatar = await UploadUserImage(avt, user.image, user.id, 'avatar');
-    } else avatar = avt;
+      avatarPromise = UploadUserImage(avt, user.image, user.id, 'avatar');
+    }
 
     if (bnr instanceof File) {
-      banner = await UploadUserImage(bnr, user.banner, user.id, 'banner');
-    } else banner = bnr;
+      bannerPromise = UploadUserImage(bnr, user.banner, user.id, 'banner');
+    }
+
+    const [image, banner] = await Promise.all([avatarPromise, bannerPromise]);
 
     const updatedUser = await db.user.update({
       where: {
@@ -126,7 +129,7 @@ export async function PUT(req: Request) {
       },
       data: {
         name,
-        image: avatar,
+        image,
         banner,
         // @ts-ignore
         color: color ? color : user.color,
