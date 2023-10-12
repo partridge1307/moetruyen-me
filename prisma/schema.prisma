@@ -224,7 +224,6 @@ model Manga {
   @@unique([name, creatorId])
   @@index([creatorId])
   @@index([slug])
-  @@index([altName], type: Gin)
 }
 
 model MangaAuthor {
