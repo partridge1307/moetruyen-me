@@ -1,0 +1,15 @@
+.root {
+  background-color: rgb(24, 24, 27);
+  border-color: rgb(249, 115, 22);
+}
+
+.wrapper {
+  background-color: transparent;
+}
+
+.inner {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

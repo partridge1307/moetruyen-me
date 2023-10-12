@@ -1,6 +1,5 @@
 'use client';
 
-import { AspectRatio } from '@/components/ui/AspectRatio';
 import { Input } from '@/components/ui/Input';
 import {
   Select,
@@ -22,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { FC, useEffect, useRef, useState } from 'react';
 import ImageCropModal from './ImageCropModal';
 import UserBadge from './User/Badge';
+import { Button, buttonVariants } from './ui/Button';
 
 interface UserProfileProps {
   user: Pick<User, 'name' | 'color' | 'image' | 'banner'> & {
@@ -169,7 +169,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         }}
       >
         <div className="relative">
-          <AspectRatio ratio={16 / 9}>
+          <div className="relative aspect-video">
             {!!bannerURL ? (
               <Image
                 fill
@@ -199,10 +199,10 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                 <ImagePlus className="w-8 h-8" />
               </div>
             )}
-          </AspectRatio>
+          </div>
 
           <div className="absolute w-28 h-28 lg:w-36 lg:h-36 bottom-0 translate-y-1/2 left-4 lg:left-6">
-            <AspectRatio ratio={1 / 1}>
+            <div className="relative aspect-square">
               {!!avatarURL ? (
                 <Image
                   fill
@@ -212,7 +212,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                   src={avatarURL}
                   alt="Preview User Avatar"
                   role="button"
-                  className="object-cover object-top hover:cursor-pointer rounded-full border-4 dark:border-zinc-900 dark:bg-zinc-900"
+                  className="object-cover object-top hover:cursor-pointer rounded-full border-8 dark:border-zinc-900 dark:bg-zinc-900"
                   onClick={(e) => {
                     e.preventDefault();
 
@@ -222,7 +222,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
               ) : (
                 <div
                   role="button"
-                  className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-full border-4 dark:bg-zinc-900"
+                  className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-full border-8 dark:bg-zinc-900"
                   onClick={(e) => {
                     e.preventDefault();
 
@@ -232,7 +232,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                   <ImagePlus className="w-5 lg:w-6 h-5 lg:h-6" />
                 </div>
               )}
-            </AspectRatio>
+            </div>
           </div>
         </div>
 
@@ -312,32 +312,38 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         {hasChange && (
           <div className="absolute bottom-0 inset-x-0 flex justify-end items-center gap-6 p-3 px-4 rounded-lg dark:bg-zinc-900/70">
             <button
-              tabIndex={0}
-              aria-label="cancel"
               type="button"
+              aria-label="cancel"
+              tabIndex={0}
               disabled={isUpdating}
-              className={cn('hover:underline underline-offset-2', {
-                'opacity-50': isUpdating,
-              })}
+              className={cn(
+                'hover:underline underline-offset-2',
+                {
+                  'opacity-50': isUpdating,
+                },
+                buttonVariants({ variant: 'ghost', size: 'sm' })
+              )}
               onClick={() => onResetHandler()}
             >
               Hủy
             </button>
-            <button
-              tabIndex={1}
-              aria-label="submit"
-              form="profile-update-form"
-              disabled={isUpdating}
+            <Button
+              size={'sm'}
               type="submit"
+              form="profile-update-form"
+              aria-label="submit"
+              tabIndex={1}
+              disabled={isUpdating}
+              isLoading={isUpdating}
               className={cn(
-                'w-20 p-1 px-2 rounded-md bg-green-700 hover:bg-green-900',
+                'w-20 rounded-md text-white bg-green-700 hover:bg-green-900',
                 {
                   'opacity-50': isUpdating,
                 }
               )}
             >
               Sửa
-            </button>
+            </Button>
           </div>
         )}
       </form>

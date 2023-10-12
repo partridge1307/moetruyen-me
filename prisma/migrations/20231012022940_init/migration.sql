@@ -1,6 +1,3 @@
--- CreateExtension
-CREATE EXTENSION pg_trgm;
-
 -- CreateEnum
 CREATE TYPE "VoteType" AS ENUM ('UP_VOTE', 'DOWN_VOTE');
 
@@ -151,7 +148,7 @@ CREATE TABLE "Manga" (
     "image" TEXT NOT NULL,
     "description" JSONB NOT NULL,
     "review" TEXT NOT NULL,
-    "altName" TEXT,
+    "altName" TEXT[],
     "facebookLink" TEXT,
     "discordLink" TEXT,
     "creatorId" TEXT NOT NULL,
@@ -402,7 +399,7 @@ CREATE TABLE "_ConversationToUser" (
 );
 
 -- CreateIndex
-CREATE INDEX "Account_provider_providerAccountId_idx" ON "Account"("provider", "providerAccountId");
+CREATE INDEX "Account_providerAccountId_provider_idx" ON "Account"("providerAccountId", "provider");
 
 -- CreateIndex
 CREATE INDEX "Account_userId_idx" ON "Account"("userId");
@@ -441,13 +438,7 @@ CREATE UNIQUE INDEX "User_name_key" ON "User"("name" ASC);
 CREATE INDEX "User_email_idx" ON "User" USING HASH ("email");
 
 -- CreateIndex
-CREATE INDEX "User_permissions_idx" ON "User"("permissions");
-
--- CreateIndex
 CREATE INDEX "User_teamId_idx" ON "User"("teamId");
-
--- CreateIndex
-CREATE INDEX "User_name_idx" ON "User" USING GIN ("name" gin_trgm_ops);
 
 -- CreateIndex
 CREATE INDEX "Notify_toUserId_idx" ON "Notify"("toUserId");
@@ -489,13 +480,7 @@ CREATE UNIQUE INDEX "Manga_slug_key" ON "Manga"("slug");
 CREATE INDEX "Manga_creatorId_idx" ON "Manga"("creatorId");
 
 -- CreateIndex
-CREATE INDEX "Manga_isPublished_idx" ON "Manga" USING HASH ("isPublished");
-
--- CreateIndex
 CREATE INDEX "Manga_slug_idx" ON "Manga"("slug");
-
--- CreateIndex
-CREATE INDEX "Manga_name_idx" ON "Manga" USING GIN ("name" gin_trgm_ops);
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Manga_name_creatorId_key" ON "Manga"("name", "creatorId");
@@ -513,25 +498,19 @@ CREATE INDEX "Chapter_mangaId_idx" ON "Chapter"("mangaId");
 CREATE INDEX "Chapter_teamId_idx" ON "Chapter"("teamId");
 
 -- CreateIndex
-CREATE INDEX "Chapter_isPublished_idx" ON "Chapter" USING HASH ("isPublished");
-
--- CreateIndex
 CREATE INDEX "Comment_authorId_idx" ON "Comment"("authorId");
-
--- CreateIndex
-CREATE INDEX "Comment_chapterId_idx" ON "Comment"("chapterId");
 
 -- CreateIndex
 CREATE INDEX "Comment_mangaId_idx" ON "Comment"("mangaId");
 
 -- CreateIndex
+CREATE INDEX "Comment_chapterId_idx" ON "Comment"("chapterId");
+
+-- CreateIndex
 CREATE INDEX "Comment_replyToId_idx" ON "Comment"("replyToId");
 
 -- CreateIndex
-CREATE INDEX "CommentVote_userId_commentId_idx" ON "CommentVote"("userId", "commentId");
-
--- CreateIndex
-CREATE INDEX "CommentVote_commentId_idx" ON "CommentVote"("commentId");
+CREATE INDEX "CommentVote_commentId_userId_idx" ON "CommentVote"("commentId", "userId");
 
 -- CreateIndex
 CREATE INDEX "View_mangaId_idx" ON "View"("mangaId");
@@ -561,9 +540,6 @@ CREATE INDEX "History_userId_idx" ON "History"("userId");
 CREATE INDEX "History_mangaId_idx" ON "History"("mangaId");
 
 -- CreateIndex
-CREATE INDEX "History_chapterId_idx" ON "History"("chapterId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "History_userId_mangaId_key" ON "History"("userId", "mangaId");
 
 -- CreateIndex
@@ -591,9 +567,6 @@ CREATE INDEX "SubForum_creatorId_idx" ON "SubForum"("creatorId");
 CREATE INDEX "SubForum_slug_idx" ON "SubForum"("slug");
 
 -- CreateIndex
-CREATE INDEX "SubForum_name_idx" ON "SubForum" USING GIN ("title" gin_trgm_ops);
-
--- CreateIndex
 CREATE INDEX "Post_subForumId_idx" ON "Post"("subForumId");
 
 -- CreateIndex
@@ -612,13 +585,7 @@ CREATE INDEX "PostComment_replyToId_idx" ON "PostComment"("replyToId");
 CREATE INDEX "PostVote_userId_postId_idx" ON "PostVote"("userId", "postId");
 
 -- CreateIndex
-CREATE INDEX "PostVote_userId_idx" ON "PostVote"("userId");
-
--- CreateIndex
-CREATE INDEX "PostCommentVote_userId_postCommentId_idx" ON "PostCommentVote"("userId", "postCommentId");
-
--- CreateIndex
-CREATE INDEX "PostCommentVote_userId_idx" ON "PostCommentVote"("userId");
+CREATE INDEX "PostCommentVote_postCommentId_userId_idx" ON "PostCommentVote"("postCommentId", "userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_userFollows_AB_unique" ON "_userFollows"("A", "B");

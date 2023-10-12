@@ -27,7 +27,7 @@ model Account {
   user User @relation(fields: [userId], references: [id])
 
   @@unique([provider, providerAccountId])
-  @@index([provider, providerAccountId])
+  @@index([providerAccountId, provider])
   @@index([userId])
 }
 
@@ -110,9 +110,7 @@ model User {
   discordChannel DiscordChannel?
 
   @@index([email], type: Hash)
-  @@index([permissions])
   @@index([teamId])
-  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "User_name_idx")
 }
 
 model Badge {
@@ -204,7 +202,7 @@ model Manga {
   image        String
   description  Json
   review       String
-  altName      String?
+  altName      String[]
   facebookLink String?
   discordLink  String?
   creatorId    String
@@ -225,9 +223,8 @@ model Manga {
 
   @@unique([name, creatorId])
   @@index([creatorId])
-  @@index([isPublished], type: Hash)
   @@index([slug])
-  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "Manga_name_idx")
+  @@index([altName], type: Gin)
 }
 
 model MangaAuthor {
@@ -260,7 +257,6 @@ model Chapter {
 
   @@index([mangaId])
   @@index([teamId])
-  @@index([isPublished], type: Hash)
 }
 
 model Comment {
@@ -281,8 +277,8 @@ model Comment {
   replyTo Comment? @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
-  @@index([chapterId])
   @@index([mangaId])
+  @@index([chapterId])
   @@index([replyToId])
 }
 
@@ -295,8 +291,7 @@ model CommentVote {
   user    User    @relation(fields: [userId], references: [id])
 
   @@id([userId, commentId])
-  @@index([userId, commentId])
-  @@index([commentId])
+  @@index([commentId, userId])
 }
 
 model View {
@@ -357,7 +352,6 @@ model History {
   @@unique([userId, mangaId])
   @@index([userId])
   @@index([mangaId])
-  @@index([chapterId])
 }
 
 model DiscordChannel {
@@ -422,7 +416,6 @@ model SubForum {
 
   @@index([creatorId])
   @@index([slug])
-  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, name: "SubForum_name_idx")
 }
 
 model Subscription {
@@ -485,7 +478,6 @@ model PostVote {
 
   @@id([userId, postId])
   @@index([userId, postId])
-  @@index([userId])
 }
 
 model PostCommentVote {
@@ -497,8 +489,7 @@ model PostCommentVote {
   postComment PostComment @relation(fields: [postCommentId], references: [id], onDelete: Cascade)
 
   @@id([userId, postCommentId])
-  @@index([userId, postCommentId])
-  @@index([userId])
+  @@index([postCommentId, userId])
 }
 
 enum VoteType {

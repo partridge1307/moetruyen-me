@@ -23,16 +23,10 @@ interface TwoFactFormProps {
   // eslint-disable-next-line no-unused-vars
   setActive: (value: number) => void;
   // eslint-disable-next-line no-unused-vars
-  setDataUri: (value: string) => void;
-  // eslint-disable-next-line no-unused-vars
   setKeyUri: (value: string) => void;
 }
 
-const TwoFactForm: FC<TwoFactFormProps> = ({
-  setActive,
-  setDataUri,
-  setKeyUri,
-}) => {
+const TwoFactForm: FC<TwoFactFormProps> = ({ setActive, setKeyUri }) => {
   const { loginToast, notFoundToast, serverErrorToast } = useCustomToast();
 
   const form = useForm<TwoFactorPayload>({
@@ -64,7 +58,6 @@ const TwoFactForm: FC<TwoFactFormProps> = ({
       return serverErrorToast();
     },
     onSuccess: (data) => {
-      setDataUri(data.dataUri);
       setKeyUri(data.keyUri);
       return setActive(1);
     },

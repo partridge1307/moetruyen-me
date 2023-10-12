@@ -9,7 +9,9 @@ import {
   FormMessage,
 } from '@/components/ui/Form';
 import { ChapterUploadPayload } from '@/lib/validators/chapter';
+import classes from '@/styles/mantine/dropzone.module.css';
 import { Dropzone } from '@mantine/dropzone';
+import '@mantine/dropzone/styles.layer.css';
 import type JSZip from 'jszip';
 import {
   ArrowUpFromLine,
@@ -161,7 +163,7 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
                 }}
                 multiple
                 type="file"
-                accept=".jpg, .png, .jpeg"
+                accept="image/jpg, image/png, image/jpeg"
                 className="hidden"
                 onChange={(e) => {
                   if (e.target.files?.length) {
@@ -196,7 +198,7 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
       <input
         ref={zipInputFef}
         type="file"
-        accept=".zip"
+        accept="application/zip"
         className="hidden"
         onChange={async (e) => {
           if (e.target.files?.length) {
@@ -246,6 +248,7 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
         multiple
         maxSize={4000000}
         accept={['image/png', 'image/jpeg', 'image/jpg', 'application/zip']}
+        classNames={classes}
         onDrop={async (files) => {
           if (files.some((file) => file.type === 'application/zip')) {
             if (!jszipRef.current) return;
@@ -297,44 +300,23 @@ const ChapterImageFormField: FC<ChapterImageFormFieldProps> = ({
             setImages(blobImages);
           }
         }}
-        styles={{
-          wrapper: {
-            '&': {
-              backgroundColor: 'transparent',
-            },
-          },
-          root: {
-            'html.dark &': {
-              backgroundColor: 'rgb(24, 24, 27)',
-              borderColor: 'rgb(249, 115, 22)',
-            },
-          },
-          inner: {
-            '&': {
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            },
-          },
-        }}
       >
         <Dropzone.Accept>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 dark:text-white">
             <ArrowUpFromLine className="w-6 h-6" />
             <p>Kéo ảnh vào khu vực này</p>
           </div>
         </Dropzone.Accept>
 
         <Dropzone.Reject>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-red-500">
             <CircleOff className="w-6 h-6 text-red-500" />
             <p>Ảnh không hợp lệ</p>
           </div>
         </Dropzone.Reject>
 
         <Dropzone.Idle>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 dark:text-white">
             <Loader className="w-6 h-6 animate-spin" />
             <p>Đang nhận ảnh</p>
           </div>

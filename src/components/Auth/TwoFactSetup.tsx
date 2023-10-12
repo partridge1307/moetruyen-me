@@ -1,11 +1,14 @@
 'use client';
 
+import classes from '@/styles/mantine/stepper.module.css';
 import { Stepper } from '@mantine/core';
+import '@mantine/core/styles.layer.css';
 import { useMediaQuery } from '@mantine/hooks';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import TwoFactForm from './TwoFactForm';
-import { useRouter } from 'next/navigation';
+import '@/styles/mantine/globals.css';
 
 const QrStepper = dynamic(() => import('./QrStepper'), {
   ssr: false,
@@ -25,7 +28,6 @@ const TwoFactSetup = () => {
   const router = useRouter();
 
   const [active, setActive] = useState(0);
-  const [dataUri, setDataUri] = useState('');
   const [keyUri, setKeyUri] = useState('');
 
   return (
@@ -33,60 +35,14 @@ const TwoFactSetup = () => {
       active={active}
       onStepClick={setActive}
       orientation={isMobile ? 'vertical' : 'horizontal'}
-      styles={{
-        content: {
-          '& > *': {
-            paddingTop: '2rem',
-          },
-        },
-        stepIcon: {
-          'html.dark &[data-completed]': {
-            borderColor: 'rgb(249, 115, 22)',
-            backgroundColor: 'rgb(249, 115, 22)',
-          },
-          'html.dark &[data-progress]': {
-            borderColor: 'rgb(249, 115, 22)',
-            backgroundColor: 'white',
-            color: 'black',
-          },
-          'html.dark &': {
-            backgroundColor: 'transparent',
-            color: 'white',
-          },
-        },
-        separatorActive: {
-          backgroundColor: 'rgb(249, 115, 22)',
-        },
-        verticalSeparatorActive: {
-          borderColor: 'rgb(249, 115, 22)',
-        },
-        stepBody: {
-          gap: '0.25rem',
-        },
-        stepLabel: {
-          'html.dark &': {
-            color: 'white',
-            fontSize: '1.125rem',
-            fontWeight: 600,
-          },
-        },
-        stepDescription: {
-          'html.dark &': {
-            color: 'rgb(255, 255, 255, 0.75)',
-          },
-        },
-      }}
+      classNames={classes}
     >
       <Stepper.Step
         label="Thiết lập"
         description="Thiết lập 2 lớp"
         allowStepSelect={false}
       >
-        <TwoFactForm
-          setActive={setActive}
-          setDataUri={setDataUri}
-          setKeyUri={setKeyUri}
-        />
+        <TwoFactForm setActive={setActive} setKeyUri={setKeyUri} />
       </Stepper.Step>
 
       <Stepper.Step
@@ -94,7 +50,7 @@ const TwoFactSetup = () => {
         description="Kết nối 2 lớp"
         allowStepSelect={false}
       >
-        <QrStepper dataUri={dataUri} keyUri={keyUri} setActive={setActive} />
+        <QrStepper keyUri={keyUri} setActive={setActive} />
       </Stepper.Step>
 
       <Stepper.Step

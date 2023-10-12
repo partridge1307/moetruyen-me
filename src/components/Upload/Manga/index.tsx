@@ -56,7 +56,7 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
       name: '',
       description: undefined,
       review: '',
-      altName: '',
+      altName: [],
       author: [],
       tag: [],
       facebookLink: '',
@@ -82,16 +82,23 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
 
       const form = new FormData();
 
-      const blob = await fetch(image).then((res) => res.blob());
-      form.append('image', blob);
+      if (image.startsWith('blob')) {
+        const blob = await fetch(image).then((res) => res.blob());
+        form.append('image', blob);
+      } else {
+        form.append('image', image);
+      }
+
+      !!slug && form.append('slug', slug);
 
       form.append('name', name);
-      !!slug && form.append('slug', slug);
-      form.append('description', JSON.stringify(description));
       form.append('review', review);
-      altName && form.append('altName', altName);
       facebookLink && form.append('facebookLink', facebookLink);
       discordLink && form.append('discordLink', discordLink);
+
+      form.append('description', JSON.stringify(description));
+
+      altName.map((name) => form.append('altName', name));
       author.map((a) => form.append('author', JSON.stringify(a)));
       tag.map((t) => form.append('tag', JSON.stringify(t)));
 

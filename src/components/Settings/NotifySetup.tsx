@@ -1,10 +1,13 @@
 'use client';
 
+import '@/styles/mantine/globals.css';
+import classes from '@/styles/mantine/stepper.module.css';
 import { Stepper } from '@mantine/core';
-import { useState } from 'react';
-import ServerSetup from './ServerSetup';
+import '@mantine/core/styles.layer.css';
 import { useMediaQuery } from '@mantine/hooks';
 import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import ServerSetup from './ServerSetup';
 
 const ChannelSetup = dynamic(() => import('./ChannelSetup'), {
   ssr: false,
@@ -36,49 +39,7 @@ const NotifySetup = () => {
       active={active}
       onStepClick={setActive}
       orientation={isMobile ? 'vertical' : 'horizontal'}
-      styles={{
-        content: {
-          '& > *': {
-            paddingTop: '2rem',
-          },
-        },
-        stepIcon: {
-          'html.dark &[data-completed]': {
-            borderColor: 'rgb(249, 115, 22)',
-            backgroundColor: 'rgb(249, 115, 22)',
-          },
-          'html.dark &[data-progress]': {
-            borderColor: 'rgb(249, 115, 22)',
-            backgroundColor: 'white',
-            color: 'black',
-          },
-          'html.dark &': {
-            backgroundColor: 'transparent',
-            color: 'white',
-          },
-        },
-        separatorActive: {
-          backgroundColor: 'rgb(249, 115, 22)',
-        },
-        verticalSeparatorActive: {
-          borderColor: 'rgb(249, 115, 22)',
-        },
-        stepBody: {
-          gap: '0.25rem',
-        },
-        stepLabel: {
-          'html.dark &': {
-            color: 'white',
-            fontSize: '1.125rem',
-            fontWeight: 600,
-          },
-        },
-        stepDescription: {
-          'html.dark &': {
-            color: 'rgb(255, 255, 255, 0.75)',
-          },
-        },
-      }}
+      classNames={classes}
     >
       <Stepper.Step
         label="Server"

@@ -2,11 +2,10 @@ import { getAuthSession } from '@/lib/auth';
 import { encrypt } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { TwoFactorValidator } from '@/lib/validators/auth';
-import { authenticator } from 'otplib';
-import qrcode from 'qrcode';
-import { compare } from 'bcrypt';
-import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
+import { compare } from 'bcrypt';
+import { authenticator } from 'otplib';
+import { ZodError } from 'zod';
 
 export async function POST(req: Request) {
   try {
@@ -50,9 +49,8 @@ export async function POST(req: Request) {
       'Moetruyen',
       twoFactorSecret
     );
-    const dataUri = await qrcode.toDataURL(keyUri);
 
-    return new Response(JSON.stringify({ keyUri, dataUri }));
+    return new Response(JSON.stringify({ keyUri }));
   } catch (error) {
     if (error instanceof ZodError) {
       return new Response('Invalid', { status: 422 });

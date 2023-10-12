@@ -2,15 +2,17 @@ import { FC } from 'react';
 import { Button, buttonVariants } from '../ui/Button';
 import { MonitorDown } from 'lucide-react';
 import { Icons } from '../Icons';
+import { useQRCode } from 'next-qrcode';
 
 interface QrStepperProps {
-  dataUri: string;
   keyUri: string;
   // eslint-disable-next-line no-unused-vars
   setActive: (value: number) => void;
 }
 
-const QrStepper: FC<QrStepperProps> = ({ dataUri, keyUri, setActive }) => {
+const QrStepper: FC<QrStepperProps> = ({ keyUri, setActive }) => {
+  const { Canvas } = useQRCode();
+
   return (
     <div>
       <p>Vui lòng làm theo hướng dẫn dưới đây:</p>
@@ -63,10 +65,7 @@ const QrStepper: FC<QrStepperProps> = ({ dataUri, keyUri, setActive }) => {
             2, Quét mã QR dưới đây hoặc bấm vào nút đường dẫn bên dưới{' '}
           </h2>
 
-          {!!dataUri.length && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={dataUri} alt={`Two factor Qr Code`} />
-          )}
+          {!!keyUri.length && <Canvas text={keyUri} />}
 
           {!!keyUri.length && (
             <a href={keyUri} target="_blank" className={buttonVariants()}>

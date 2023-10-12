@@ -32,6 +32,9 @@ export const MangaUploadValidator = z.object({
       (value) => vieRegex.test(value),
       'Tên chỉ chấp nhận kí tự in hoa, in thường, gạch dưới, khoảng cách hoặc số'
     ),
+  altName: z
+    .array(z.string().max(512, 'Tối đa 512 kí tự'))
+    .max(5, 'Tối đa 5 tên'),
   slug: z
     .string()
     .optional()
@@ -42,19 +45,6 @@ export const MangaUploadValidator = z.object({
     }, 'Tối đa 32 kí tự. Kí tự thuộc alphanumeric, dấu gạch ngang'),
   description: z.any() as ZodType<SerializedEditorState<SerializedLexicalNode>>,
   review: z.string().min(5, 'Tối thiểu 5 kí tự').max(256, 'Tối đa 256 kí tự'),
-  altName: z
-    .string()
-    .optional()
-    .refine((name) => {
-      if (name) {
-        return name.length > 4;
-      } else return true;
-    }, 'Tối thiểu 5 kí tự')
-    .refine((name) => {
-      if (name) {
-        return name.length < 513;
-      } else return true;
-    }, 'Tối đa 512 kí tự'),
   author: z.array(authorInfo).min(1, { message: 'Tối thiểu một tác giả' }),
   tag: z.array(tagInfo).min(1, { message: 'Tối thiểu có một thể loại' }),
   facebookLink: z
@@ -117,8 +107,8 @@ export const MangaFormValidator = zfd.formData({
     z.string().min(5, 'Tối thiểu 5 kí tự').max(256, 'Tối đa 256 kí tự')
   ),
   altName: zfd
-    .text(z.string().min(5, 'Tối thiểu 5 kí tự').max(512, 'Tối đa 512 kí tự'))
-    .optional(),
+    .repeatableOfType(zfd.text(z.string().max(512, 'Tối đa 512 kí tự')))
+    .refine((values) => values.length < 6, 'Tối đa 5 tên'),
   author: zfd.repeatableOfType(zfd.json(authorInfo)),
   tag: zfd.repeatableOfType(zfd.json(tagInfo)),
   facebookLink: zfd.text(

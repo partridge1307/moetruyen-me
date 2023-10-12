@@ -70,7 +70,7 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
     defaultValues: {
       slug: manga.slug,
       name: manga.name,
-      altName: manga.altName ?? '',
+      altName: manga.altName ?? [],
       image: manga.image,
       author: manga.author,
       tag: manga.tags,
@@ -108,11 +108,13 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
       }
 
       form.append('name', name);
-      form.append('description', JSON.stringify(description));
       form.append('review', review);
-      altName && form.append('altName', altName);
       facebookLink && form.append('facebookLink', facebookLink);
       discordLink && form.append('discordLink', discordLink);
+
+      form.append('description', JSON.stringify(description));
+
+      altName.map((name) => form.append('altName', name));
       author.map((a) => form.append('author', JSON.stringify(a)));
       tag.map((t) => form.append('tag', JSON.stringify(t)));
 

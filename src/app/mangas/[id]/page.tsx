@@ -48,6 +48,7 @@ const page: FC<pageProps> = async ({ params }) => {
       slug: true,
       name: true,
       image: true,
+      altName: true,
       description: true,
       facebookLink: true,
       discordLink: true,
@@ -87,14 +88,8 @@ const page: FC<pageProps> = async ({ params }) => {
 
           <TabsContent value="info" className="space-y-6">
             <div className="space-y-1">
-              <label htmlFor="thumbnail" className="text-lg font-medium">
-                Ảnh bìa
-              </label>
-              <div
-                id="thumbnail"
-                className="relative"
-                style={{ aspectRatio: 4 / 3 }}
-              >
+              <p className="text-lg font-medium">Ảnh bìa</p>
+              <div className="relative" style={{ aspectRatio: 4 / 3 }}>
                 <Image
                   fill
                   sizes="(max-width: 640px) 40vw, 60vw"
@@ -108,13 +103,16 @@ const page: FC<pageProps> = async ({ params }) => {
             </div>
 
             <div>
-              <label htmlFor="name" className="text-lg font-medium">
-                Tên truyện
-              </label>
-              <h1 id="name" className="text-lg lg:text-xl font-semibold">
-                {manga.name}
-              </h1>
+              <p className="text-lg font-medium">Tên truyện</p>
+              <h1 className="text-lg lg:text-xl font-semibold">{manga.name}</h1>
             </div>
+
+            {!!manga.altName.length && (
+              <div>
+                <p>Tên khác</p>
+                <p>{manga.altName.join(', ')}</p>
+              </div>
+            )}
 
             <dl className="flex items-center gap-2">
               <dt>Trạng thái:</dt>
@@ -162,21 +160,15 @@ const page: FC<pageProps> = async ({ params }) => {
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="description" className="text-lg font-medium">
-                Mô tả
-              </label>
-              <div id="description" className="p-1 rounded-md dark:bg-zinc-700">
+              <p className="text-lg font-medium">Mô tả</p>
+              <div className="p-1 rounded-md dark:bg-zinc-700">
                 <MTEditor id={manga.id} content={manga.description} />
               </div>
             </div>
 
             <div>
-              <label htmlFor="review" className="text-lg font-medium">
-                Sơ lược
-              </label>
-              <p id="review" className="p-1 rounded-md dark:bg-zinc-700">
-                {manga.review}
-              </p>
+              <p className="text-lg font-medium">Sơ lược</p>
+              <p className="p-1 rounded-md dark:bg-zinc-700">{manga.review}</p>
             </div>
 
             {!!manga.discordLink ||

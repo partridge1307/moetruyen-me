@@ -5,8 +5,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/Form';
-import { Input } from '@/components/ui/Input';
 import { MangaUploadPayload } from '@/lib/validators/manga';
+import '@/styles/mantine/globals.css';
+import classes from '@/styles/mantine/tags-input.module.css';
+import { TagsInput } from '@mantine/core';
+import '@mantine/core/styles.layer.css';
 import { FC } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
@@ -21,10 +24,17 @@ const MangaAltNameFormField: FC<MangaAltNameFormFieldProps> = ({ form }) => {
       name="altName"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Tên khác(Nếu có)</FormLabel>
+          <FormLabel>Tên khác (Nếu có)</FormLabel>
           <FormMessage />
           <FormControl>
-            <Input placeholder="Tên khác" autoComplete="off" {...field} />
+            <TagsInput
+              ref={field.ref}
+              placeholder="Tên khác"
+              classNames={classes}
+              clearable
+              value={field.value}
+              onChange={(values) => field.onChange(values)}
+            />
           </FormControl>
         </FormItem>
       )}

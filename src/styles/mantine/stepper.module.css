@@ -1,0 +1,22 @@
+.content {
+  & > * {
+    padding-top: 2rem;
+  }
+}
+
+.separatorActive {
+  background-color: rgb(249, 115, 22);
+}
+
+.verticalSeparatorActive {
+  border-color: rgb(249, 115, 22);
+}
+
+.stepBody {
+  gap: 0.25rem;
+}
+
+.stepLabel {
+  font-size: 1.125rem;
+  font-weight: 600;
+}

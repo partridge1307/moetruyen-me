@@ -1,0 +1,32 @@
+:is(.dark) :where(.mantine-TagsInput-pill) {
+  @apply bg-zinc-700 text-white;
+}
+
+.mantine-Pill-remove.mantine-CloseButton-root {
+  color: rgb(239, 68, 68);
+}
+
+:is(.dark) :where(.mantine-Stepper-stepIcon) {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+
+  &[data-completed] {
+    border-color: rgb(249, 115, 22);
+    background-color: rgb(249, 115, 22);
+  }
+
+  &[data-progress] {
+    border: 2px solid rgb(249, 115, 22);
+    background-color: white;
+    color: black;
+  }
+}
+
+:is(.dark) :where(.mantine-Stepper-stepLabel) {
+  color: white;
+}
+
+:is(.dark) :where(.mantine-Stepper-stepDescription) {
+  color: rgb(255, 255, 255, 0.75);
+}

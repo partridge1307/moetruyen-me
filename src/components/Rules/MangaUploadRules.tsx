@@ -65,8 +65,7 @@ const MangaUploadRules = () => {
             trang mạng xã hội, <span className="font-semibold">SEO</span>
           </li>
           <li>
-            Tên <span className="font-semibold">ngăn cách</span> nhau bằng{' '}
-            <span className="font-semibold">dấu phẩy</span>
+            Tối đa <span className="font-semibold">5</span> tên
           </li>
           <li>
             Tối đa <span className="font-semibold">512</span> kí tự
