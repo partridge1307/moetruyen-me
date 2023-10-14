@@ -250,7 +250,6 @@ model Chapter {
   comment      Comment[]
   dailyView    DailyView[]
   weeklyView   WeeklyView[]
-  history      History[]
 
   team Team? @relation(fields: [teamId], references: [id])
 
@@ -344,9 +343,8 @@ model History {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user    User     @relation(fields: [userId], references: [id])
-  manga   Manga    @relation(fields: [mangaId], references: [id], onDelete: Cascade)
-  chapter Chapter? @relation(fields: [chapterId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  manga Manga @relation(fields: [mangaId], references: [id], onDelete: Cascade)
 
   @@unique([userId, mangaId])
   @@index([userId])
