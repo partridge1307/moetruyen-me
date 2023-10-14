@@ -1,6 +1,5 @@
 'use client';
 
-import { mainURL } from '@/config';
 import { signOut } from 'next-auth/react';
 import { buttonVariants } from './ui/Button';
 
@@ -11,7 +10,7 @@ const SignOutButton = () => {
         variant: 'destructive',
         className: 'w-full',
       })}
-      onClick={() => signOut({ callbackUrl: mainURL })}
+      onClick={() => signOut({ callbackUrl: process.env.NEXT_PUBLIC_MAIN_URL })}
     >
       Đăng xuất
     </button>

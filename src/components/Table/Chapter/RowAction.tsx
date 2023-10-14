@@ -16,7 +16,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { mainURL } from '@/config';
 import { useCustomToast } from '@/hooks/use-custom-toast';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -106,7 +105,7 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
         {chapter.isPublished ? (
           <DropdownMenuItem>
             <a
-              href={`${mainURL}/chapter/${chapter.id}`}
+              href={`${process.env.NEXT_PUBLIC_MAIN_URL}/chapter/${chapter.id}`}
               target="_blank"
               className="w-full h-full transition-colors hover:cursor-pointer hover:dark:bg-zinc-800"
             >

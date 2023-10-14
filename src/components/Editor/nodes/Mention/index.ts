@@ -1,4 +1,3 @@
-import { mainURL } from '@/config';
 import type {
   DOMConversionMap,
   DOMConversionOutput,
@@ -100,9 +99,9 @@ export class MentionNode extends TextNode {
     domChild.contentEditable = 'false';
 
     !!domChild.textContent &&
-      (domOuter.href = `${mainURL}/user/${domChild.textContent
-        .split(' ')
-        .join('-')}`);
+      (domOuter.href = `${
+        process.env.NEXT_PUBLIC_MAIN_URL
+      }/user/${domChild.textContent.split(' ').join('-')}`);
     domOuter.target = '_blank';
 
     domChild.textContent = `@${domChild.textContent}`;

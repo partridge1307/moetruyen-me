@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/AlertDialog';
 import { buttonVariants } from '@/components/ui/Button';
 import { ContextMenuItem } from '@/components/ui/ContextMenu';
-import { mainURL } from '@/config';
 import { useCustomToast } from '@/hooks/use-custom-toast';
 import type { User } from '@prisma/client';
 import { useMutation } from '@tanstack/react-query';
@@ -102,7 +101,11 @@ const MemberAction: FC<MemberActionProps> = ({
         </>
       ) : (
         <ContextMenuItem className="hover:cursor-pointer">
-          <Link href={`${mainURL}/user/${user.name?.split(' ').join('-')}`}>
+          <Link
+            href={`${process.env.NEXT_PUBLIC_MAIN_URL}/user/${user.name
+              ?.split(' ')
+              .join('-')}`}
+          >
             Xem thông tin
           </Link>
         </ContextMenuItem>
