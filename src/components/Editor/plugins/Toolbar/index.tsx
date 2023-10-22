@@ -41,6 +41,7 @@ import {
 } from 'lexical';
 import {
   AlignCenter,
+  AlignJustify,
   AlignLeft,
   AlignRight,
   Bold,
@@ -66,6 +67,13 @@ const blockTypeToBlockName = {
   bullet: 'Bulleted List',
   check: 'Check List',
   number: 'Numbered List',
+};
+
+const alignType = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+  justify: 'justify',
 };
 
 const Toolbar = () => {
@@ -281,7 +289,17 @@ const Toolbar = () => {
             </>
           )}
         </div>
-        <Select defaultValue={'left-align'}>
+        <Select
+          defaultValue={'left'}
+          onValueChange={(value) => {
+            if (value in alignType) {
+              editor.dispatchCommand(
+                FORMAT_ELEMENT_COMMAND,
+                value as keyof typeof alignType
+              );
+            }
+          }}
+        >
           <SelectTrigger
             aria-label="align button"
             type="button"
@@ -289,33 +307,46 @@ const Toolbar = () => {
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent onCloseAutoFocus={() => editor.focus()}>
             <SelectItem
-              value="left-align"
-              className="cursor-pointer"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
+              ref={(ref) => {
+                if (!ref) return;
+                ref.ontouchstart = (e) => e.preventDefault();
               }}
+              value="left"
+              className="cursor-pointer"
             >
               <AlignLeft className="w-8 h-8 md:w-5 md:h-5" />
             </SelectItem>
             <SelectItem
-              value="center-align"
-              className="cursor-pointer"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
+              ref={(ref) => {
+                if (!ref) return;
+                ref.ontouchstart = (e) => e.preventDefault();
               }}
+              value="center"
+              className="cursor-pointer"
             >
               <AlignCenter className="w-8 h-8 md:w-5 md:h-5" />
             </SelectItem>
             <SelectItem
-              value="right-align"
-              className="cursor-pointer"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
+              ref={(ref) => {
+                if (!ref) return;
+                ref.ontouchstart = (e) => e.preventDefault();
               }}
+              value="right"
+              className="cursor-pointer"
             >
               <AlignRight className="w-8 h-8 md:w-5 md:h-5" />
+            </SelectItem>
+            <SelectItem
+              ref={(ref) => {
+                if (!ref) return;
+                ref.ontouchstart = (e) => e.preventDefault();
+              }}
+              value="justify"
+              className="cursor-pointer"
+            >
+              <AlignJustify className="w-8 h-8 md:w-5 md:h-5" />
             </SelectItem>
           </SelectContent>
         </Select>

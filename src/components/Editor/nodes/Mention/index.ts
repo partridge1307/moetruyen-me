@@ -99,9 +99,7 @@ export class MentionNode extends TextNode {
     domChild.contentEditable = 'false';
 
     !!domChild.textContent &&
-      (domOuter.href = `${
-        process.env.NEXT_PUBLIC_MAIN_URL
-      }/user/${domChild.textContent.split(' ').join('-')}`);
+      (domOuter.href = `/user/${domChild.textContent.split(' ').join('-')}`);
     domOuter.target = '_blank';
 
     domChild.textContent = `@${domChild.textContent}`;

@@ -1,6 +1,7 @@
 'use client';
 
 import MangaAuthorSkeleton from '@/components/Skeleton/MangaAuthorSkeleton';
+import MangaCoverSkeleton from '@/components/Skeleton/MangaCoverSkeleton';
 import MangaImageSkeleton from '@/components/Skeleton/MangaImageSkeleton';
 import MangaTagSkeleton from '@/components/Skeleton/MangaTagSkeleton';
 import { Button } from '@/components/ui/Button';
@@ -28,6 +29,10 @@ import MangaNameForm from './MangaNameFormField';
 import MangaReviewForm from './MangaReviewFormField';
 import MangaSlugForm from './MangaSlugFormField';
 
+const MangaCoverFormField = dynamic(() => import('./MangaCoverFormField'), {
+  ssr: false,
+  loading: () => <MangaCoverSkeleton />,
+});
 const MangaImageFormField = dynamic(() => import('./MangaImageFormField'), {
   ssr: false,
   loading: () => <MangaImageSkeleton />,
@@ -48,6 +53,7 @@ interface EditMangaProps {
     | 'slug'
     | 'name'
     | 'altName'
+    | 'cover'
     | 'image'
     | 'description'
     | 'review'
@@ -68,6 +74,7 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
   const form = useForm<MangaUploadPayload>({
     resolver: zodResolver(MangaUploadValidator),
     defaultValues: {
+      cover: manga.cover ?? undefined,
       slug: manga.slug,
       name: manga.name,
       altName: manga.altName ?? [],
@@ -156,6 +163,8 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmitHandler)} className="space-y-6">
+        <MangaCoverFormField form={form} />
+
         <MangaImageFormField form={form} />
 
         <MangaNameForm form={form} />

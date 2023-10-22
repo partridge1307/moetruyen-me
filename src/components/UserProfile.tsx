@@ -11,7 +11,7 @@ import {
 import { useCustomToast } from '@/hooks/use-custom-toast';
 import { cn } from '@/lib/utils';
 import { UserProfileEditPayload } from '@/lib/validators/user';
-import { Badge, User } from '@prisma/client';
+import type { Badge } from '@prisma/client';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { ImagePlus } from 'lucide-react';
@@ -24,7 +24,7 @@ import UserBadge from './User/Badge';
 import { Button, buttonVariants } from './ui/Button';
 
 interface UserProfileProps {
-  user: Pick<User, 'name' | 'color' | 'image' | 'banner'> & {
+  user: {
     badge: Badge[];
   };
 }
@@ -39,7 +39,7 @@ type NormalColor = {
 };
 
 const UserProfile: FC<UserProfileProps> = ({ user }) => {
-  const { update } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const { loginToast, notFoundToast, serverErrorToast, successToast } =
     useCustomToast();
@@ -48,17 +48,16 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
   const bannerRef = useRef<HTMLInputElement>(null);
   const imageCropRef = useRef<HTMLButtonElement>(null);
 
-  const [avatarURL, setAvatarURL] = useState(user.image ?? '');
-  const [bannerURL, setBannerURL] = useState(user.banner ?? '');
   const [currentTarget, setCurrentTarget] = useState<'AVATAR' | 'BANNER'>(
     'AVATAR'
   );
 
-  const [username, setUsername] = useState<string>(user.name!);
-
-  const [userColor, setUserColor] = useState(
-    user.color ? (user.color as GradientColor | NormalColor) : null
-  );
+  const [avatarURL, setAvatarURL] = useState('');
+  const [bannerURL, setBannerURL] = useState('');
+  const [username, setUsername] = useState('');
+  const [userColor, setUserColor] = useState<
+    GradientColor | NormalColor | null
+  >(null);
 
   const [hasChange, setHasChange] = useState(false);
 
@@ -79,9 +78,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
       form.append('name', name);
       color !== null && form.append('color', JSON.stringify(color));
 
-      const { data } = await axios.put(`/api/user`, form);
-
-      return data as UserProfileEditPayload;
+      await axios.put(`/api/user`, form);
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -90,59 +87,49 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
       }
       return serverErrorToast();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       update();
       router.refresh();
-
-      setAvatarURL(data.avatar);
-      setBannerURL(data.banner);
-      setUsername(data.name);
-      setUserColor(data.color);
 
       return successToast();
     },
   });
 
   useEffect(() => {
+    if (status === 'authenticated') {
+      setAvatarURL(session.user.image ?? '');
+      setBannerURL(session.user.banner ?? '');
+      setUsername(session.user.name!);
+      setUserColor(session.user.color);
+    }
+  }, [session?.user, status]);
+
+  useEffect(() => {
     let isChanged = false;
 
-    if (username !== user.name) {
+    if (username !== session?.user.name) {
       isChanged = true;
     }
-    if (avatarURL !== (user.image ?? '')) {
+    if (avatarURL !== (session?.user.image ?? '')) {
       isChanged = true;
     }
-    if (bannerURL !== (user.banner ?? '')) {
+    if (bannerURL !== (session?.user.banner ?? '')) {
       isChanged = true;
     }
-    if (JSON.stringify(userColor) !== JSON.stringify(user.color)) {
+    if (JSON.stringify(userColor) !== JSON.stringify(session?.user.color)) {
       isChanged = true;
     }
 
     setHasChange(isChanged);
-  }, [
-    avatarURL,
-    user.image,
-    bannerURL,
-    user.banner,
-    userColor,
-    user.color,
-    username,
-    user.name,
-  ]);
+  }, [avatarURL, bannerURL, userColor, username, session?.user]);
 
   function onResetHandler() {
-    setAvatarURL(user.image ?? '');
-    setBannerURL(user.banner ?? '');
-    setUsername(user.name!);
+    setAvatarURL(session?.user.image ?? '');
+    setBannerURL(session?.user.banner ?? '');
+    setUsername(session?.user.name!);
     setUserColor(
-      user.color
-        ? (user.color as
-            | {
-                from: string;
-                to: string;
-              }
-            | { color: string })
+      session?.user.color
+        ? (session?.user.color as GradientColor | NormalColor)
         : null
     );
   }

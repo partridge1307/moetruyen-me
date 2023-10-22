@@ -146,6 +146,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return this.__altText;
   }
 
+  getTextContent(): string {
+    return 'Hình ảnh';
+  }
+
   decorate(): JSX.Element {
     return (
       <Suspense fallback={null}>

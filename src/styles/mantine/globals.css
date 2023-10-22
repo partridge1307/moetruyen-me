@@ -30,3 +30,7 @@
 :is(.dark) :where(.mantine-Stepper-stepDescription) {
   color: rgb(255, 255, 255, 0.75);
 }
+
+:is(.dark) :where(.mantine-PinInput-input) {
+  color: white;
+}

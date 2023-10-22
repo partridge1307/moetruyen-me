@@ -19,10 +19,6 @@ const page = async () => {
     },
     select: {
       badge: true,
-      name: true,
-      color: true,
-      image: true,
-      banner: true,
     },
   });
   if (!user) return notFound();

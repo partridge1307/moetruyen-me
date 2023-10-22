@@ -144,3 +144,12 @@ export const rgbDataURL = (r: number, g: number, b: number) =>
 
 export const normalizeText = (text: string) =>
   text.normalize('NFKD').replace(/[\u0300-\u036F]/g, '');
+
+const tsquerySpecialChars = /[()|&:*!]/g;
+export const generateSearchPhrase = (searchPhrase: string) =>
+  searchPhrase
+    .replace(tsquerySpecialChars, ' ')
+    .trim()
+    .split(/\s+/)
+    .map((phrase) => `${phrase}:*`)
+    .join(' | ');

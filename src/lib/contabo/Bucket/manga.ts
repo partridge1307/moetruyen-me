@@ -1,15 +1,20 @@
-import sharp from 'sharp';
-import { generateKey, resizeImage, sendCommand } from '../utils';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
 import { contabo } from '../client';
+import { generateKey, resizeImage, sendCommand } from '../utils';
 
 const UploadMangaImage = async (
   image: Blob,
   mangaId: number,
-  prevImage: string | null
+  prevImage: string | null,
+  type: 'thumbnail' | 'cover'
 ) => {
   const arrayBuffer = await new Blob([image]).arrayBuffer();
-  const sharpImage = sharp(arrayBuffer).toFormat('png').png({ quality: 40 });
+  let sharpImage = sharp(arrayBuffer);
+  sharpImage =
+    type === 'thumbnail'
+      ? sharpImage.toFormat('png').png({ quality: 40 })
+      : sharpImage.toFormat('webp').webp({ quality: 40 });
 
   const { width, height } = await sharpImage.metadata();
 
@@ -24,13 +29,17 @@ const UploadMangaImage = async (
       new PutObjectCommand({
         Body: optimizedImage,
         Bucket: process.env.CB_BUCKET,
-        Key: `manga/${mangaId}/thumbnail.png`,
+        Key: `manga/${mangaId}/${
+          type === 'thumbnail' ? 'thumbnail.png' : 'cover.webp'
+        }`,
       })
     )
   );
 
   const Key = generateKey(
-    `${process.env.IMG_DOMAIN}/manga/${mangaId}/thumbnail.png`,
+    `${process.env.IMG_DOMAIN}/manga/${mangaId}/${
+      type === 'thumbnail' ? 'thumbnail.png' : 'cover.webp'
+    }`,
     prevImage
   );
   return Key;

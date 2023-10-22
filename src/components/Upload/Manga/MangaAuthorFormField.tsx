@@ -46,7 +46,7 @@ const MangaAuthorForm: FC<MangaAuthorFormProps> = ({ form, existAuthors }) => {
 
   useEffect(() => {
     if (debouncedValue.length) {
-      const cachedResults = authorCache.get(debouncedValue);
+      const cachedResults = authorCache.get(debouncedValue.trim());
 
       if (cachedResults === null) {
         return;
@@ -99,7 +99,7 @@ const MangaAuthorForm: FC<MangaAuthorFormProps> = ({ form, existAuthors }) => {
                 placeholder="Tác giả"
                 value={authorInput}
                 onChange={(e) => {
-                  setAuthorInput(e.target.value.trim());
+                  setAuthorInput(e.target.value);
                 }}
                 className="border-none focus:ring-0 focus-visible:ring-transparent ring-offset-transparent"
               />

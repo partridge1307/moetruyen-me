@@ -1,50 +1,45 @@
 'use client';
 
 import ImageCropModal from '@/components/ImageCropModal';
-import type { MangaUploadPayload } from '@/lib/validators/manga';
-import { ImagePlus } from 'lucide-react';
-import Image from 'next/image';
-import { FC, useRef } from 'react';
-import type { UseFormReturn } from 'react-hook-form';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '../../ui/Form';
+} from '@/components/ui/Form';
+import { MangaUploadPayload } from '@/lib/validators/manga';
+import { ImagePlus } from 'lucide-react';
+import Image from 'next/image';
+import { FC, useRef } from 'react';
+import { UseFormReturn } from 'react-hook-form';
 
-interface MangaImageFormFieldProps {
+interface MangaCoverFormFieldProps {
   form: UseFormReturn<MangaUploadPayload>;
 }
 
-const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
+const MangaCoverFormField: FC<MangaCoverFormFieldProps> = ({ form }) => {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const imageCropRef = useRef<HTMLButtonElement>(null);
 
   return (
     <FormField
       control={form.control}
-      name="image"
+      name="cover"
       render={({ field }) => (
         <FormItem>
-          <FormLabel
-            className="after:content-['*'] after:text-red-500 after:ml-0.5"
-            title="Xem trước ở tỉ lệ của Tiêu Điểm. Còn lại Ảnh sẽ tự fill vừa với khung"
-          >
-            Ảnh
-          </FormLabel>
+          <FormLabel>Ảnh bìa (Nếu có)</FormLabel>
           <FormMessage />
           <FormControl>
-            <div className="relative w-1/4" style={{ aspectRatio: 5 / 7 }}>
-              {!!field.value ? (
+            <div className="relative aspect-[4/2] md:aspect-[4/1]">
+              {field.value ? (
                 <Image
                   fill
                   sizes="40vw"
                   quality={40}
                   priority
                   src={field.value}
-                  alt="Preview Image"
+                  alt="Preview Cover"
                   className="rounded-md border-2 object-cover hover:cursor-pointer dark:border-zinc-800"
                   onClick={(e) => {
                     e.preventDefault();
@@ -84,11 +79,12 @@ const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
               }
             }}
           />
+
           {!!field.value && (
             <ImageCropModal
               ref={imageCropRef}
               image={field.value}
-              aspect={5 / 7}
+              aspect={4 / 1}
               setImageCropped={(value) => field.onChange(value)}
             />
           )}
@@ -98,4 +94,4 @@ const MangaImageFormField: FC<MangaImageFormFieldProps> = ({ form }) => {
   );
 };
 
-export default MangaImageFormField;
+export default MangaCoverFormField;

@@ -18,6 +18,7 @@ import {
   FormItem,
   FormLabel,
 } from '../ui/Form';
+import '@/styles/mantine/globals.css';
 
 interface TOTPFormProps {
   type: 'ENABLE' | 'DISABLE';

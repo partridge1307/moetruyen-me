@@ -1,6 +1,7 @@
 'use client';
 
 import MangaAuthorSkeleton from '@/components/Skeleton/MangaAuthorSkeleton';
+import MangaCoverSkeleton from '@/components/Skeleton/MangaCoverSkeleton';
 import MangaImageSkeleton from '@/components/Skeleton/MangaImageSkeleton';
 import MangaTagSkeleton from '@/components/Skeleton/MangaTagSkeleton';
 import { Button } from '@/components/ui/Button';
@@ -26,6 +27,10 @@ import MangaNameForm from './MangaNameFormField';
 import MangaReviewForm from './MangaReviewFormField';
 import MangaSlugForm from './MangaSlugFormField';
 
+const MangaCoverFormField = dynamic(() => import('./MangaCoverFormField'), {
+  ssr: false,
+  loading: () => <MangaCoverSkeleton />,
+});
 const MangaImageForm = dynamic(() => import('./MangaImageFormField'), {
   ssr: false,
   loading: () => <MangaImageSkeleton />,
@@ -52,6 +57,7 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
   const form = useForm<MangaUploadPayload>({
     resolver: zodResolver(MangaUploadValidator),
     defaultValues: {
+      cover: undefined,
       image: undefined,
       name: '',
       description: undefined,
@@ -68,6 +74,7 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
     mutationKey: ['upload-manga'],
     mutationFn: async (values: MangaUploadPayload) => {
       const {
+        cover,
         image,
         name,
         slug,
@@ -81,6 +88,15 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
       } = values;
 
       const form = new FormData();
+
+      if (cover) {
+        if (cover.startsWith('blob')) {
+          const blob = await fetch(cover).then((res) => res.blob());
+          form.append('cover', blob);
+        } else {
+          form.append('cover', cover);
+        }
+      }
 
       if (image.startsWith('blob')) {
         const blob = await fetch(image).then((res) => res.blob());
@@ -146,6 +162,8 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
           onSubmit={form.handleSubmit(onSubmitHandler)}
           className="space-y-6"
         >
+          <MangaCoverFormField form={form} />
+
           <MangaImageForm form={form} />
 
           <MangaNameForm form={form} />

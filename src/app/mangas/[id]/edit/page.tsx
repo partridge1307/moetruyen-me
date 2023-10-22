@@ -33,6 +33,7 @@ const page: FC<pageProps> = async ({ params }) => {
         slug: true,
         name: true,
         altName: true,
+        cover: true,
         image: true,
         author: true,
         tags: true,

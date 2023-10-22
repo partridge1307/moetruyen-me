@@ -10,8 +10,9 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
     if (!session) return new Response('Unauthorized', { status: 401 });
 
     const {
-      slug,
+      cover: c,
       image: img,
+      slug,
       name,
       description,
       review,
@@ -30,16 +31,35 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
       select: {
         id: true,
         slug: true,
+        cover: true,
         image: true,
       },
     });
 
-    let image: string;
-    if (img instanceof File) {
-      image = await UploadMangaImage(img, targetManga.id, targetManga.image);
-    } else {
-      image = img;
+    let coverPromise, imagePromise;
+    if (c) {
+      if (c instanceof File) {
+        coverPromise = UploadMangaImage(
+          c,
+          targetManga.id,
+          targetManga.cover,
+          'cover'
+        );
+      } else coverPromise = c;
     }
+
+    if (img instanceof File) {
+      imagePromise = UploadMangaImage(
+        img,
+        targetManga.id,
+        targetManga.image,
+        'thumbnail'
+      );
+    } else {
+      imagePromise = img;
+    }
+
+    const [cover, image] = await Promise.all([coverPromise, imagePromise]);
 
     const userSlug = slug?.trim() ?? targetManga.slug;
 
@@ -48,6 +68,7 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
         id: targetManga.id,
       },
       data: {
+        cover,
         image,
         slug: userSlug,
         name,

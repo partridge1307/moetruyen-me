@@ -123,7 +123,7 @@ export async function PUT(req: Request) {
 
     const [image, banner] = await Promise.all([avatarPromise, bannerPromise]);
 
-    const updatedUser = await db.user.update({
+    await db.user.update({
       where: {
         id: user.id,
       },
@@ -136,14 +136,7 @@ export async function PUT(req: Request) {
       },
     });
 
-    return new Response(
-      JSON.stringify({
-        name: updatedUser.name,
-        avatar: updatedUser.image,
-        banner: updatedUser.banner,
-        color: updatedUser.color,
-      })
-    );
+    return new Response('OK');
   } catch (error) {
     if (error instanceof ZodError) {
       return new Response('Invalid', { status: 422 });

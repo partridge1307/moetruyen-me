@@ -51,12 +51,6 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
       if (e instanceof AxiosError) {
         if (e.response?.status === 401) return loginToast();
         if (e.response?.status === 404) return notFoundToast();
-        if (e.response?.status === 406)
-          return toast({
-            title: 'Manga chưa publish',
-            description: 'Yêu cầu Manga đã publish để thực hiện',
-            variant: 'destructive',
-          });
         if (e.response?.status === 409)
           return toast({
             title: 'Đã publish',

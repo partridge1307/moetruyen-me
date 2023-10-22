@@ -239,6 +239,13 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
                     },
                   },
                   team: {
+                    where: {
+                      follows: {
+                        none: {
+                          id: session.user.id,
+                        },
+                      },
+                    },
                     select: {
                       follows: {
                         select: {
@@ -267,9 +274,6 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     if (chapter.isPublished)
       return new Response('Already published', { status: 409 });
 
-    if (!chapter.manga.isPublished)
-      return new Response('Manga must publish first', { status: 406 });
-
     const chapterFollowUsersId = [
       ...chapter.manga.followedBy.map((user) => user.id),
       ...chapter.manga.creator.followedBy.map((user) => user.id),
@@ -279,6 +283,24 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     ];
 
     await db.$transaction([
+      ...(!chapter.manga.isPublished
+        ? [
+            db.manga.update({
+              where: {
+                id: chapter.manga.id,
+              },
+              data: {
+                isPublished: true,
+                view: {
+                  connectOrCreate: {
+                    where: { mangaId: chapter.manga.id },
+                    create: { totalView: 0 },
+                  },
+                },
+              },
+            }),
+          ]
+        : []),
       db.chapter.update({
         where: {
           id: chapter.id,

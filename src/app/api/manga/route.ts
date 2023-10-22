@@ -36,6 +36,7 @@ export async function POST(req: Request) {
       return new Response('Need verify', { status: 400 });
 
     const {
+      cover: c,
       image: img,
       name,
       slug,
@@ -77,19 +78,28 @@ export async function POST(req: Request) {
       },
     });
 
-    let uploadedImage;
-    if (img instanceof File) {
-      uploadedImage = await UploadMangaImage(img, mangaCreated.id, null);
-    } else {
-      uploadedImage = img;
+    let coverPromise, imagePromise;
+    if (c) {
+      if (c instanceof File) {
+        coverPromise = UploadMangaImage(c, mangaCreated.id, null, 'cover');
+      } else coverPromise = c;
     }
+
+    if (img instanceof File) {
+      imagePromise = UploadMangaImage(img, mangaCreated.id, null, 'thumbnail');
+    } else {
+      imagePromise = img;
+    }
+
+    const [cover, image] = await Promise.all([coverPromise, imagePromise]);
 
     await db.manga.update({
       where: {
         id: mangaCreated.id,
       },
       data: {
-        image: uploadedImage,
+        cover,
+        image,
         slug:
           slug?.trim() ??
           `${normalizeText(mangaCreated.name)

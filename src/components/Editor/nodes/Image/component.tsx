@@ -58,12 +58,13 @@ function LazyImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={imageRef}
       width={width}
       height={height}
       className={className || undefined}
       src={src}
       alt={altText}
-      ref={imageRef}
+      decoding="async"
       loading="lazy"
       draggable={false}
       style={{

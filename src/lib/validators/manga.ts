@@ -17,6 +17,17 @@ export const tagInfo = z.object({
 export type tagInfoProps = z.infer<typeof tagInfo>;
 
 export const MangaUploadValidator = z.object({
+  cover: z
+    .string()
+    .optional()
+    .refine((value) => {
+      if (value) {
+        return (
+          value.startsWith('blob') ||
+          value.startsWith('https://i.moetruyen.net')
+        );
+      } else return true;
+    }, 'Ảnh bìa không hợp lệ'),
   image: z
     .string()
     .refine(
@@ -67,6 +78,20 @@ export const MangaUploadValidator = z.object({
 export type MangaUploadPayload = z.infer<typeof MangaUploadValidator>;
 
 export const MangaFormValidator = zfd.formData({
+  cover: zfd
+    .file()
+    .optional()
+    .refine(
+      (file) => (!file ? true : file.size < 4 * 1000 * 1000),
+      'Tối đa 4MB'
+    )
+    .refine(
+      (file) =>
+        !file
+          ? true
+          : ['image/jpg', 'image/jpeg', 'image/png'].includes(file.type),
+      'Chỉ nhận ảnh có định dạng .jpg, .png, .jpeg'
+    ),
   image: zfd
     .file()
     .refine((file) => file.size < 4 * 1000 * 1000, 'Tối đa 4MB')

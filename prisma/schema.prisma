@@ -199,6 +199,7 @@ model Manga {
   id           Int           @id @default(autoincrement())
   slug         String        @unique
   name         String
+  cover        String?
   image        String
   description  Json
   review       String

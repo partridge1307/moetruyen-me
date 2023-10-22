@@ -3,6 +3,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogFooter,
   AlertDialogTrigger,
 } from '@/components/ui/AlertDialog';
 import { buttonVariants } from '@/components/ui/Button';
@@ -29,7 +30,7 @@ import {
   type LexicalCommand,
   type LexicalEditor,
 } from 'lexical';
-import { FileImage, Image as ImageIcon, Link2 } from 'lucide-react';
+import { FileImage, Image as ImageIcon, Link2, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
   $createImageNode,
@@ -43,6 +44,7 @@ export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
   createCommand('INSERT_IMAGE_COMMAND');
 
 declare global {
+  // eslint-disable-next-line no-unused-vars
   interface DragEvent {
     rangeOffset?: number;
     rangeParent?: Node;
@@ -52,19 +54,20 @@ declare global {
 export function InsertURLImageUploaded({
   onClick,
 }: {
+  // eslint-disable-next-line no-unused-vars
   onClick: (payload: ImagePayload) => void;
 }): JSX.Element {
   const [src, setSrc] = useState<string>('');
   const isDisabled = src === '';
 
   return (
-    <>
+    <AlertDialogContent>
       <Input
         placeholder="Điền Link..."
         value={src}
         onChange={(e) => setSrc(e.target.value)}
       />
-      <div className="flex items-stretch justify-end gap-4">
+      <AlertDialogFooter>
         <AlertDialogCancel
           type="button"
           className={buttonVariants({ variant: 'destructive' })}
@@ -80,41 +83,52 @@ export function InsertURLImageUploaded({
         >
           Xong
         </AlertDialogAction>
-      </div>
-    </>
+      </AlertDialogFooter>
+    </AlertDialogContent>
   );
 }
 
 export function InsertImageUploaded({
   onClick,
 }: {
+  // eslint-disable-next-line no-unused-vars
   onClick: (payload: InsertImagePayload) => void;
 }): JSX.Element {
   const [src, setSrc] = useState('');
+  const [isLoading, setLoading] = useState(false);
 
   const isDisabled = src === '';
 
   const LoadImage = (files: FileList | null) => {
-    const reader = new FileReader();
-    reader.onload = function () {
-      if (typeof reader.result === 'string') {
-        setSrc(reader.result);
-      }
-      return '';
-    };
-    if (files !== null) {
-      reader.readAsDataURL(files[0]);
+    if (files !== null && files[0].size < 2 * 1000 * 1000) {
+      setLoading(true);
+
+      const form = new FormData();
+      form.append('image', files[0], files[0].name);
+
+      fetch('/api/image', {
+        method: 'POST',
+        body: form,
+      })
+        .then((res) => {
+          if (res.status === 500) return;
+          return res.json();
+        })
+        .then((res) => {
+          !!res && setSrc(res.url);
+          setLoading(false);
+        });
     }
   };
 
   return (
-    <>
+    <AlertDialogContent>
       <Input
         type="file"
-        accept=".jpg, .jpeg, .png"
+        accept="image/jpg, image/jpeg, image/png"
         onChange={(e) => LoadImage(e.target.files)}
       />
-      <div className="flex items-stretch justify-end gap-4">
+      <AlertDialogFooter>
         <AlertDialogCancel
           type="button"
           className={buttonVariants({ variant: 'destructive' })}
@@ -126,10 +140,10 @@ export function InsertImageUploaded({
           disabled={isDisabled}
           onClick={() => onClick({ src, altText: 'Image' })}
         >
-          Xong
+          {isLoading && <Loader2 className="w-5 h-5 animate-spin" />} Xong
         </AlertDialogAction>
-      </div>
-    </>
+      </AlertDialogFooter>
+    </AlertDialogContent>
   );
 }
 
@@ -185,7 +199,7 @@ export function ImageInputBody({
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger aria-label="image insert button" type="button">
         <ImageIcon className="w-8 h-8 md:w-5 md:h-5" />
       </DropdownMenuTrigger>
@@ -198,9 +212,8 @@ export function ImageInputBody({
             <FileImage className="w-[1.2rem] h-[1.2rem]" />
             <p>Từ máy</p>
           </AlertDialogTrigger>
-          <AlertDialogContent>
-            <InsertImageUploaded onClick={onClick} />
-          </AlertDialogContent>
+
+          <InsertImageUploaded onClick={onClick} />
         </AlertDialog>
 
         <AlertDialog>
@@ -211,9 +224,8 @@ export function ImageInputBody({
             <Link2 className="w-5 h-5" />
             <p>Từ Link</p>
           </AlertDialogTrigger>
-          <AlertDialogContent>
-            <InsertURLImageUploaded onClick={onClick} />
-          </AlertDialogContent>
+
+          <InsertURLImageUploaded onClick={onClick} />
         </AlertDialog>
       </DropdownMenuContent>
     </DropdownMenu>
