@@ -42,7 +42,7 @@ const ChapterIndexFormField: FC<ChapterIndexFormFieldProps> = ({ form }) => {
               <Select
                 onValueChange={(value) => {
                   if (value === 'custom') setDisableChapterIndex(false);
-                  else if (value === 'append') {
+                  else {
                     field.onChange(0);
                     setDisableChapterIndex(true);
                   }

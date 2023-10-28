@@ -3,9 +3,17 @@ import Providers from '@/components/Providers';
 import { Toaster } from '@/components/ui/Toaster';
 import { getAuthSession } from '@/lib/auth';
 import '@/styles/globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Roboto } from 'next/font/google';
 import { redirect } from 'next/navigation';
+
+export const viewport: Viewport = {
+  colorScheme: 'dark light',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F1F5F9' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090B' },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(`${process.env.NEXTAUTH_URL}`),
@@ -15,8 +23,6 @@ export const metadata: Metadata = {
   },
   description:
     'Web đọc truyện tranh online tiện ích nhất được cập nhật liên tục mỗi ngày - Cùng tham gia đọc truyện và thảo luận tại Moetruyen',
-  colorScheme: 'dark light',
-  themeColor: 'dark light',
   referrer: 'origin-when-cross-origin',
   generator: 'Moetruyen',
   authors: [{ name: 'Moetruyen' }],

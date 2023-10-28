@@ -240,7 +240,6 @@ model Chapter {
   chapterIndex Float        @default(1)
   name         String?
   images       String[]
-  blurImages   String[]
   volume       Int
   mangaId      Int
   teamId       Int?
@@ -340,7 +339,6 @@ model History {
   id        Int      @id @default(autoincrement())
   userId    String
   mangaId   Int
-  chapterId Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

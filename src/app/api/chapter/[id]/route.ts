@@ -2,7 +2,6 @@ import { getAuthSession } from '@/lib/auth';
 import { EditChapterImage, UploadChapterImage } from '@/lib/contabo';
 import { db } from '@/lib/db';
 import { signPublicToken } from '@/lib/jwt';
-import { getImagesBase64 } from '@/lib/plaiceholder';
 import {
   ChapterFormEditValidator,
   ChapterFormUploadValidator,
@@ -86,7 +85,6 @@ export async function POST(req: Request, context: { params: { id: string } }) {
           name: chapterName,
           volume,
           images: [],
-          blurImages: [],
           manga: {
             connect: { id: manga.id },
           },
@@ -102,7 +100,6 @@ export async function POST(req: Request, context: { params: { id: string } }) {
           name: chapterName,
           volume,
           images: [],
-          blurImages: [],
           manga: {
             connect: { id: manga.id },
           },
@@ -115,7 +112,6 @@ export async function POST(req: Request, context: { params: { id: string } }) {
       manga.id,
       createdChapter.id
     );
-    const blurImages = await getImagesBase64(uploadedImages);
 
     await db.chapter.update({
       where: {
@@ -123,7 +119,6 @@ export async function POST(req: Request, context: { params: { id: string } }) {
       },
       data: {
         images: uploadedImages,
-        blurImages: blurImages,
       },
     });
 
@@ -175,7 +170,6 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
     )
       .sort((a, b) => a.index - b.index)
       .map((img) => img.image);
-    const blurImages = await getImagesBase64(edittedImages);
 
     await db.chapter.update({
       where: {
@@ -186,7 +180,6 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
         name: chapterName,
         volume,
         images: edittedImages,
-        blurImages,
       },
     });
 
