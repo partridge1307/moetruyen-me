@@ -104,8 +104,6 @@ model User {
   followedBy User[] @relation("userFollows")
   following  User[] @relation("userFollows")
 
-  messages       Message[]
-  conversation   Conversation[]  @relation("ConversationToUser")
   isWaitVeify    VerifyList?
   discordChannel DiscordChannel?
 
@@ -364,29 +362,6 @@ model DiscordChannel {
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId])
-}
-
-// Chat
-
-model Conversation {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  messages  Message[]
-  users     User[]    @relation("ConversationToUser")
-}
-
-model Message {
-  id             Int      @id @default(autoincrement())
-  content        String
-  conversationId Int
-  senderId       String
-  createdAt      DateTime @default(now())
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation(fields: [senderId], references: [id])
-
-  @@index([conversationId])
-  @@index([senderId])
 }
 
 // Manage

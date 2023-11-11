@@ -92,6 +92,7 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
     mutationFn: async (values: MangaUploadPayload) => {
       const {
         slug,
+        cover,
         image,
         name,
         description,
@@ -105,7 +106,14 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
 
       const form = new FormData();
 
-      slug && form.append('slug', slug);
+      if (!!cover) {
+        if (cover.startsWith('blob')) {
+          const blob = await fetch(cover).then((res) => res.blob());
+          form.append('cover', blob);
+        } else {
+          form.append('cover', cover);
+        }
+      }
 
       if (image.startsWith('blob')) {
         const blob = await fetch(image).then((res) => res.blob());
@@ -113,6 +121,8 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
       } else {
         form.append('image', image);
       }
+
+      !!slug && form.append('slug', slug);
 
       form.append('name', name);
       form.append('review', review);

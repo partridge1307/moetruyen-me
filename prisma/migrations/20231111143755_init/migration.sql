@@ -265,25 +265,6 @@ CREATE TABLE "DiscordChannel" (
 );
 
 -- CreateTable
-CREATE TABLE "Conversation" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Conversation_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Message" (
-    "id" SERIAL NOT NULL,
-    "content" TEXT NOT NULL,
-    "conversationId" INTEGER NOT NULL,
-    "senderId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Log" (
     "id" SERIAL NOT NULL,
     "content" TEXT NOT NULL,
@@ -391,12 +372,6 @@ CREATE TABLE "_MangaToTag" (
 
 -- CreateTable
 CREATE TABLE "_userMangaFollow" (
-    "A" INTEGER NOT NULL,
-    "B" TEXT NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "_ConversationToUser" (
     "A" INTEGER NOT NULL,
     "B" TEXT NOT NULL
 );
@@ -552,12 +527,6 @@ CREATE UNIQUE INDEX "DiscordChannel_userId_key" ON "DiscordChannel"("userId");
 CREATE INDEX "DiscordChannel_userId_idx" ON "DiscordChannel"("userId");
 
 -- CreateIndex
-CREATE INDEX "Message_conversationId_idx" ON "Message"("conversationId");
-
--- CreateIndex
-CREATE INDEX "Message_senderId_idx" ON "Message"("senderId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "SubForum_slug_key" ON "SubForum"("slug");
 
 -- CreateIndex
@@ -625,12 +594,6 @@ CREATE UNIQUE INDEX "_userMangaFollow_AB_unique" ON "_userMangaFollow"("A", "B")
 
 -- CreateIndex
 CREATE INDEX "_userMangaFollow_B_index" ON "_userMangaFollow"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_ConversationToUser_AB_unique" ON "_ConversationToUser"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_ConversationToUser_B_index" ON "_ConversationToUser"("B");
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -717,12 +680,6 @@ ALTER TABLE "History" ADD CONSTRAINT "History_mangaId_fkey" FOREIGN KEY ("mangaI
 ALTER TABLE "DiscordChannel" ADD CONSTRAINT "DiscordChannel_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Message" ADD CONSTRAINT "Message_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "SubForum" ADD CONSTRAINT "SubForum_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -793,9 +750,3 @@ ALTER TABLE "_userMangaFollow" ADD CONSTRAINT "_userMangaFollow_A_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "_userMangaFollow" ADD CONSTRAINT "_userMangaFollow_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ConversationToUser" ADD CONSTRAINT "_ConversationToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ConversationToUser" ADD CONSTRAINT "_ConversationToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
