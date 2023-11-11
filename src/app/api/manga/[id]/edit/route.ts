@@ -35,7 +35,6 @@ export async function POST(req: Request, context: { params: { id: string } }) {
         image: true,
       },
     });
-    console.log(c);
 
     let coverPromise, imagePromise;
     if (!!c || typeof c !== 'undefined') {
