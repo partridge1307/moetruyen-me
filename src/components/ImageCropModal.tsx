@@ -10,7 +10,7 @@ import {
 import { buttonVariants } from '@/components/ui/Button';
 import { Slider } from '@/components/ui/Slider';
 import { cn, dataUrlToBlob } from '@/lib/utils';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import type { Crop, PixelCrop } from 'react-image-crop';
 import { ReactCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -103,7 +103,7 @@ const ImageCropModal = forwardRef<HTMLButtonElement, ImageCropModalProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [aspect, imageRef.current]);
 
-    function onDoneHandler() {
+    const onDoneHandler = useCallback(() => {
       if (
         completeCrop?.width &&
         completeCrop?.height &&
@@ -116,26 +116,29 @@ const ImageCropModal = forwardRef<HTMLButtonElement, ImageCropModalProps>(
 
         setImageCropped(url);
       }
-    }
+    }, [completeCrop, image, setImageCropped]);
 
-    function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
-      const { height, width, clientWidth, clientHeight } = e.currentTarget;
-      const centerCrop = centerAspectCrop(width, height, aspect);
+    const onImageLoad = useCallback(
+      (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const { height, width, clientWidth, clientHeight } = e.currentTarget;
+        const centerCrop = centerAspectCrop(width, height, aspect);
 
-      const xCrop = Math.round(clientWidth * (centerCrop.x / 100));
-      const widthCrop = Math.round(clientWidth * (centerCrop.width / 100));
-      const yCrop = Math.round(clientHeight * (centerCrop.y / 100));
-      const heightCrop = Math.round(clientHeight * (centerCrop.height / 100));
+        const xCrop = Math.round(clientWidth * (centerCrop.x / 100));
+        const widthCrop = Math.round(clientWidth * (centerCrop.width / 100));
+        const yCrop = Math.round(clientHeight * (centerCrop.y / 100));
+        const heightCrop = Math.round(clientHeight * (centerCrop.height / 100));
 
-      setCompleteCrop({
-        unit: 'px',
-        x: xCrop,
-        width: widthCrop,
-        y: yCrop,
-        height: heightCrop,
-      });
-      setCrop(centerCrop);
-    }
+        setCompleteCrop({
+          unit: 'px',
+          x: xCrop,
+          width: widthCrop,
+          y: yCrop,
+          height: heightCrop,
+        });
+        setCrop(centerCrop);
+      },
+      [aspect]
+    );
 
     return (
       <AlertDialog>
