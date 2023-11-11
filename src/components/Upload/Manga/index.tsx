@@ -90,7 +90,7 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
 
       const form = new FormData();
 
-      if (cover) {
+      if (!!cover) {
         if (cover.startsWith('blob')) {
           const blob = await fetch(cover).then((res) => res.blob());
           form.append('cover', blob);
