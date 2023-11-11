@@ -2,7 +2,7 @@
 
 import { DataTableColumnHeader } from '@/components/Table/ColumnHeader';
 import { formatTimeToNow } from '@/lib/utils';
-import type { Chapter } from '@prisma/client';
+import { ProgressType, type Chapter } from '@prisma/client';
 import type { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -18,7 +18,13 @@ const DataTableRowAction = dynamic(() => import('./RowAction'), {
 
 export type ChapterColumn = Pick<
   Chapter,
-  'id' | 'name' | 'images' | 'isPublished' | 'mangaId' | 'updatedAt'
+  | 'id'
+  | 'name'
+  | 'images'
+  | 'isPublished'
+  | 'mangaId'
+  | 'progress'
+  | 'updatedAt'
 >;
 
 export const columns: ColumnDef<ChapterColumn>[] = [
@@ -59,6 +65,26 @@ export const columns: ColumnDef<ChapterColumn>[] = [
         : 'Chờ đăng';
 
       return <div>{formattedStatus}</div>;
+    },
+  },
+  {
+    id: 'Tình trạng',
+    accessorKey: 'progress',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tình trạng" />
+    ),
+    cell: ({ row }) => {
+      const formatValue = row.getValue('Tình trạng');
+      const formattedValue =
+        formatValue === ProgressType.ERROR
+          ? 'Lỗi'
+          : formatValue === ProgressType.SUCCESS
+          ? 'Thành công'
+          : formatValue === ProgressType.EDITTING
+          ? 'Đang sửa'
+          : 'Đang tải';
+
+      return <div>{formattedValue}</div>;
     },
   },
   {

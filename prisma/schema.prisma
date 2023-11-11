@@ -244,12 +244,14 @@ model Chapter {
   mangaId      Int
   teamId       Int?
   isPublished  Boolean      @default(false)
+  progress     ProgressType @default(UPLOADING)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  manga        Manga        @relation(fields: [mangaId], references: [id], onDelete: Cascade)
-  comment      Comment[]
-  dailyView    DailyView[]
-  weeklyView   WeeklyView[]
+
+  manga      Manga        @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+  comment    Comment[]
+  dailyView  DailyView[]
+  weeklyView WeeklyView[]
 
   team Team? @relation(fields: [teamId], references: [id])
 
@@ -486,6 +488,13 @@ model PostCommentVote {
 
   @@id([userId, postCommentId])
   @@index([postCommentId, userId])
+}
+
+enum ProgressType {
+  SUCCESS
+  ERROR
+  UPLOADING
+  EDITTING
 }
 
 enum VoteType {

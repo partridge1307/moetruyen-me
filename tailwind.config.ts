@@ -71,6 +71,10 @@ module.exports = {
           '0%, 100%': { transform: 'translateX(2rem)' },
           '50%': { transform: 'translateX(-2.5rem)' },
         },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
         rainbow: {
           '0%, 100%': {
             'background-size': '300% 100%',
@@ -91,6 +95,7 @@ module.exports = {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'up-down': 'up-down 3s ease-in-out infinite',
         'left-right': 'left-right 3s ease-in-out infinite',
+        wiggle: 'wiggle 0.5s ease-in-out infinite',
         rainbow: 'rainbow 5s ease-in-out infinite',
       },
     },

@@ -1,13 +1,41 @@
 import { getAuthSession } from '@/lib/auth';
-import { EditChapterImage, UploadChapterImage } from '@/lib/contabo';
+import { DeleteChapterImages, UploadChapterImage } from '@/lib/contabo';
 import { db } from '@/lib/db';
 import { signPublicToken } from '@/lib/jwt';
-import {
-  ChapterFormEditValidator,
-  ChapterFormUploadValidator,
-} from '@/lib/validators/chapter';
+import { ChapterFormUploadValidator } from '@/lib/validators/chapter';
 import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
+
+const asyncUploadChapter = async (
+  images: File[],
+  mangaId: number,
+  chapterId: number
+) => {
+  try {
+    const uploadedImages = await UploadChapterImage(images, mangaId, chapterId);
+    await db.chapter.update({
+      where: {
+        id: chapterId,
+      },
+      data: {
+        images: uploadedImages,
+        progress: 'SUCCESS',
+      },
+    });
+  } catch (error) {
+    await Promise.all([
+      db.chapter.update({
+        where: {
+          id: chapterId,
+        },
+        data: {
+          progress: 'ERROR',
+        },
+      }),
+      DeleteChapterImages({ mangaId, chapterId }),
+    ]);
+  }
+};
 
 export async function POST(req: Request, context: { params: { id: string } }) {
   try {
@@ -107,20 +135,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
       });
     }
 
-    const uploadedImages = await UploadChapterImage(
-      images,
-      manga.id,
-      createdChapter.id
-    );
-
-    await db.chapter.update({
-      where: {
-        id: createdChapter.id,
-      },
-      data: {
-        images: uploadedImages,
-      },
-    });
+    asyncUploadChapter(images, manga.id, createdChapter.id);
 
     return new Response('OK');
   } catch (error) {
@@ -131,69 +146,6 @@ export async function POST(req: Request, context: { params: { id: string } }) {
         return new Response('Not found', { status: 404 });
       }
     }
-    return new Response('Something went wrong', { status: 500 });
-  }
-}
-
-export async function PATCH(req: Request, context: { params: { id: string } }) {
-  try {
-    const session = await getAuthSession();
-    if (!session) return new Response('Unauthorized', { status: 401 });
-
-    const { images, order, chapterIndex, chapterName, volume } =
-      ChapterFormEditValidator.parse(await req.formData());
-
-    const chapter = await db.chapter.findUniqueOrThrow({
-      where: {
-        manga: {
-          creatorId: session.user.id,
-        },
-        id: +context.params.id,
-      },
-      select: {
-        id: true,
-        mangaId: true,
-        images: true,
-      },
-    });
-
-    const edittedImages = (
-      await EditChapterImage(
-        images.sort(
-          (a, b) =>
-            order.indexOf(images.indexOf(a)) - order.indexOf(images.indexOf(b))
-        ),
-        chapter.images,
-        chapter.mangaId,
-        chapter.id
-      )
-    )
-      .sort((a, b) => a.index - b.index)
-      .map((img) => img.image);
-
-    await db.chapter.update({
-      where: {
-        id: +context.params.id,
-      },
-      data: {
-        chapterIndex,
-        name: chapterName,
-        volume,
-        images: edittedImages,
-      },
-    });
-
-    return new Response('OK');
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return new Response(error.message, { status: 422 });
-    }
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        return new Response('Not found', { status: 404 });
-      }
-    }
-
     return new Response('Something went wrong', { status: 500 });
   }
 }

@@ -78,8 +78,8 @@ const ChapterEdit: FC<EditProps> = ({ chapter }) => {
         })
       );
 
-      await axios.patch(`/api/chapter/${chapter.id}`, form, {
-        onDownloadProgress(progressEvent) {
+      await axios.post(`/api/chapter/${chapter.id}/edit`, form, {
+        onUploadProgress(progressEvent) {
           const percentCompleted = Math.floor(
             (progressEvent.loaded * 100) / progressEvent.total!
           );

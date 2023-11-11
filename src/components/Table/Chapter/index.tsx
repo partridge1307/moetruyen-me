@@ -2,6 +2,7 @@
 
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/Table';
+import { useInterval } from '@mantine/hooks';
 import type {
   ColumnFiltersState,
   SortingState,
@@ -17,10 +18,12 @@ import {
 } from '@tanstack/react-table';
 import dynamic from 'next/dist/shared/lib/dynamic';
 import Link from 'next/link';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import TableDataHeader from '../TableHeader';
 import TablePagination from '../TablePagination';
 import { ChapterColumn, columns } from './Column';
+import clearCache from './clearCache';
 
 const DataToolbar = dynamic(() => import('./Toolbar'), {
   ssr: false,
@@ -37,6 +40,9 @@ interface DataTableProps {
 }
 
 function ChapterTable({ data }: DataTableProps) {
+  const pathName = usePathname();
+  const interval = useInterval(() => clearCache(pathName), 5000);
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilter] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -57,6 +63,13 @@ function ChapterTable({ data }: DataTableProps) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
   });
+
+  useEffect(() => {
+    interval.start();
+
+    return interval.stop;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
@@ -88,7 +101,7 @@ function ChapterTable({ data }: DataTableProps) {
                   if (cell.column.id !== 'actions') {
                     return (
                       <TableCell key={cell.id}>
-                        <Link href={`/me/chapter/${row.original.id}`}>
+                        <Link href={`/chapters/${row.original.id}`}>
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

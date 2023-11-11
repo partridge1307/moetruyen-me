@@ -18,7 +18,7 @@ const SignOutDropdown = dynamic(() => import('@/components/SignOutDropdown'), {
 const Navbar = ({ session }: { session: Session }) => {
   return (
     <>
-      <nav className="sticky inset-x-0 top-0 mb-4 lg:mb-10 h-fit p-2 z-30 border-b bg-slate-100 dark:bg-zinc-800">
+      <nav className="sticky inset-x-0 top-0 mb-4 lg:mb-6 h-fit p-2 z-30 border-b bg-slate-100 dark:bg-zinc-800">
         <div className="container max-sm:px-2 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Sidebar session={session} />

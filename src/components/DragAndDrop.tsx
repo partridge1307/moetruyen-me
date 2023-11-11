@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import '@/styles/zoom.css';
 import {
   DndContext,
@@ -11,9 +12,8 @@ import {
 import { SortableContext, arrayMove, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Edit, Maximize2, X } from 'lucide-react';
-import Image from 'next/image';
 import type { Dispatch, FC, RefObject, SetStateAction } from 'react';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controlled as ControlledZoom } from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
 
@@ -39,6 +39,7 @@ const DnDChapterImage: FC<indexProps> = ({ items, setItems, isUpload }) => {
   const itemIds = useMemo(() => items.map((item) => item.src), [items]);
   const editImageRef = useRef<HTMLInputElement>(null);
   const [currentIdx, setCurrentIdx] = useState<number>(-1);
+  const [isDragging, setDragging] = useState(false);
 
   const onDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -82,6 +83,8 @@ const DnDChapterImage: FC<indexProps> = ({ items, setItems, isUpload }) => {
               key={idx}
               index={idx}
               editImageRef={editImageRef}
+              isDragging={isDragging}
+              setDragging={setDragging}
               setCurrentIdx={setCurrentIdx}
               setItems={setItems}
               img={item}
@@ -108,6 +111,8 @@ const SortableItem = memo(function SortableItem({
   index,
   isUpload,
   editImageRef,
+  isDragging,
+  setDragging,
   setCurrentIdx,
   setItems,
 }: {
@@ -115,6 +120,8 @@ const SortableItem = memo(function SortableItem({
   index: number;
   isUpload: boolean;
   editImageRef: RefObject<HTMLInputElement>;
+  isDragging: boolean;
+  setDragging: Dispatch<SetStateAction<boolean>>;
   setCurrentIdx: Dispatch<SetStateAction<number>>;
   setItems: Dispatch<SetStateAction<{ src: string; name: string }[]>>;
 }) {
@@ -122,11 +129,19 @@ const SortableItem = memo(function SortableItem({
     attributes,
     listeners,
     setNodeRef,
-    isDragging,
+    isDragging: isImgDragging,
     transform,
     transition,
   } = useSortable({ id: img.src });
   const [isZoomed, setZoom] = useState(false);
+
+  useEffect(() => {
+    if (isImgDragging) {
+      setDragging(true);
+    } else {
+      setDragging(false);
+    }
+  }, [isImgDragging, setDragging]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -137,67 +152,72 @@ const SortableItem = memo(function SortableItem({
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <ControlledZoom
-        isZoomed={isZoomed}
-        onZoomChange={setZoom}
-        wrapElement="div"
-        classDialog="custom-zoom"
+    <ControlledZoom
+      isZoomed={isZoomed}
+      onZoomChange={setZoom}
+      wrapElement="div"
+      classDialog="custom-zoom"
+    >
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="relative w-28 h-44 md:w-32 md:h-48"
       >
-        <div className="relative w-28 h-44 md:w-32 md:h-48">
-          <Image
-            fill
-            sizes="(max-width: 640px) 50vw, 40vw"
-            priority
+        <div
+          className={cn('relative inline-flex items-center w-full h-full', {
+            'motion-safe:animate-wiggle': isDragging,
+          })}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={img.src}
-            alt={`${img.name} Image`}
             className="object-cover rounded-md"
+            alt={`${img.name} Image`}
           />
-
-          {!isUpload && !isDragging && (
-            <button
-              type="button"
-              className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 p-1 rounded-full dark:bg-zinc-800/80"
-              onClick={() => {
-                editImageRef.current?.click();
-                setCurrentIdx(index);
-              }}
-            >
-              <Edit className="w-4 h-4 opacity-70" />
-            </button>
-          )}
-
-          {!isUpload && !isDragging && (
-            <button
-              type="button"
-              className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 p-1 rounded-full dark:bg-zinc-800/80"
-              onClick={() => {
-                setItems((items) =>
-                  items.filter((item) => item.src !== img.src)
-                );
-              }}
-            >
-              <X className="w-4 h-4 opacity-70" />
-            </button>
-          )}
-
-          {!isUpload && !isDragging && (
-            <button
-              type="button"
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full dark:bg-zinc-800/80"
-              onClick={() => {
-                setZoom(true);
-              }}
-            >
-              <Maximize2 className="w-5 h-5 opacity-80" />
-            </button>
-          )}
-
           <p className="absolute bottom-0 inset-x-1 p-1 text-xs text-center rounded-full line-clamp-1 dark:bg-zinc-800/80">
             {img.name}
           </p>
         </div>
-      </ControlledZoom>
-    </div>
+
+        {!isUpload && !isDragging && (
+          <button
+            type="button"
+            className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 p-1 rounded-full dark:bg-zinc-800/80"
+            onClick={() => {
+              editImageRef.current?.click();
+              setCurrentIdx(index);
+            }}
+          >
+            <Edit className="w-4 h-4 opacity-70" />
+          </button>
+        )}
+
+        {!isUpload && !isDragging && (
+          <button
+            type="button"
+            className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 p-1 rounded-full dark:bg-zinc-800/80"
+            onClick={() => {
+              setItems((items) => items.filter((item) => item.src !== img.src));
+            }}
+          >
+            <X className="w-4 h-4 opacity-70" />
+          </button>
+        )}
+
+        {!isUpload && !isDragging && (
+          <button
+            type="button"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full dark:bg-zinc-800/80"
+            onClick={() => {
+              setZoom(true);
+            }}
+          >
+            <Maximize2 className="w-5 h-5 opacity-80" />
+          </button>
+        )}
+      </div>
+    </ControlledZoom>
   );
 });

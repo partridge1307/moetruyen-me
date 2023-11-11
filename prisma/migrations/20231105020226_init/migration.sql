@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "ProgressType" AS ENUM ('SUCCESS', 'ERROR', 'UPLOADING', 'EDITTING');
+
+-- CreateEnum
 CREATE TYPE "VoteType" AS ENUM ('UP_VOTE', 'DOWN_VOTE');
 
 -- CreateEnum
@@ -175,11 +178,11 @@ CREATE TABLE "Chapter" (
     "chapterIndex" DOUBLE PRECISION NOT NULL DEFAULT 1,
     "name" TEXT,
     "images" TEXT[],
-    "blurImages" TEXT[],
     "volume" INTEGER NOT NULL,
     "mangaId" INTEGER NOT NULL,
     "teamId" INTEGER,
     "isPublished" BOOLEAN NOT NULL DEFAULT false,
+    "progress" "ProgressType" NOT NULL DEFAULT 'UPLOADING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -244,7 +247,6 @@ CREATE TABLE "History" (
     "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
     "mangaId" INTEGER NOT NULL,
-    "chapterId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

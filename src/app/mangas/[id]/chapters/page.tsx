@@ -35,10 +35,11 @@ const page: FC<pageProps> = async ({ params }) => {
       select: {
         id: true,
         name: true,
+        images: true,
         isPublished: true,
         mangaId: true,
+        progress: true,
         updatedAt: true,
-        images: true,
       },
     });
   if (!chapters) return notFound();
