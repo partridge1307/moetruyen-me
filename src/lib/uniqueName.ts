@@ -55,7 +55,7 @@ export const setRandomUsername = async (userId: string): Promise<User> => {
 
   if (isExisted) return setRandomUsername(userId);
   else
-    return await db.user.update({
+    return db.user.update({
       where: {
         id: userId,
       },
