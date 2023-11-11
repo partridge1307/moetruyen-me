@@ -125,7 +125,7 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
       author.map((a) => form.append('author', JSON.stringify(a)));
       tag.map((t) => form.append('tag', JSON.stringify(t)));
 
-      const { data } = await axios.patch(`/api/manga/${manga.id}`, form);
+      const { data } = await axios.post(`/api/manga/${manga.id}/edit`, form);
 
       return data;
     },
@@ -156,7 +156,6 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
       ...values,
       description: values.description ?? manga.description,
     };
-    console.log(payload);
 
     Update(payload);
   }

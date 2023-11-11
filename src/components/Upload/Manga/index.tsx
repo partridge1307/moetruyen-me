@@ -153,7 +153,6 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
   });
 
   const onSubmitHandler = (values: MangaUploadPayload) => {
-    console.log(values);
     Upload(values);
   };
 

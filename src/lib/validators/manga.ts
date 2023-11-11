@@ -80,18 +80,22 @@ export type MangaUploadPayload = z.infer<typeof MangaUploadValidator>;
 export const MangaFormValidator = zfd.formData({
   cover: zfd
     .file()
+    .or(zfd.text())
     .optional()
-    .refine(
-      (file) => (!file ? true : file.size < 4 * 1000 * 1000),
-      'Tối đa 4MB'
-    )
-    .refine(
-      (file) =>
-        !file
-          ? true
-          : ['image/jpg', 'image/jpeg', 'image/png'].includes(file.type),
-      'Chỉ nhận ảnh có định dạng .jpg, .png, .jpeg'
-    ),
+    .refine((file) => {
+      if (!file) return true;
+
+      if (file instanceof File) {
+        return file.size < 4 * 1000 * 1000;
+      } else return file.startsWith(`${process.env.IMG_DOMAIN}`);
+    }, 'Tối đa 4MB')
+    .refine((file) => {
+      if (!file) return true;
+
+      if (file instanceof File) {
+        return ['image/jpg', 'image/jpeg', 'image/png'].includes(file.type);
+      } else return file.startsWith(`${process.env.IMG_DOMAIN}`);
+    }, 'Chỉ nhận ảnh có định dạng .jpg, .png, .jpeg'),
   image: zfd
     .file()
     .refine((file) => file.size < 4 * 1000 * 1000, 'Tối đa 4MB')
