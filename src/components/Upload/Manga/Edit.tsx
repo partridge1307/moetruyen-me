@@ -156,6 +156,7 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
       ...values,
       description: values.description ?? manga.description,
     };
+    console.log(payload);
 
     Update(payload);
   }
