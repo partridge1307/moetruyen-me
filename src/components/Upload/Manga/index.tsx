@@ -60,6 +60,7 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
       cover: undefined,
       image: undefined,
       name: '',
+      slug: '',
       description: undefined,
       review: '',
       altName: [],
