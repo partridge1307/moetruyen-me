@@ -6,7 +6,7 @@ import Discord from 'next-auth/providers/discord';
 import { cookies, headers } from 'next/headers';
 import { NextRequest } from 'next/server';
 import { db } from './db';
-import { generateRandomName } from './uniqueName';
+import { setRandomUsername } from './uniqueName';
 
 export interface AuthContext {
   params: { nextauth: string[] };
@@ -144,14 +144,7 @@ export const authOptionsWrapper = (
           }
 
           if (!dbUser.name) {
-            const updatedUser = await db.user.update({
-              where: {
-                id: dbUser.id,
-              },
-              data: {
-                name: generateRandomName,
-              },
-            });
+            const updatedUser = await setRandomUsername(dbUser.id);
 
             return {
               user: {
