@@ -1,7 +1,6 @@
 import { Menu } from 'lucide-react';
 import type { Session } from 'next-auth';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { Icons } from '../Icons';
 import ThemeChangeClient from '../ThemeChangeClient';
 import { buttonVariants } from '../ui/Button';
@@ -22,7 +21,11 @@ const Navbar = ({ session }: { session: Session }) => {
         <div className="container max-sm:px-2 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Sidebar session={session} />
-            <Link href="/" className="flex items-center space-x-2">
+            <a
+              aria-label="Moetruyen home"
+              href={`${process.env.NEXT_PUBLIC_MAIN_URL}`}
+              className="flex items-center space-x-2"
+            >
               <Icons.logo
                 aria-label="Moetruyen Logo"
                 className="w-6 h-6 dark:fill-white"
@@ -39,7 +42,7 @@ const Navbar = ({ session }: { session: Session }) => {
                   </span>
                 </span>
               </p>
-            </Link>
+            </a>
           </div>
 
           <div className="flex items-center gap-8">
