@@ -14,11 +14,10 @@ jobs:
           sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{secrets.SSH_SERVER_IP}} << 'EOF'
             echo "Connected!!!"
             export PATH="$PATH:/usr/bin/nodejs"
-            cd ~/main_page
+            cd ~/manage_page
             git pull
-            yarn --version
             yarn install
             yarn build
-            pm2 restart main
+            pm2 restart manage
             echo "Deployment done!"
           EOF
