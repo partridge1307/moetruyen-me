@@ -223,6 +223,7 @@ model Manga {
   @@unique([name, creatorId])
   @@index([creatorId])
   @@index([slug])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, name: "Manga_name_gin_index")
 }
 
 model MangaAuthor {
