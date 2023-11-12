@@ -41,7 +41,7 @@ export const MangaUploadValidator = z.object({
     .max(256, { message: 'Tối đa 256 kí tự' })
     .refine(
       (value) => vieRegex.test(value),
-      'Tên chỉ chấp nhận kí tự in hoa, in thường, gạch dưới, khoảng cách hoặc số'
+      'Tên chỉ chấp nhận kí tự latin, kí tự đặc biệt phổ thông'
     ),
   altName: z
     .array(z.string().max(512, 'Tối đa 512 kí tự'))
@@ -118,7 +118,7 @@ export const MangaFormValidator = zfd.formData({
       .max(256, 'Tối đa 256 kí tự')
       .refine(
         (value) => vieRegex.test(value),
-        'Tên chỉ chấp nhận kí tự in hoa, in thường, gạch dưới, khoảng cách hoặc số'
+        'Tên chỉ chấp nhận kí tự latin, kí tự đặc biệt phổ thông'
       )
   ),
   slug: zfd
