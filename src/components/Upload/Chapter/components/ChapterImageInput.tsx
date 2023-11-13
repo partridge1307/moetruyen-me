@@ -307,20 +307,23 @@ const ZipExtractor = async (file: File) => {
   try {
     const zippedFiles = Object.values((await jszip.loadAsync(file)).files);
 
-    return await Promise.all(
-      zippedFiles.map(async (zippedFile) => {
-        const blob = await zippedFile.async('blob');
+    return (
+      await Promise.all(
+        zippedFiles.map(async (zippedFile) => {
+          const blob = await zippedFile.async('blob');
+          if (blob.size > 4 * 1000 * 1000) return;
 
-        return {
-          src: URL.createObjectURL(
-            new Blob([blob], {
-              type: `image/${zippedFile.name.split('.').pop() ?? 'jpeg'}`,
-            })
-          ),
-          name: zippedFile.name,
-        };
-      })
-    );
+          return {
+            src: URL.createObjectURL(
+              new Blob([blob], {
+                type: `image/${zippedFile.name.split('.').pop() ?? 'jpeg'}`,
+              })
+            ),
+            name: zippedFile.name,
+          };
+        })
+      )
+    ).filter(Boolean) as ImageType[];
   } catch (error) {
     throw error;
   }
