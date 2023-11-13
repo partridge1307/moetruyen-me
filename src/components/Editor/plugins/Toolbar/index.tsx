@@ -54,7 +54,7 @@ import {
   Underline,
   Undo,
 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ImageInputBody } from '../Image';
 import { FloatingLinkEditor, getSelectedNode } from '../Link';
@@ -87,6 +87,12 @@ const Toolbar = () => {
   const [linkInput, setLinkInput] = useState<string>('');
   const [isLink, setIsLink] = useState<boolean>(false);
   const [isLinkDisabled, setIsLinkDisabled] = useState<boolean>(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const mouseCoords = useRef({
+    startX: 0,
+    scrollLeft: 0,
+  });
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -193,9 +199,43 @@ const Toolbar = () => {
     [editor, isLink]
   );
 
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    if (!toolbarRef.current) return;
+
+    const startX = e.pageX - toolbarRef.current.offsetLeft;
+    mouseCoords.current = { startX, scrollLeft: toolbarRef.current.scrollLeft };
+    setIsDragging(true);
+  }, []);
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+  const handleDragging = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDragging || !toolbarRef.current) return;
+      e.preventDefault();
+
+      const x = e.pageX - toolbarRef.current.offsetLeft;
+      const walkX = (x - mouseCoords.current.startX) * 1.5;
+
+      toolbarRef.current.scrollLeft = mouseCoords.current.scrollLeft - walkX;
+    },
+    [isDragging]
+  );
+
   return (
-    <div className="overflow-auto flex justify-between gap-4 lg:gap-2">
-      <div className="flex items-center gap-2">
+    <div
+      ref={toolbarRef}
+      className="overflow-auto flex justify-between space-x-6 lg:gap-2 hide_scrollbar"
+      onMouseDown={handleDragStart}
+      onMouseUp={handleDragEnd}
+      onMouseLeave={handleDragEnd}
+      onMouseMove={handleDragging}
+    >
+      <div
+        className="flex items-center gap-2"
+        onMouseDown={handleDragStart}
+        onMouseUp={handleDragEnd}
+      >
         <div className="flex items-center gap-1">
           <button
             aria-label="bold format button"

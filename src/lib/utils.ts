@@ -153,3 +153,39 @@ export const generateSearchPhrase = (searchPhrase: string) =>
     .split(/\s+/)
     .map((phrase) => `${phrase}:*`)
     .join(' | ');
+
+export const getMimeType = (target: any) => {
+  try {
+    let header = '',
+      type;
+
+    const arr = (target as Uint8Array).subarray(0, 4);
+
+    for (let i = 0; i < arr.length; ++i) {
+      header += arr[i].toString(16);
+    }
+
+    switch (header) {
+      case '89504e47':
+        type = 'image/png';
+        break;
+      case '47494638':
+        type = 'image/gif';
+        break;
+      case 'ffd8ffe0':
+      case 'ffd8ffe1':
+      case 'ffd8ffe2':
+      case 'ffd8ffe3':
+      case 'ffd8ffe8':
+        type = 'image/jpeg';
+        break;
+      default:
+        type = 'unknown'; // Or you can use the blob.type as fallback
+        break;
+    }
+
+    return type;
+  } catch (error) {
+    return 'unknown';
+  }
+};

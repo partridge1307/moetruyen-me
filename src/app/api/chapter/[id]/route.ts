@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { signPublicToken } from '@/lib/jwt';
 import { ChapterFormUploadValidator } from '@/lib/validators/chapter';
 import { Prisma } from '@prisma/client';
+import { fileTypeFromBuffer } from 'file-type';
 import { ZodError } from 'zod';
 
 const asyncUploadChapter = async (
@@ -12,7 +13,24 @@ const asyncUploadChapter = async (
   chapterId: number
 ) => {
   try {
-    const uploadedImages = await UploadChapterImage(images, mangaId, chapterId);
+    const filterredFiles = (
+      await Promise.all(
+        images.map(async (image) => {
+          const type = await fileTypeFromBuffer(await image.arrayBuffer());
+          if (!type) return;
+
+          if (['image/png', 'image/jpeg', 'image/jpg'].includes(type?.mime)) {
+            return image;
+          }
+        })
+      )
+    ).filter(Boolean) as File[];
+
+    const uploadedImages = await UploadChapterImage(
+      filterredFiles,
+      mangaId,
+      chapterId
+    );
     await db.chapter.update({
       where: {
         id: chapterId,

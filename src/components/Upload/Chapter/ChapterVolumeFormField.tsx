@@ -24,14 +24,7 @@ const ChapterVolumeFormField: FC<ChapterVolumeFormFieldProps> = ({ form }) => {
           <FormLabel>Volume</FormLabel>
           <FormMessage />
           <FormControl>
-            <Input
-              ref={field.ref}
-              type="number"
-              min={0}
-              value={field.value}
-              onChange={(e) => field.onChange(e.target.valueAsNumber)}
-              onBlur={field.onBlur}
-            />
+            <Input type="number" min={0} {...field} />
           </FormControl>
         </FormItem>
       )}

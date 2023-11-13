@@ -3,6 +3,7 @@ import { EditChapterImage } from '@/lib/contabo';
 import { db } from '@/lib/db';
 import { ChapterFormEditValidator } from '@/lib/validators/chapter';
 import { Prisma } from '@prisma/client';
+import { fileTypeFromBuffer } from 'file-type';
 import { ZodError } from 'zod';
 
 const asyncEditChapter = async (
@@ -13,9 +14,24 @@ const asyncEditChapter = async (
   chapterId: number
 ) => {
   try {
+    const filterredFiles = (
+      await Promise.all(
+        images.map(async (image) => {
+          if (image instanceof File) {
+            const type = await fileTypeFromBuffer(await image.arrayBuffer());
+            if (!type) return;
+
+            if (['image/png', 'image/jpeg', 'image/jpg'].includes(type?.mime)) {
+              return image;
+            }
+          } else return image;
+        })
+      )
+    ).filter(Boolean) as (string | File)[];
+
     const edittedImages = (
       await EditChapterImage(
-        images.sort(
+        filterredFiles.sort(
           (a, b) =>
             order.indexOf(images.indexOf(a)) - order.indexOf(images.indexOf(b))
         ),
