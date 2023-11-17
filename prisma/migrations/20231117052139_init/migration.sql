@@ -1,3 +1,6 @@
+-- CreateExtension
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- CreateEnum
 CREATE TYPE "ProgressType" AS ENUM ('SUCCESS', 'ERROR', 'UPLOADING', 'EDITTING');
 
@@ -301,7 +304,7 @@ CREATE TABLE "Post" (
     "subForumId" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
     "content" JSONB NOT NULL,
-    "description" TEXT NOT NULL,
+    "plainTextContent" TEXT NOT NULL,
     "authorId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -459,6 +462,9 @@ CREATE INDEX "Manga_creatorId_idx" ON "Manga"("creatorId");
 
 -- CreateIndex
 CREATE INDEX "Manga_slug_idx" ON "Manga"("slug");
+
+-- CreateIndex
+CREATE INDEX "Manga_name_gin_index" ON "Manga" USING GIN ("name" gin_trgm_ops);
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Manga_name_creatorId_key" ON "Manga"("name", "creatorId");
