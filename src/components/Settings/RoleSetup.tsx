@@ -24,8 +24,14 @@ const RoleSetup: FC<RoleSetupProps> = ({
   server,
   channel,
 }) => {
-  const { loginToast, notFoundToast, serverErrorToast, successToast } =
-    useCustomToast();
+  const {
+    loginToast,
+    notFoundToast,
+    serverErrorToast,
+    successToast,
+    discordNotFoundToast,
+    discordErrorToast,
+  } = useCustomToast();
   const [roleSelected, setRole] = useState<TInfo>();
   const router = useRouter();
 
@@ -44,12 +50,14 @@ const RoleSetup: FC<RoleSetupProps> = ({
             description: 'Bạn đã thiết lập thông báo trước đó',
             variant: 'destructive',
           });
-        if (err.response?.status === 403)
-          return toast({
-            title: 'Không thể tìm thấy',
-            description: 'Không thể tìm thấy hoặc gửi tin nhắn tới Channel',
-            variant: 'destructive',
-          });
+        if (err.response?.status === 403 || err.response?.status === 503) {
+          if (err.response?.status === 403) discordNotFoundToast();
+          if (err.response.status === 503) discordErrorToast();
+
+          router.push('/settings');
+          router.refresh();
+          return;
+        }
       }
 
       return serverErrorToast();

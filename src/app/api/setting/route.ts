@@ -27,13 +27,16 @@ export async function GET() {
       },
     });
 
-    const result = await fetch(`${process.env.BOT_SERVER}/discord/server`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId: user.account[0].providerAccountId }),
-    });
+    const result = await fetch(
+      `${process.env.BOT_SERVER}/api/discord/servers`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.account[0].providerAccountId }),
+      }
+    );
 
     if (result.status !== 200) {
       if (result.status === 404)
@@ -84,16 +87,19 @@ export async function POST(req: Request) {
       },
     });
 
-    const result = await fetch(`${process.env.BOT_SERVER}/discord/channel`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: user.account[0].providerAccountId,
-        serverId: id,
-      }),
-    });
+    const result = await fetch(
+      `${process.env.BOT_SERVER}/api/discord/channels`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.account[0].providerAccountId,
+          serverId: id,
+        }),
+      }
+    );
 
     if (result.status !== 200) {
       if (result.status === 404)
@@ -169,25 +175,27 @@ export async function PUT(req: Request) {
     });
 
     const jwtKey = signPublicToken({
-      userId: user.account[0].providerAccountId,
-      server: {
-        id: createdDiscordChannel.serverId,
-        name: createdDiscordChannel.serverName,
+      data: {
+        userId: user.account[0].providerAccountId,
+        server: {
+          id: createdDiscordChannel.serverId,
+          name: createdDiscordChannel.serverName,
+        },
+        channel: {
+          id: createdDiscordChannel.channelId,
+          name: createdDiscordChannel.channelName,
+        },
+        ...(!!createdDiscordChannel.roleId &&
+          !!createdDiscordChannel.roleName && {
+            role: {
+              id: createdDiscordChannel.roleId,
+              name: createdDiscordChannel.roleName,
+            },
+          }),
       },
-      channel: {
-        id: createdDiscordChannel.channelId,
-        name: createdDiscordChannel.channelName,
-      },
-      ...(!!createdDiscordChannel.roleId &&
-        !!createdDiscordChannel.roleName && {
-          role: {
-            id: createdDiscordChannel.roleId,
-            name: createdDiscordChannel.roleName,
-          },
-        }),
     });
 
-    const result = await fetch(`${process.env.BOT_SERVER}/discord/setup`, {
+    const result = await fetch(`${process.env.BOT_SERVER}/api/private/set-up`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${jwtKey}`,

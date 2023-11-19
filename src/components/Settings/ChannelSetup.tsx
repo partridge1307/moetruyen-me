@@ -1,7 +1,6 @@
 'use client';
 
 import { useCustomToast } from '@/hooks/use-custom-toast';
-import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
@@ -31,7 +30,13 @@ const ChannelSetup: FC<ChannelSetupProps> = ({
   setChannel,
   setRoles,
 }) => {
-  const { loginToast, notFoundToast, serverErrorToast } = useCustomToast();
+  const {
+    loginToast,
+    notFoundToast,
+    serverErrorToast,
+    discordNotFoundToast,
+    discordErrorToast,
+  } = useCustomToast();
 
   const { data: metaData, isFetching: isFetchingChannel } = useQuery({
     queryKey: ['fetch-discord-channel'],
@@ -44,18 +49,8 @@ const ChannelSetup: FC<ChannelSetupProps> = ({
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) return loginToast();
         if (err.response?.status === 404) return notFoundToast();
-        if (err.response?.status === 409)
-          return toast({
-            title: 'Không tìm thấy Server',
-            description: 'Vui lòng điền ID Server hoặc thử lại sau',
-            variant: 'destructive',
-          });
-        if (err.response?.status === 503)
-          return toast({
-            title: 'Không thể kết nối tới Bot',
-            description: 'Vui lòng thử lại sau',
-            variant: 'destructive',
-          });
+        if (err.response?.status === 409) return discordNotFoundToast();
+        if (err.response?.status === 503) return discordErrorToast();
       }
 
       return serverErrorToast();
@@ -86,6 +81,8 @@ const ChannelSetup: FC<ChannelSetupProps> = ({
               <span>Tên: {channel.name}</span>
             </li>
           ))
+        ) : isFetchingChannel ? (
+          <li>Đang tìm kiếm</li>
         ) : (
           <li>Không tìm thấy Channel</li>
         )}

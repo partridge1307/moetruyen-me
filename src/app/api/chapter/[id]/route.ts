@@ -285,12 +285,14 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
 
     if (channel) {
       const jwtKey = signPublicToken({
-        chapterId: chapter.id,
-        channelId: channel.channelId,
-        roleId: channel.roleId,
+        data: {
+          chapterId: chapter.id,
+          channelId: channel.channelId,
+          roleId: channel.roleId,
+        },
       });
 
-      const result = await fetch(`${process.env.BOT_SERVER}/discord/notify`, {
+      const result = await fetch(`${process.env.BOT_SERVER}/api/private`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${jwtKey}`,

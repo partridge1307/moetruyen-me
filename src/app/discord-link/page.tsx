@@ -26,6 +26,7 @@ const page = async () => {
           providerAccountId: true,
         },
       },
+      discordChannel: true,
     },
   });
   if (!user) return notFound();
@@ -34,18 +35,29 @@ const page = async () => {
     <main className="container md:w-3/4 lg:w-2/3 p-2 mb-4 md:mb-10 space-y-10 rounded-md dark:bg-zinc-900/60">
       <h1 className="text-2xl font-semibold">Thiết lập thông báo Discord</h1>
 
-      {!!user.account.length ? (
-        <NotifySetup />
-      ) : (
+      {!!user.discordChannel && (
         <section className="flex flex-col items-center gap-10">
-          <p className="text-lg">
-            Bạn cần liên kết với Discord để thực hiện hành động này
-          </p>
+          <p className="text-lg">Bạn đã thiết lập thông báo Discord trước đó</p>
           <Link href="/settings" className={buttonVariants()}>
             Quay lại
           </Link>
         </section>
       )}
+
+      {!user.discordChannel ? (
+        !!user.account.length ? (
+          <NotifySetup />
+        ) : (
+          <section className="flex flex-col items-center gap-10">
+            <p className="text-lg">
+              Bạn cần liên kết với Discord để thực hiện hành động này
+            </p>
+            <Link href="/settings" className={buttonVariants()}>
+              Quay lại
+            </Link>
+          </section>
+        )
+      ) : null}
     </main>
   );
 };

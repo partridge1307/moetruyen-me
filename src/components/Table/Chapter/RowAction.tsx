@@ -38,8 +38,14 @@ interface DataTableRowActionProps {
 
 function DataTableRowAction({ row }: DataTableRowActionProps) {
   const chapter = row.original;
-  const { loginToast, notFoundToast, serverErrorToast, successToast } =
-    useCustomToast();
+  const {
+    loginToast,
+    notFoundToast,
+    serverErrorToast,
+    successToast,
+    discordErrorToast,
+    discordNotFoundToast,
+  } = useCustomToast();
   const { refresh } = useRouter();
 
   const { mutate: publish, isLoading: isPublishLoading } = useMutation({
@@ -57,12 +63,13 @@ function DataTableRowAction({ row }: DataTableRowActionProps) {
             description: 'Bạn đã publish Chapter này rồi',
             variant: 'destructive',
           });
-        if (e.response?.status === 403)
-          return toast({
-            title: 'Không thể tìm thấy',
-            description: 'Không thể tìm thấy hoặc gửi tin nhắn tới Channel',
-            variant: 'destructive',
-          });
+        if (e.response?.status === 403 || e.response?.status === 503) {
+          if (e.response.status === 403) discordNotFoundToast();
+          if (e.response.status === 503) discordErrorToast();
+
+          refresh();
+          return;
+        }
       }
 
       return serverErrorToast();
