@@ -57,7 +57,8 @@ export async function POST(req: Request) {
       data: {
         name,
         slug: randomUUID(),
-        description: { ...description },
+        // @ts-ignore
+        description,
         review,
         image: '',
         altName,

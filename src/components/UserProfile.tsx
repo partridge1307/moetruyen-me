@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { useCustomToast } from '@/hooks/use-custom-toast';
+import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { UserProfileEditPayload } from '@/lib/validators/user';
 import type { Badge } from '@prisma/client';
@@ -69,10 +70,14 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
 
       if (avatar.startsWith('blob')) {
         const blob = await fetch(avatar).then((res) => res.blob());
+        if (blob.size > 4 * 1000 * 1000) throw new Error('EXCEEDED_SIZE');
+
         form.append('avatar', blob);
       }
       if (banner.startsWith('blob')) {
         const blob = await fetch(banner).then((res) => res.blob());
+        if (blob.size > 4 * 1000 * 1000) throw new Error('EXCEEDED_SIZE');
+
         form.append('banner', blob);
       }
       form.append('name', name);
@@ -81,6 +86,14 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
       await axios.put(`/api/user`, form);
     },
     onError: (err) => {
+      if (err instanceof Error) {
+        return toast({
+          title: 'Quá kích cỡ',
+          description: 'Chỉ nhận ảnh dưới 4MB',
+          variant: 'destructive',
+        });
+      }
+
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) return loginToast();
         if (err.response?.status === 404) return notFoundToast();
@@ -342,16 +355,20 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         accept=".jpg, .jpeg, .png"
         className="hidden"
         onChange={(e) => {
-          if (
-            e.target.files?.length &&
-            e.target.files[0].size < 4 * 1000 * 1000
-          ) {
-            setCurrentTarget('AVATAR');
-            setAvatarURL(URL.createObjectURL(e.target.files[0]));
-            e.target.value = '';
+          if (!e.target.files?.length) return;
+          if (e.target.files[0].size > 4 * 1000 * 1000)
+            return toast({
+              title: 'Quá kích cỡ',
+              description: 'Chỉ nhận ảnh dưới 4MB',
+              variant: 'destructive',
+            });
 
-            setTimeout(() => imageCropRef.current?.click(), 0);
-          }
+          const file = e.target.files[0];
+          setCurrentTarget('AVATAR');
+          setBannerURL(URL.createObjectURL(file));
+          e.target.value = '';
+
+          setTimeout(() => imageCropRef.current?.click(), 0);
         }}
       />
       <input
@@ -361,16 +378,20 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         accept=".jpg, .jpeg, .png"
         className="hidden"
         onChange={(e) => {
-          if (
-            e.target.files?.length &&
-            e.target.files[0].size < 4 * 1000 * 1000
-          ) {
-            setCurrentTarget('BANNER');
-            setBannerURL(URL.createObjectURL(e.target.files[0]));
-            e.target.value = '';
+          if (!e.target.files?.length) return;
+          if (e.target.files[0].size > 4 * 1000 * 1000)
+            return toast({
+              title: 'Quá kích cỡ',
+              description: 'Chỉ nhận ảnh dưới 4MB',
+              variant: 'destructive',
+            });
 
-            setTimeout(() => imageCropRef.current?.click(), 0);
-          }
+          const file = e.target.files[0];
+          setCurrentTarget('BANNER');
+          setBannerURL(URL.createObjectURL(file));
+          e.target.value = '';
+
+          setTimeout(() => imageCropRef.current?.click(), 0);
         }}
       />
 
