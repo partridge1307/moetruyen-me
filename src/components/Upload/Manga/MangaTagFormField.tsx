@@ -145,7 +145,6 @@ const MangaTagForm: FC<MangaTagFormProps> = ({ form, tags, existTags }) => {
 
                     setTagsSelected([]);
                     form.setValue('tag', []);
-                    setOpen(false);
                   }}
                 >
                   Reset
