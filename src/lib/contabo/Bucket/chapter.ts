@@ -18,7 +18,7 @@ const UploadChapterImage = async (
       const arrayBuffer = await new Blob([img]).arrayBuffer();
       const sharpImage = sharp(arrayBuffer)
         .toFormat('webp')
-        .webp({ quality: 40 });
+        .webp({ quality: 75 });
 
       const { width: originalWidth, height: originalHeight } =
         await sharpImage.metadata();
@@ -91,7 +91,7 @@ const EditChapterImage = async (
       const arrayBuffer = await new Blob([image]).arrayBuffer();
       const sharpImage = sharp(arrayBuffer)
         .toFormat('webp')
-        .webp({ quality: 40 });
+        .webp({ quality: 75 });
 
       const { width, height } = await sharpImage.metadata();
 

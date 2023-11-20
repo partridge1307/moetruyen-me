@@ -14,7 +14,7 @@ const UploadMangaImage = async (
   sharpImage =
     type === 'thumbnail'
       ? sharpImage.toFormat('png').png({ quality: 40 })
-      : sharpImage.toFormat('webp').webp({ quality: 40 });
+      : sharpImage.toFormat('webp').webp({ quality: 75 });
 
   const { width, height } = await sharpImage.metadata();
 
