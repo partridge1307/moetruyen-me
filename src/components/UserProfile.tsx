@@ -45,8 +45,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
   const { loginToast, notFoundToast, serverErrorToast, successToast } =
     useCustomToast();
 
-  const avatarRef = useRef<HTMLInputElement>(null);
-  const bannerRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const imageCropRef = useRef<HTMLButtonElement>(null);
 
   const [currentTarget, setCurrentTarget] = useState<'AVATAR' | 'BANNER'>(
@@ -170,7 +169,17 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         }}
       >
         <div className="relative">
-          <div className="relative aspect-video">
+          <div
+            className="relative aspect-video"
+            role="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              setCurrentTarget('BANNER');
+              inputRef.current?.click();
+            }}
+          >
             {!!bannerURL ? (
               <Image
                 fill
@@ -179,31 +188,27 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                 priority
                 src={bannerURL}
                 alt="Preview User Banner"
-                role="button"
                 className="object-cover object-top hover:cursor-pointer rounded-md border-2 dark:border-zinc-800"
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  bannerRef.current?.click();
-                }}
               />
             ) : (
-              <div
-                role="button"
-                className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-md border-dashed border-2 dark:bg-zinc-900"
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  bannerRef.current?.click();
-                }}
-              >
+              <div className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-md border-dashed border-2 dark:bg-zinc-900">
                 <ImagePlus className="w-8 h-8" />
               </div>
             )}
           </div>
 
           <div className="absolute w-28 h-28 lg:w-36 lg:h-36 bottom-0 translate-y-1/2 left-4 lg:left-6">
-            <div className="relative aspect-square">
+            <div
+              className="relative aspect-square"
+              role="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                setCurrentTarget('AVATAR');
+                inputRef.current?.click();
+              }}
+            >
               {!!avatarURL ? (
                 <Image
                   fill
@@ -212,24 +217,10 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                   priority
                   src={avatarURL}
                   alt="Preview User Avatar"
-                  role="button"
                   className="object-cover object-top hover:cursor-pointer rounded-full border-8 dark:border-zinc-900 dark:bg-zinc-900"
-                  onClick={(e) => {
-                    e.preventDefault();
-
-                    avatarRef.current?.click();
-                  }}
                 />
               ) : (
-                <div
-                  role="button"
-                  className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-full border-8 dark:bg-zinc-900"
-                  onClick={(e) => {
-                    e.preventDefault();
-
-                    avatarRef.current?.click();
-                  }}
-                >
+                <div className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-full border-8 dark:bg-zinc-900">
                   <ImagePlus className="w-5 lg:w-6 h-5 lg:h-6" />
                 </div>
               )}
@@ -350,12 +341,15 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
       </form>
 
       <input
+        ref={inputRef}
         disabled={isUpdating}
-        ref={avatarRef}
         type="file"
-        accept=".jpg, .jpeg, .png"
         className="hidden"
+        accept="image/jpeg, image/jpg, image/png"
         onChange={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
           if (!e.target.files?.length) return;
           if (e.target.files[0].size > 4 * 1000 * 1000)
             return toast({
@@ -365,33 +359,13 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
             });
 
           const file = e.target.files[0];
-          setCurrentTarget('AVATAR');
-          setBannerURL(URL.createObjectURL(file));
+          if (currentTarget === 'AVATAR') {
+            setAvatarURL(URL.createObjectURL(file));
+          } else {
+            setBannerURL(URL.createObjectURL(file));
+          }
+
           e.target.value = '';
-
-          setTimeout(() => imageCropRef.current?.click(), 0);
-        }}
-      />
-      <input
-        disabled={isUpdating}
-        ref={bannerRef}
-        type="file"
-        accept=".jpg, .jpeg, .png"
-        className="hidden"
-        onChange={(e) => {
-          if (!e.target.files?.length) return;
-          if (e.target.files[0].size > 4 * 1000 * 1000)
-            return toast({
-              title: 'Quá kích cỡ',
-              description: 'Chỉ nhận ảnh dưới 4MB',
-              variant: 'destructive',
-            });
-
-          const file = e.target.files[0];
-          setCurrentTarget('BANNER');
-          setBannerURL(URL.createObjectURL(file));
-          e.target.value = '';
-
           setTimeout(() => imageCropRef.current?.click(), 0);
         }}
       />
