@@ -175,7 +175,7 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
 
           <MangaAuthorForm form={form} />
 
-          <MangaTagForm form={form} tag={tag} />
+          <MangaTagForm form={form} tags={tag} />
 
           <MangaDescForm form={form} />
 

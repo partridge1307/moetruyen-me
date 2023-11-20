@@ -185,7 +185,7 @@ const EditManga: FC<EditMangaProps> = ({ manga, tags }) => {
 
         <MangaAuthorForm form={form} existAuthors={manga.author} />
 
-        <MangaTagForm form={form} tag={tags} existTags={manga.tags} />
+        <MangaTagForm form={form} tags={tags} existTags={manga.tags} />
 
         <MangaDescForm form={form} initialContent={manga.description} />
 

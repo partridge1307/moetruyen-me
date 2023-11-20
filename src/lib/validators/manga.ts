@@ -93,14 +93,19 @@ export const MangaFormValidator = zfd.formData({
       if (!file) return true;
 
       if (file instanceof File) {
-        return ['image/jpg', 'image/jpeg', 'image/png'].includes(file.type);
+        return ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'].includes(
+          file.type
+        );
       } else return file.startsWith(`${process.env.IMG_DOMAIN}`);
     }, 'Chỉ nhận ảnh có định dạng .jpg, .png, .jpeg'),
   image: zfd
     .file()
     .refine((file) => file.size < 4 * 1000 * 1000, 'Tối đa 4MB')
     .refine(
-      (file) => ['image/jpg', 'image/jpeg', 'image/png'].includes(file.type),
+      (file) =>
+        ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'].includes(
+          file.type
+        ),
       'Chỉ nhận ảnh có định dạng .jpg, .png, .jpeg'
     )
     .or(

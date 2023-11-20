@@ -25,7 +25,8 @@ const MangaUploadRules = () => {
           </li>
           <li>
             Tên chỉ nhận <span className="font-semibold">Alphanumeric</span>. Kí
-            tự <span className="font-semibold">Việt Nam</span>
+            tự <span className="font-semibold">Việt Nam</span>. Kí tự đặc biệt
+            phổ thông (., !, @, ...)
           </li>
           <li>
             Không được ghi thêm từ ngữ{' '}
@@ -59,11 +60,6 @@ const MangaUploadRules = () => {
       <div>
         <h2 className="text-lg font-medium">Tên khác</h2>
         <ol className="list-decimal list-inside">
-          <li>
-            Tên khác sẽ chỉ được dùng trong việc{' '}
-            <span className="font-semibold">hiển thị OEmbed</span> ra những
-            trang mạng xã hội, <span className="font-semibold">SEO</span>
-          </li>
           <li>
             Tối đa <span className="font-semibold">5</span> tên
           </li>

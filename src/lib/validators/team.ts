@@ -7,7 +7,10 @@ export const TeamFormValidator = zfd.formData({
     .file()
     .refine((file) => file.size < 4 * 1000 * 1000, 'Ảnh phải nhỏ hơn 4MB')
     .refine(
-      (file) => ['image/png', 'image/jpeg', 'image/jpg'].includes(file.type),
+      (file) =>
+        ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(
+          file.type
+        ),
       'Ảnh phải là định dạng JPG, PNG, JPEG'
     ),
   name: zfd.text(

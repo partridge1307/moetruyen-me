@@ -1,26 +1,20 @@
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/Command';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/AlertDialog';
+import { Button } from '@/components/ui/Button';
 import {
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/Form';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/Popover';
-import { cn } from '@/lib/utils';
 import type { MangaUploadPayload, tagInfoProps } from '@/lib/validators/manga';
-import { Check, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { FC, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 
@@ -35,13 +29,15 @@ type Tags = {
 
 interface MangaTagFormProps {
   form: UseFormReturn<MangaUploadPayload>;
-  tag: Tags[];
+  tags: Tags[];
   existTags?: tagInfoProps[];
 }
 
-const MangaTagForm: FC<MangaTagFormProps> = ({ form, tag, existTags }) => {
-  const tagCopy = tag.flatMap((t) => t.data);
-  const [tagSelect, setTagSelect] = useState<tagInfoProps[]>(existTags ?? []);
+const MangaTagForm: FC<MangaTagFormProps> = ({ form, tags, existTags }) => {
+  const [open, setOpen] = useState(false);
+  const [tagsSelected, setTagsSelected] = useState<tagInfoProps[]>(
+    existTags ?? []
+  );
 
   return (
     <FormField
@@ -51,94 +47,113 @@ const MangaTagForm: FC<MangaTagFormProps> = ({ form, tag, existTags }) => {
         <FormItem>
           <FormLabel>Thể loại</FormLabel>
           <FormMessage />
-          <Popover>
-            <ul className="flex flex-wrap items-center gap-x-2">
-              {tagSelect.map((t, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-x-1 rounded-md bg-zinc-800 p-1"
-                >
-                  {t.name}
-                  <span
-                    onClick={() => {
-                      const tagValue = [
-                        ...tagSelect.filter((ta) => ta.name !== t.name),
-                      ];
-                      form.setValue('tag', tagValue);
-                      setTagSelect(tagValue);
-                    }}
+          <div className="w-full px-3 py-2 space-y-3 rounded-md border border-input text-sm bg-background">
+            {!!tagsSelected.length && (
+              <ul className="flex flex-wrap items-center gap-3">
+                {tagsSelected.map((tag) => (
+                  <li
+                    key={tag.id}
+                    className="flex items-center gap-2 pl-3 px-1 py-0.5 rounded-full bg-muted"
                   >
-                    <X className="h-5 w-5 cursor-pointer text-red-500" />
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <PopoverTrigger className="w-full">
-              <FormControl>
-                <div className="relative h-10 rounded-md bg-background">
-                  <span className="absolute text-sm top-1/2 -translate-y-1/2 left-3 opacity-70">
-                    Thể loại
-                  </span>
-                </div>
-              </FormControl>
-            </PopoverTrigger>
-            <PopoverContent>
-              <Command>
-                <CommandInput placeholder="Tìm thể loại" />
-                <CommandEmpty>Không tìm thấy</CommandEmpty>
-                <CommandList>
-                  {!!tag.length &&
-                    tag.map((t, idx) => (
-                      <CommandGroup key={`${idx}`} heading={t.category}>
-                        {t.data.map((d, i) => (
-                          <CommandItem
-                            key={`${i}`}
-                            title={d.description}
-                            className="cursor-pointer"
-                            onSelect={(currVal) => {
-                              if (
-                                !tagSelect.some(
-                                  (d) => d.name.toLocaleLowerCase() === currVal
-                                )
-                              ) {
-                                const tagValue = [
-                                  ...tagSelect,
-                                  ...tagCopy.filter(
-                                    (T) => T.name.toLowerCase() === currVal
-                                  ),
-                                ];
-                                form.setValue('tag', tagValue);
-                                setTagSelect(tagValue);
+                    {tag.name}
+                    <X
+                      className="text-red-500"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const filteredTags = tagsSelected.filter(
+                          (t) => t.id !== tag.id
+                        );
+                        setTagsSelected(filteredTags);
+                        form.setValue('tag', filteredTags);
+                      }}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen(true);
+              }}
+              className="text-muted-foreground"
+            >
+              Nhập thể loại
+            </div>
+          </div>
+          <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialogContent className="max-h-[100dvh] overflow-y-auto scrollbar dark:scrollbar--dark">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Thêm/Xóa Tag Manga</AlertDialogTitle>
+              </AlertDialogHeader>
+
+              <div className="divide-y divide-primary/40">
+                {tags.map((tag, index) => (
+                  <div key={index} className="space-y-1 py-3">
+                    <p className="text-xl font-semibold">{tag.category}</p>
+                    <ul className="flex flex-wrap items-center gap-3">
+                      {tag.data.map((childTag) => (
+                        <li key={childTag.id} title={childTag.description}>
+                          <Button
+                            type="button"
+                            size={'sm'}
+                            variant={
+                              tagsSelected.includes(childTag)
+                                ? 'default'
+                                : 'secondary'
+                            }
+                            aria-label={childTag.name}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              if (tagsSelected.includes(childTag)) {
+                                const filteredTags = tagsSelected.filter(
+                                  (tag) => tag.id !== childTag.id
+                                );
+
+                                setTagsSelected(filteredTags);
+                                form.setValue('tag', filteredTags);
                               } else {
-                                const tagValue = [
-                                  ...tagSelect.filter(
-                                    (T) => T.name.toLowerCase() !== currVal
-                                  ),
-                                ];
-                                form.setValue('tag', tagValue);
-                                setTagSelect(tagValue);
+                                const addedTags = [...tagsSelected, childTag];
+
+                                setTagsSelected(addedTags);
+                                form.setValue('tag', addedTags);
                               }
                             }}
                           >
-                            <div
-                              className={cn(
-                                'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-                                tagSelect.includes(d)
-                                  ? 'bg-primary text-primary-foreground'
-                                  : 'opacity-50 [&_svg]:invisible'
-                              )}
-                            >
-                              <Check className="h-4 w-4" />
-                            </div>
-                            {d.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    ))}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                            {childTag.name}
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              <AlertDialogFooter>
+                <Button
+                  type="button"
+                  variant={'destructive'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    setTagsSelected([]);
+                    form.setValue('tag', []);
+                    setOpen(false);
+                  }}
+                >
+                  Reset
+                </Button>
+                <AlertDialogAction type="button">Xong</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </FormItem>
       )}
     />
