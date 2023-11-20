@@ -45,7 +45,9 @@ export const UserFormUpdateValidator = zfd.formData({
     .optional()
     .refine((file) => {
       if (file) {
-        return ['image/jpg', 'image/png', 'image/jpeg'].includes(file.type);
+        return ['image/jpg', 'image/png', 'image/jpeg', 'image/webp'].includes(
+          file.type
+        );
       } else return true;
     }, 'Chỉ nhận định dạng .jpg, .png, .jpeg')
     .refine((file) => {
@@ -58,7 +60,9 @@ export const UserFormUpdateValidator = zfd.formData({
     .optional()
     .refine((file) => {
       if (file) {
-        return ['image/jpg', 'image/png', 'image/jpeg'].includes(file.type);
+        return ['image/jpg', 'image/png', 'image/jpeg', 'image/webp'].includes(
+          file.type
+        );
       } else return true;
     }, 'Chỉ nhận định dạng .jpg, .png, .jpeg')
     .refine((file) => {

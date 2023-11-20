@@ -86,6 +86,11 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
       await axios.put(`/api/user`, form);
     },
     onError: (err) => {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 401) return loginToast();
+        if (err.response?.status === 404) return notFoundToast();
+      }
+
       if (err instanceof Error) {
         return toast({
           title: 'Quá kích cỡ',
@@ -94,10 +99,6 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         });
       }
 
-      if (err instanceof AxiosError) {
-        if (err.response?.status === 401) return loginToast();
-        if (err.response?.status === 404) return notFoundToast();
-      }
       return serverErrorToast();
     },
     onSuccess: () => {
