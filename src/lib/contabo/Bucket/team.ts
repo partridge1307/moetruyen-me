@@ -30,7 +30,7 @@ const UploadTeamImage = async (
   );
 
   const Key = generateKey(
-    `${process.env.IMG_DOMAIN}/team/${teamId}.png`,
+    `${process.env.NEXT_PUBLIC_IMG_DOMAIN}/team/${teamId}.png`,
     prevImage
   );
 

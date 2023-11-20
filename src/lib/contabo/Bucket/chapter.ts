@@ -1,4 +1,6 @@
 import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
   DeleteObjectsCommand,
   DeleteObjectsCommandInput,
   ListObjectsV2Command,
@@ -6,178 +8,170 @@ import {
 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import { contabo } from '../client';
-import { generateKey, generateName, resizeImage, sendCommand } from '../utils';
+import { generateKey, resizeImage, sendCommand } from '../utils';
 
 const UploadChapterImage = async (
-  images: Blob[],
+  images: File[],
   mangaId: number,
   chapterId: number
 ) => {
-  const optimizedImages = await Promise.all(
-    images.map(async (img) => {
-      const arrayBuffer = await new Blob([img]).arrayBuffer();
+  const ImagePromises = images.map(async (img, index) => {
+    const arrayBuffer = await new Blob([img]).arrayBuffer();
+    const sharpImage = sharp(arrayBuffer)
+      .toFormat('webp')
+      .webp({ quality: 75 });
+
+    const { width: originalWidth, height: originalHeight } =
+      await sharpImage.metadata();
+
+    const buffer = await resizeImage(
+      sharpImage,
+      originalWidth,
+      originalHeight
+    ).toBuffer();
+
+    return {
+      buffer,
+      name: (++index).toString(),
+    };
+  });
+  const optimizedImages = await Promise.all(ImagePromises);
+
+  const promises = optimizedImages.map(async (image) => {
+    await sendCommand(() =>
+      contabo.send(
+        new PutObjectCommand({
+          Body: image.buffer,
+          Bucket: process.env.CB_BUCKET,
+          Key: `chapter/${mangaId}/${chapterId}/${image.name}.webp`,
+        })
+      )
+    );
+
+    return `${process.env.NEXT_PUBLIC_IMG_DOMAIN}/chapter/${mangaId}/${chapterId}/${image.name}.webp`;
+  });
+
+  return await Promise.all(promises);
+};
+
+const makeTempImagesFolder = (
+  userImages: (string | File)[],
+  dbImages: string[],
+  mangaId: number,
+  chapterId: number
+) => {
+  const promises = userImages.map(async (image, index) => {
+    if (image instanceof File) {
+      const arrayBuffer = await new Blob([image]).arrayBuffer();
       const sharpImage = sharp(arrayBuffer)
         .toFormat('webp')
         .webp({ quality: 75 });
 
       const { width: originalWidth, height: originalHeight } =
         await sharpImage.metadata();
-
       const buffer = await resizeImage(
         sharpImage,
         originalWidth,
         originalHeight
       ).toBuffer();
 
-      return {
-        buffer,
-        name: img.name.split('.').shift(),
-      };
-    })
-  );
+      const command = new PutObjectCommand({
+        Bucket: process.env.CB_BUCKET,
+        Body: buffer,
+        Key: `chapter/${mangaId}/NEW_${chapterId}/${++index}.webp`,
+      });
 
-  const imagesLink = await Promise.all(
-    optimizedImages.map(async (image) => {
-      await sendCommand(() =>
-        contabo.send(
-          new PutObjectCommand({
-            Body: image.buffer,
-            Bucket: process.env.CB_BUCKET,
-            Key: `chapter/${mangaId}/${chapterId}/${image.name}.webp`,
-          })
-        )
-      );
+      await sendCommand(() => contabo.send(command));
 
-      return `${process.env.IMG_DOMAIN}/chapter/${mangaId}/${chapterId}/${image.name}.webp`;
-    })
-  );
+      const key = `${process.env.NEXT_PUBLIC_IMG_DOMAIN}/chapter/${mangaId}/${chapterId}/${index}.webp`;
+      const existImage = dbImages.find((img) => img.startsWith(key));
 
-  return imagesLink;
+      if (!existImage) return generateKey(key, null);
+      else return generateKey(key, existImage);
+    } else {
+      const pathName = new URL(image).pathname;
+      const extractedKey = pathName.match(/(\d+.webp)(?!.*\d)/g)?.[0];
+      if (!extractedKey) return;
+
+      const OLD_KEY = `chapter/${mangaId}/${chapterId}/${extractedKey}`;
+
+      const copyCommand = new CopyObjectCommand({
+        Bucket: process.env.CB_BUCKET,
+        CopySource: `${process.env.CB_BUCKET}/${OLD_KEY}`,
+        Key: `chapter/${mangaId}/NEW_${chapterId}/${++index}.webp`,
+      });
+
+      await sendCommand(() => contabo.send(copyCommand)).then(() => {
+        const deleteCommand = new DeleteObjectCommand({
+          Bucket: process.env.CB_BUCKET,
+          Key: OLD_KEY,
+        });
+        return contabo.send(deleteCommand);
+      });
+
+      const key = `${process.env.NEXT_PUBLIC_IMG_DOMAIN}/chapter/${mangaId}/${chapterId}/${index}.webp`;
+      const existImage = dbImages.find((img) => img.startsWith(key));
+
+      if (!existImage) return generateKey(key, null);
+      else return generateKey(key, existImage);
+    }
+  });
+
+  return Promise.all(promises);
+};
+
+const copyBackAndRemoveTemp = async (mangaId: number, chapterId: number) => {
+  const listCommand = new ListObjectsV2Command({
+    Bucket: process.env.CB_BUCKET,
+    Delimiter: '/',
+    Prefix: `chapter/${mangaId}/NEW_${chapterId}/`,
+  });
+  const listImages = await sendCommand(() => contabo.send(listCommand));
+
+  if (!listImages.Contents?.length) return;
+  const keys = listImages.Contents.map((content) => content.Key).filter(
+    Boolean
+  ) as string[];
+
+  const promises = keys.map(async (key) => {
+    const extractedKey = key.match(/(\d+.webp)(?!.*\d)/g)?.[0];
+    if (!extractedKey) return;
+
+    const copyCommand = new CopyObjectCommand({
+      Bucket: process.env.CB_BUCKET,
+      CopySource: `${process.env.CB_BUCKET}/${key}`,
+      Key: `chapter/${mangaId}/${chapterId}/${extractedKey}`,
+    });
+    await sendCommand(() => contabo.send(copyCommand)).then(() => {
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: process.env.CB_BUCKET,
+        Key: key,
+      });
+      return contabo.send(deleteCommand);
+    });
+  });
+
+  await Promise.all(promises);
 };
 
 const EditChapterImage = async (
-  newImages: (Blob | string)[],
-  existingImages: string[],
+  userImages: (string | File)[],
+  dbImages: string[],
   mangaId: number,
   chapterId: number
 ) => {
-  const serializedNewImages = newImages.map((image, index) => ({
-      index,
-      image,
-    })),
-    serializedExistImages = existingImages.map((image, index) => ({
-      index,
-      image,
-    }));
-
-  const blobImages = serializedNewImages.filter(
-      (image) => image.image instanceof File
-    ) as {
-      index: number;
-      image: File;
-    }[],
-    linkImages = serializedNewImages.filter(
-      (image) => typeof image.image === 'string'
-    ) as {
-      index: number;
-      image: string;
-    }[],
-    deletedImages = serializedExistImages.filter(
-      (img) => !linkImages.some((image) => image.image === img.image)
-    );
-
-  const blobImagesHandler = await Promise.all(
-    blobImages.map(async ({ image, index }) => {
-      const arrayBuffer = await new Blob([image]).arrayBuffer();
-      const sharpImage = sharp(arrayBuffer)
-        .toFormat('webp')
-        .webp({ quality: 75 });
-
-      const { width, height } = await sharpImage.metadata();
-
-      const optimizedImage = await resizeImage(
-        sharpImage,
-        width,
-        height
-      ).toBuffer();
-
-      const key = `${
-        process.env.IMG_DOMAIN
-      }/chapter/${mangaId}/${chapterId}/${image.name.split('.').shift()}.webp`;
-
-      let command, generatedKey;
-
-      const existImage = serializedExistImages.find(
-        (exist) => exist.index === index && exist.image.startsWith(key)
-      );
-      if (existImage) {
-        command = new PutObjectCommand({
-          Body: optimizedImage,
-          Bucket: process.env.CB_BUCKET,
-          Key: `chapter/${mangaId}/${chapterId}/${image.name
-            .split('.')
-            .shift()}.webp`,
-        });
-
-        generatedKey = generateKey(
-          `${
-            process.env.IMG_DOMAIN
-          }/chapter/${mangaId}/${chapterId}/${image.name
-            .split('.')
-            .shift()}.webp`,
-          existImage.image
-        );
-      } else {
-        const name = image.name.split('.').shift()!;
-        const newName = generateName(
-          name,
-          existingImages,
-          Number(name.split('_').pop()),
-          `${process.env.IMG_DOMAIN}/chapter/${mangaId}/${chapterId}`
-        );
-
-        command = new PutObjectCommand({
-          Body: optimizedImage,
-          Bucket: process.env.CB_BUCKET,
-          Key: `chapter/${mangaId}/${chapterId}/${newName}.webp`,
-        });
-
-        generatedKey = generateKey(
-          `${process.env.IMG_DOMAIN}/chapter/${mangaId}/${chapterId}/${newName}.webp`,
-          null
-        );
-      }
-
-      return {
-        index: index,
-        image: generatedKey,
-        command: command,
-      };
-    })
+  const results = await makeTempImagesFolder(
+    userImages,
+    dbImages,
+    mangaId,
+    chapterId
   );
 
-  const uploadedNewImages = await Promise.all(
-    blobImagesHandler.map(async (blobImage) => {
-      await sendCommand(() => contabo.send(blobImage.command));
+  await DeleteChapterImages({ mangaId, chapterId });
 
-      return { index: blobImage.index, image: blobImage.image };
-    })
-  );
+  await copyBackAndRemoveTemp(mangaId, chapterId);
 
-  const deleteInput: DeleteObjectsCommandInput = {
-    Bucket: process.env.CB_BUCKET,
-    Delete: {
-      Objects: deletedImages.map((deleteImage) => {
-        const image = new URL(deleteImage.image).pathname.split('/').pop();
-
-        return { Key: `chapter/${mangaId}/${chapterId}/${image}` };
-      }),
-    },
-  };
-
-  await sendCommand(() => contabo.send(new DeleteObjectsCommand(deleteInput)));
-
-  return [...linkImages, ...uploadedNewImages];
+  return results.filter(Boolean) as string[];
 };
 
 const DeleteChapterImages = async ({
@@ -208,4 +202,4 @@ const DeleteChapterImages = async ({
   );
 };
 
-export { EditChapterImage, UploadChapterImage, DeleteChapterImages };
+export { DeleteChapterImages, EditChapterImage, UploadChapterImage };

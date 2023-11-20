@@ -87,7 +87,7 @@ export const MangaFormValidator = zfd.formData({
 
       if (file instanceof File) {
         return file.size < 4 * 1000 * 1000;
-      } else return file.startsWith(`${process.env.IMG_DOMAIN}`);
+      } else return file.startsWith(`${process.env.NEXT_PUBLIC_IMG_DOMAIN}`);
     }, 'Tối đa 4MB')
     .refine((file) => {
       if (!file) return true;
@@ -96,7 +96,7 @@ export const MangaFormValidator = zfd.formData({
         return ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'].includes(
           file.type
         );
-      } else return file.startsWith(`${process.env.IMG_DOMAIN}`);
+      } else return file.startsWith(`${process.env.NEXT_PUBLIC_IMG_DOMAIN}`);
     }, 'Chỉ nhận ảnh có định dạng .jpg, .png, .jpeg'),
   image: zfd
     .file()
@@ -112,7 +112,8 @@ export const MangaFormValidator = zfd.formData({
       zfd
         .text()
         .refine(
-          (endpoint) => endpoint.startsWith(`${process.env.IMG_DOMAIN}`),
+          (endpoint) =>
+            endpoint.startsWith(`${process.env.NEXT_PUBLIC_IMG_DOMAIN}`),
           'Ảnh có đường dẫn không hợp lệ'
         )
     ),

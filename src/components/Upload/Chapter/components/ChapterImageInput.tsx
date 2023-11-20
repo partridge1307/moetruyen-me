@@ -106,6 +106,7 @@ const ChapterImageInput = forwardRef<HTMLInputElement, ChapterImageInputProps>(
         const files = event.target.files;
         onFileCommit(files);
         setFiles(files);
+        event.target.value = '';
       },
       [onFileCommit]
     );
@@ -309,19 +310,21 @@ const ZipExtractor = async (file: File) => {
 
     return (
       await Promise.all(
-        zippedFiles.map(async (zippedFile) => {
-          const blob = await zippedFile.async('blob');
-          if (blob.size > 4 * 1000 * 1000) return;
+        zippedFiles
+          .sort((a, b) => a.date.getTime() - b.date.getTime())
+          .map(async (zippedFile) => {
+            const blob = await zippedFile.async('blob');
+            if (blob.size > 4 * 1000 * 1000) return;
 
-          return {
-            src: URL.createObjectURL(
-              new Blob([blob], {
-                type: `image/${zippedFile.name.split('.').pop() ?? 'jpeg'}`,
-              })
-            ),
-            name: zippedFile.name,
-          };
-        })
+            return {
+              src: URL.createObjectURL(
+                new Blob([blob], {
+                  type: `image/${zippedFile.name.split('.').pop() ?? 'jpeg'}`,
+                })
+              ),
+              name: zippedFile.name,
+            };
+          })
       )
     ).filter(Boolean) as ImageType[];
   } catch (error) {

@@ -37,7 +37,7 @@ const UploadMangaImage = async (
   );
 
   const Key = generateKey(
-    `${process.env.IMG_DOMAIN}/manga/${mangaId}/${
+    `${process.env.NEXT_PUBLIC_IMG_DOMAIN}/manga/${mangaId}/${
       type === 'thumbnail' ? 'thumbnail.png' : 'cover.webp'
     }`,
     prevImage

@@ -65,18 +65,17 @@ const ChapterEdit: FC<EditProps> = ({ chapter }) => {
       form.append('volume', `${volume}`);
       !!chapterName && form.append('chapterName', chapterName);
 
-      await Promise.all(
-        image.map(async (img, idx) => {
-          if (!img.src.startsWith('blob')) {
-            form.append('images', img.src);
-            form.append('order', `${idx}`);
-          } else {
-            const blob = await fetch(img.src).then((res) => res.blob());
-            form.append('images', blob, img.name);
-            form.append('order', `${idx}`);
-          }
-        })
-      );
+      const promises = image.map(async (img, index) => {
+        if (img.src.startsWith('blob')) {
+          form.append('images', `${index}`);
+
+          const blob = await fetch(img.src).then((res) => res.blob());
+          form.append('files', blob, img.name);
+        } else {
+          form.append('images', img.src);
+        }
+      });
+      await Promise.all(promises);
 
       await axios.post(`/api/chapter/${chapter.id}/edit`, form, {
         onUploadProgress(progressEvent) {

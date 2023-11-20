@@ -183,7 +183,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
             {!!bannerURL ? (
               <Image
                 fill
-                sizes="50vw"
+                sizes="75vw"
                 quality={40}
                 priority
                 src={bannerURL}

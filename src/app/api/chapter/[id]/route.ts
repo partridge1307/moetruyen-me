@@ -13,21 +13,21 @@ const asyncUploadChapter = async (
   chapterId: number
 ) => {
   try {
-    const filterredFiles = (
-      await Promise.all(
-        images.map(async (image) => {
-          const type = await fileTypeFromBuffer(await image.arrayBuffer());
-          if (!type) return;
+    const promises = images.map(async (image) => {
+      const type = await fileTypeFromBuffer(await image.arrayBuffer());
+      if (!type) return;
 
-          if (['image/png', 'image/jpeg', 'image/jpg'].includes(type?.mime)) {
-            return image;
-          }
-        })
-      )
-    ).filter(Boolean) as File[];
+      if (['image/png', 'image/jpeg', 'image/jpg'].includes(type?.mime)) {
+        return image;
+      }
+    });
+
+    const filteredFiles = (await Promise.all(promises)).filter(
+      Boolean
+    ) as File[];
 
     const uploadedImages = await UploadChapterImage(
-      filterredFiles,
+      filteredFiles,
       mangaId,
       chapterId
     );

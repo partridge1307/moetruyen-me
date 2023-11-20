@@ -7,41 +7,37 @@ import { fileTypeFromBuffer } from 'file-type';
 import { ZodError } from 'zod';
 
 const asyncEditChapter = async (
-  images: (string | File)[],
-  order: number[],
+  images: string[],
+  files: File[],
   dbImages: string[],
   mangaId: number,
   chapterId: number
 ) => {
   try {
-    const filterredFiles = (
-      await Promise.all(
-        images.map(async (image) => {
-          if (image instanceof File) {
-            const type = await fileTypeFromBuffer(await image.arrayBuffer());
-            if (!type) return;
+    const promises = images.map(async (image) => {
+      if (image.startsWith(process.env.NEXT_PUBLIC_IMG_DOMAIN!)) return image;
 
-            if (['image/png', 'image/jpeg', 'image/jpg'].includes(type?.mime)) {
-              return image;
-            }
-          } else return image;
-        })
-      )
-    ).filter(Boolean) as (string | File)[];
+      const file = files.shift();
+      if (!file) return;
 
-    const edittedImages = (
-      await EditChapterImage(
-        filterredFiles.sort(
-          (a, b) =>
-            order.indexOf(images.indexOf(a)) - order.indexOf(images.indexOf(b))
-        ),
-        dbImages,
-        mangaId,
-        chapterId
-      )
-    )
-      .sort((a, b) => a.index - b.index)
-      .map((img) => img.image);
+      const type = await fileTypeFromBuffer(await file.arrayBuffer());
+      if (!type) return;
+
+      if (['image/png', 'image/jpeg', 'image/jpg'].includes(type.mime))
+        return file;
+    });
+
+    const imagesWithFiles = (await Promise.all(promises)).filter(Boolean) as (
+      | string
+      | File
+    )[];
+
+    const edittedImages = await EditChapterImage(
+      imagesWithFiles,
+      dbImages,
+      mangaId,
+      chapterId
+    );
 
     await db.chapter.update({
       where: {
@@ -69,7 +65,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
     const session = await getAuthSession();
     if (!session) return new Response('Unauthorized', { status: 401 });
 
-    const { images, order, chapterIndex, chapterName, volume } =
+    const { images, files, chapterIndex, chapterName, volume } =
       ChapterFormEditValidator.parse(await req.formData());
 
     const chapter = await db.chapter.findUniqueOrThrow({
@@ -88,7 +84,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
 
     asyncEditChapter(
       images,
-      order,
+      files,
       chapter.images,
       chapter.mangaId,
       chapter.id

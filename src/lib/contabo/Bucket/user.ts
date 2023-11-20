@@ -34,7 +34,7 @@ const UploadUserImage = async (
   );
 
   const Key = generateKey(
-    `${process.env.IMG_DOMAIN}/user/${type}/${userId}.${
+    `${process.env.NEXT_PUBLIC_IMG_DOMAIN}/user/${type}/${userId}.${
       type === 'avatar' ? 'png' : 'webp'
     }`,
     prevImage

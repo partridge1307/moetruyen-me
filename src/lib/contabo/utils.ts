@@ -40,20 +40,12 @@ const resizeImage = (
 };
 
 const generateKey = (key: string, prevImage: string | null) => {
-  let Key;
+  if (!prevImage) return key;
 
-  if (prevImage) {
-    const idParam = new URL(prevImage).searchParams.get('id');
-    if (idParam) {
-      Key = `${key}?id=${Number(idParam) + 1}`;
-    } else {
-      Key = `${key}?id=1`;
-    }
-  } else {
-    Key = key;
-  }
+  const idParam = new URL(prevImage).searchParams.get('id');
 
-  return Key;
+  if (!idParam) return `${key}?id=1`;
+  return `${key}?id=${Number(idParam) + 1}`;
 };
 
 const generateName = (
