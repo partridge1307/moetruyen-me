@@ -93,6 +93,9 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
       if (!!cover) {
         if (cover.startsWith('blob')) {
           const blob = await fetch(cover).then((res) => res.blob());
+          if (blob.size > 4 * 1000 * 1000)
+            throw new Error('EXCEEDED_IMAGE_SIZE');
+
           form.append('cover', blob);
         } else {
           form.append('cover', cover);
@@ -101,6 +104,8 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
 
       if (image.startsWith('blob')) {
         const blob = await fetch(image).then((res) => res.blob());
+        if (blob.size > 4 * 1000 * 1000) throw new Error('EXCEEDED_IMAGE_SIZE');
+
         form.append('image', blob);
       } else {
         form.append('image', image);
@@ -140,6 +145,14 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
             description: 'Slug đã tồn tại',
             variant: 'destructive',
           });
+      }
+
+      if (e instanceof Error) {
+        return toast({
+          title: 'Quá kích cỡ',
+          description: 'Chỉ nhận ảnh dưới 4MB',
+          variant: 'destructive',
+        });
       }
 
       return serverErrorToast();

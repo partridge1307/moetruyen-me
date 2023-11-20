@@ -15,6 +15,7 @@ import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import TeamDescFormField from './TeamDescFormField';
 import TeamNameFormField from './TeamNameFormField';
+import { toast } from '@/hooks/use-toast';
 
 const TeamImageFormField = dynamic(() => import('./TeamImageFormField'), {
   ssr: false,
@@ -47,6 +48,8 @@ const EditTeam: FC<EditTeamProps> = ({ team }) => {
 
       if (image.startsWith('blob')) {
         const blob = await fetch(image).then((res) => res.blob());
+        if (blob.size > 4 * 1000 * 1000) throw new Error('EXCEEDED_IMAGE_SIZE');
+
         form.append('image', blob, blob.name);
       } else {
         form.append('image', image);
@@ -61,6 +64,14 @@ const EditTeam: FC<EditTeamProps> = ({ team }) => {
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) return loginToast();
         if (err.response?.status === 404) return notFoundToast();
+      }
+
+      if (err instanceof Error) {
+        return toast({
+          title: 'Quá kích cỡ',
+          description: 'Chỉ nhận ảnh dưới 4MB',
+          variant: 'destructive',
+        });
       }
 
       return serverErrorToast();
