@@ -10,12 +10,14 @@ const nextConfig = {
         port: '',
         pathname: '/*/**',
       },
-      process.env.NODE_ENV === 'development' && {
-        protocol: 'https',
-        hostname: 'sin1.contabostorage.com',
-        port: '',
-        pathname: '/*/**',
-      },
+      process.env.NODE_ENV === 'development'
+        ? {
+            protocol: 'https',
+            hostname: 'sin1.contabostorage.com',
+            port: '',
+            pathname: '/*/**',
+          }
+        : {},
     ],
   },
   experimental: {
