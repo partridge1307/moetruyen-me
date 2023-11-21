@@ -1,5 +1,7 @@
 import type sharp from 'sharp';
 import { sleep } from '../utils';
+import { ListObjectsV2Command } from '@aws-sdk/client-s3';
+import { contabo } from './client';
 
 const sendCommand = async <T>(
   func: () => Promise<T>,
@@ -48,29 +50,13 @@ const generateKey = (key: string, prevImage: string | null) => {
   return `${key}?id=${Number(idParam) + 1}`;
 };
 
-const generateName = (
-  currentName: string,
-  existingImages: string[],
-  start: number,
-  templateString: string
-): string => {
-  let num = start;
-
-  if (isNaN(start)) {
-    num = 1;
-  }
-
-  const newName = `${currentName}_${num}`;
-
-  const existImage = existingImages.some((img) =>
-    img.startsWith(`${templateString}/${newName}.webp`)
-  );
-
-  if (existImage) {
-    return generateName(currentName, existingImages, num + 1, templateString);
-  } else {
-    return newName;
-  }
+const ListObjects = (key: string) => {
+  const command = new ListObjectsV2Command({
+    Bucket: process.env.CB_BUCKET,
+    Delimiter: '/',
+    Prefix: key,
+  });
+  return contabo.send(command);
 };
 
-export { generateKey, generateName, resizeImage, sendCommand };
+export { generateKey, ListObjects, resizeImage, sendCommand };

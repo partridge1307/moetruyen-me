@@ -8,7 +8,7 @@ import {
 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import { contabo } from '../client';
-import { generateKey, resizeImage, sendCommand } from '../utils';
+import { ListObjects, generateKey, resizeImage, sendCommand } from '../utils';
 
 const UploadChapterImage = async (
   images: File[],
@@ -54,12 +54,18 @@ const UploadChapterImage = async (
   return await Promise.all(promises);
 };
 
-const makeTempImagesFolder = (
+const makeTempImagesFolder = async (
   userImages: (string | File)[],
   dbImages: string[],
   mangaId: number,
   chapterId: number
 ) => {
+  const listObjects = await ListObjects(`chapter/${mangaId}/${chapterId}/`);
+  if (!listObjects.Contents?.length)
+    userImages = userImages.filter((image) => image instanceof File);
+
+  const keys = listObjects.Contents?.map((content) => content.Key);
+
   const promises = userImages.map(async (image, index) => {
     if (image instanceof File) {
       const arrayBuffer = await new Blob([image]).arrayBuffer();
@@ -94,6 +100,7 @@ const makeTempImagesFolder = (
       if (!extractedKey) return;
 
       const OLD_KEY = `chapter/${mangaId}/${chapterId}/${extractedKey}`;
+      if (!keys?.includes(OLD_KEY)) return;
 
       const copyCommand = new CopyObjectCommand({
         Bucket: process.env.CB_BUCKET,
@@ -181,13 +188,7 @@ const DeleteChapterImages = async ({
   mangaId: number;
   chapterId: number;
 }) => {
-  const command = new ListObjectsV2Command({
-    Bucket: process.env.CB_BUCKET,
-    Delimiter: '/',
-    Prefix: `chapter/${mangaId}/${chapterId}/`,
-  });
-
-  const listedObjects = await contabo.send(command);
+  const listedObjects = await ListObjects(`chapter/${mangaId}/${chapterId}/`);
   if (!listedObjects.Contents?.length) return;
 
   const deleteInput: DeleteObjectsCommandInput = {
