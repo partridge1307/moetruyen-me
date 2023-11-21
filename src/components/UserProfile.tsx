@@ -90,7 +90,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         if (err.response?.status === 404) return notFoundToast();
       }
 
-      if (err instanceof Error) {
+      if (err instanceof Error && err.message === 'EXCEEDED_SIZE') {
         return toast({
           title: 'Quá kích cỡ',
           description: 'Chỉ nhận ảnh dưới 4MB',

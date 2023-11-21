@@ -7,14 +7,16 @@ export const UserProfileEditValidator = z.object({
     .string()
     .refine(
       (value) =>
-        value.startsWith('blob') || value.startsWith('https://i.moetruyen.net'),
+        value.startsWith('blob') ||
+        value.startsWith(process.env.NEXT_PUBLIC_IMG_DOMAIN!),
       'Ảnh không hợp lệ'
     ),
   banner: z
     .string()
     .refine(
       (value) =>
-        value.startsWith('blob') || value.startsWith('https://i.moetruyen.net'),
+        value.startsWith('blob') ||
+        value.startsWith(process.env.NEXT_PUBLIC_IMG_DOMAIN!),
       'Ảnh không hợp lệ'
     ),
   name: z

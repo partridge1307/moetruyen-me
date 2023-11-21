@@ -34,13 +34,13 @@ const page: FC<pageProps> = async ({ params }) => {
     .chapter({
       select: {
         id: true,
+        chapterIndex: true,
         name: true,
         images: true,
         isPublished: true,
         mangaId: true,
         progress: true,
         updatedAt: true,
-        createdAt: true,
       },
     });
   if (!chapters) return notFound();
@@ -72,10 +72,7 @@ const page: FC<pageProps> = async ({ params }) => {
             </Link>
 
             <ChapterTable
-              data={chapters.sort(
-                (chapter) =>
-                  chapter.createdAt.getTime() - chapter.createdAt.getTime()
-              )}
+              data={chapters.sort((a, b) => b.chapterIndex - a.chapterIndex)}
             />
           </div>
         ) : (

@@ -19,9 +19,11 @@ const page = async () => {
       ownerId: session.user.id,
     },
     select: {
+      cover: true,
       image: true,
       name: true,
       description: true,
+      plainTextDescription: true,
     },
   });
   if (!team) return notFound();

@@ -14,28 +14,28 @@ import Image from 'next/image';
 import { FC, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
-interface TeamImageFormFieldProps {
+interface TeamCoverFormFieldProps {
   form: UseFormReturn<TeamPayload>;
 }
 
-const TeamImageFormField: FC<TeamImageFormFieldProps> = ({ form }) => {
-  const ref = useRef<HTMLInputElement>(null);
+const TeamCoverFormField: FC<TeamCoverFormFieldProps> = ({ form }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const imageCropRef = useRef<HTMLButtonElement>(null);
 
   return (
     <FormField
       control={form.control}
-      name="image"
+      name="cover"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Ảnh</FormLabel>
+          <FormLabel>Ảnh bìa</FormLabel>
           <FormMessage />
           <FormControl>
             {field.value ? (
               <div
                 role="button"
-                className="relative max-w-sm aspect-square"
-                onClick={() => ref.current?.click()}
+                className="relative w-full aspect-video"
+                onClick={() => inputRef.current?.click()}
               >
                 <Image
                   fill
@@ -44,22 +44,21 @@ const TeamImageFormField: FC<TeamImageFormFieldProps> = ({ form }) => {
                   priority
                   src={field.value}
                   alt="Image Team Preview"
-                  className="object-cover rounded-full"
+                  className="object-cover rounded-md"
                 />
               </div>
             ) : (
               <div
                 role="button"
-                className="max-w-sm aspect-square rounded-full bg-background flex justify-center items-center"
-                onClick={() => ref.current?.click()}
+                className="w-full aspect-video rounded-md bg-background flex justify-center items-center"
+                onClick={() => inputRef.current?.click()}
               >
                 <ImagePlus className="w-10 h-10" />
               </div>
             )}
           </FormControl>
-
           <input
-            ref={ref}
+            ref={inputRef}
             type="file"
             accept="image/png, image/jpg, image/jpeg"
             className="hidden"
@@ -75,12 +74,11 @@ const TeamImageFormField: FC<TeamImageFormFieldProps> = ({ form }) => {
               }
             }}
           />
-
           {!!field.value && (
             <ImageCropModal
               ref={imageCropRef}
               image={field.value}
-              aspect={1 / 1}
+              aspect={2.39 / 1}
               setImageCropped={field.onChange}
             />
           )}
@@ -90,4 +88,4 @@ const TeamImageFormField: FC<TeamImageFormFieldProps> = ({ form }) => {
   );
 };
 
-export default TeamImageFormField;
+export default TeamCoverFormField;

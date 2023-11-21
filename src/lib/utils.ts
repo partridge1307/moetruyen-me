@@ -59,6 +59,20 @@ export function formatTimeToNow(date: Date | number): string {
   });
 }
 
+export const nFormatter = (num: number, digits: number) => {
+  const lookup = [
+    { value: 1e9, symbol: 'T' },
+    { value: 1e6, symbol: 'tr' },
+    { value: 1e3, symbol: 'k' },
+    { value: 1, symbol: '' },
+  ];
+  const regex = /\.0+$|(\.[0-9]*[1-9])0+$/;
+
+  const item = lookup.find((item) => num >= item.value);
+
+  return item ? (num / item.value).toFixed(digits).replace(regex, '$1') : '0';
+};
+
 export const fbRegex =
   /(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\.\-]*)/;
 export const disRegex =

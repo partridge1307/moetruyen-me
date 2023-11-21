@@ -1,8 +1,10 @@
+import TeamCoverSkeleton from './TeamCoverSkeleton';
 import TeamImageSkeleton from './TeamImageSkeleton';
 
 const TeamUploadSkeleton = () => {
   return (
     <div className="space-y-6 text-sm">
+      <TeamCoverSkeleton />
       <TeamImageSkeleton />
 
       <div className="space-y-2">

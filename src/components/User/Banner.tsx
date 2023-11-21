@@ -19,6 +19,10 @@ const Banner: FC<BannerProps> = ({ user, className }) => {
           priority
           src={user.banner}
           alt={`${user.name} Banner`}
+          className={cn(
+            'absolute inset-0 rounded-md dark:bg-zinc-800',
+            className
+          )}
         />
       ) : (
         <div

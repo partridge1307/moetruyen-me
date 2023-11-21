@@ -1,105 +1,102 @@
-import { TabsContent } from '@/components/ui/Tabs';
-import { cn, formatTimeToNow } from '@/lib/utils';
-import type { Team, User } from '@prisma/client';
-import Image from 'next/image';
-import Link from 'next/link';
+'use client';
+
+import type { Team } from '@prisma/client';
+import dynamic from 'next/dynamic';
 import { FC } from 'react';
-import UserAvatar from '../User/Avatar';
-import Username from '../User/Name';
-import { Edit } from 'lucide-react';
-import { buttonVariants } from '../ui/Button';
-import TeamAction from './components/TeamAction';
+import EditorSkeleton from '../Skeleton/EditorSkeleton';
+import { Spoiler } from '@mantine/core';
+import '@mantine/core/styles.layer.css';
+import classes from '@/styles/mantine/team-info.module.css';
+import { useMediaQuery } from '@mantine/hooks';
+import format from 'date-fns/format';
+import { Building, Newspaper, Users2 } from 'lucide-react';
+import { nFormatter } from '@/lib/utils';
+
+const MTEditor = dynamic(
+  () => import('@/components/Editor/MoetruyenEditorOutput'),
+  { ssr: false, loading: () => <EditorSkeleton /> }
+);
 
 interface TeamInfoProps {
-  team: Pick<Team, 'image' | 'name' | 'description' | 'createdAt'> & {
-    owner: Pick<User, 'id' | 'image' | 'name' | 'color'>;
+  team: Pick<Team, 'id' | 'description' | 'createdAt'> & {
     _count: {
       member: number;
       chapter: number;
     };
   };
-  sessionUserId: string;
 }
 
-const TeamInfo: FC<TeamInfoProps> = ({ team, sessionUserId }) => {
+const TeamInfo: FC<TeamInfoProps> = ({ team }) => {
+  const isMobile = useMediaQuery('(max-width: 640px)');
+
   return (
-    <TabsContent
-      value="info"
-      className="space-y-10 mt-0 data-[state=active]:mt-2"
-    >
-      <section className="grid grid-cols-[.9fr_1fr] md:grid-cols-[.3fr_1fr] gap-4 md:gap-10 mb-16">
-        <div className="relative aspect-square">
-          <Image
-            fill
-            sizes="(max-width: 640px) 20vw, 30vw"
-            quality={40}
-            priority
-            src={team.image}
-            alt={`${team.name} Thumbnail`}
-            className="object-cover rounded-full border-4 dark:border-zinc-800"
-          />
-        </div>
+    <section className="md:space-y-14">
+      <Spoiler
+        maxHeight={120}
+        showLabel={
+          <p className="w-fit text-sm rounded-b-md px-2.5 py-0.5 bg-primary text-primary-foreground">
+            Xem thêm
+          </p>
+        }
+        hideLabel={
+          <p className="w-fit text-sm rounded-b-md px-2.5 py-0.5 bg-primary text-primary-foreground">
+            Lược bớt
+          </p>
+        }
+        classNames={classes}
+      >
+        <MTEditor id={team.id} content={team.description} />
+        {!!isMobile && (
+          <div className="flex flex-wrap items-center gap-6">
+            <dl className="flex items-center gap-1.5">
+              <dt>{nFormatter(team._count.chapter, 1)}</dt>
+              <dd>
+                <Newspaper className="w-4 h-4" />
+              </dd>
+            </dl>
 
-        <div className="flex flex-col justify-between max-sm:gap-2 my-2">
-          <h1 className="text-lg lg:text-xl font-semibold">{team.name}</h1>
+            <dl className="flex items-center gap-1.5">
+              <dt>{nFormatter(team._count.member, 1)}</dt>
+              <dd>
+                <Users2 className="w-4 h-4" />
+              </dd>
+            </dl>
 
-          <dl className="space-y-1">
-            <dt className="max-sm:text-sm">Owner:</dt>
-            <dd>
-              <Link
-                href={`${process.env.MAIN_URL}/user/${team.owner.name
-                  ?.split(' ')
-                  .join('-')}`}
-                className="flex items-center w-fit space-x-2 p-1 pr-4 rounded-md dark:bg-zinc-800"
-              >
-                <UserAvatar
-                  user={team.owner}
-                  className="w-10 h-10 lg:w-12 lg:h-12"
-                />
-                <Username user={team.owner} className="max-sm:text-sm" />
-              </Link>
-            </dd>
-          </dl>
-
-          <dl className="flex items-center space-x-2 max-sm:text-sm">
-            <dt>Tạo từ:</dt>
-            <dd>
-              <time dateTime={team.createdAt.toDateString()}>
-                {formatTimeToNow(new Date(team.createdAt))}
-              </time>
-            </dd>
-          </dl>
-        </div>
-      </section>
-
-      <section>
-        {sessionUserId === team.owner.id ? (
-          <Link href="/team/edit" className={cn(buttonVariants(), 'space-x-2')}>
-            <Edit className="w-5 h-5" />
-            <span>Chỉnh sửa</span>
-          </Link>
-        ) : (
-          <TeamAction />
+            <dl className="flex items-center gap-1.5">
+              <dt>{format(team.createdAt, 'd/M/y')}</dt>
+              <dd>
+                <Building className="w-4 h-4" />
+              </dd>
+            </dl>
+          </div>
         )}
-      </section>
+      </Spoiler>
 
-      <section className="space-y-1">
-        <h1 className="lg:text-lg font-medium">Mô tả</h1>
-        <p className="p-1 rounded-md dark:bg-zinc-800">{team.description}</p>
-      </section>
+      {!isMobile && (
+        <div className="flex flex-wrap items-center gap-10">
+          <dl className="flex items-center gap-1.5">
+            <dt>{nFormatter(team._count.chapter, 1)}</dt>
+            <dd>
+              <Newspaper className="w-4 h-4" />
+            </dd>
+          </dl>
 
-      <section className="flex flex-wrap justify-center items-center space-x-10">
-        <dl className="flex items-center space-x-1">
-          <dt className="font-medium">{team._count.member}</dt>
-          <dd>Thành viên</dd>
-        </dl>
+          <dl className="flex items-center gap-1.5">
+            <dt>{nFormatter(team._count.member, 1)}</dt>
+            <dd>
+              <Users2 className="w-4 h-4" />
+            </dd>
+          </dl>
 
-        <dl className="flex items-center space-x-1">
-          <dt className="font-medium">{team._count.chapter}</dt>
-          <dd>Chapter đã đăng</dd>
-        </dl>
-      </section>
-    </TabsContent>
+          <dl className="flex items-center gap-1.5">
+            <dt>{format(team.createdAt, 'd/M/y')}</dt>
+            <dd>
+              <Building className="w-4 h-4" />
+            </dd>
+          </dl>
+        </div>
+      )}
+    </section>
   );
 };
 

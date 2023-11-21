@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     });
 
     let coverPromise, imagePromise;
-    if (!!c || typeof c !== 'undefined') {
+    if (!!c) {
       if (c instanceof File) {
         coverPromise = UploadMangaImage(c, mangaCreated.id, null, 'cover');
       } else coverPromise = c;

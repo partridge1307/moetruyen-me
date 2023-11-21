@@ -24,7 +24,7 @@ export const MangaUploadValidator = z.object({
       if (value) {
         return (
           value.startsWith('blob') ||
-          value.startsWith('https://i.moetruyen.net')
+          value.startsWith(process.env.NEXT_PUBLIC_IMG_DOMAIN!)
         );
       } else return true;
     }, 'Ảnh bìa không hợp lệ'),
@@ -32,7 +32,8 @@ export const MangaUploadValidator = z.object({
     .string()
     .refine(
       (value) =>
-        value.startsWith('blob') || value.startsWith('https://i.moetruyen.net'),
+        value.startsWith('blob') ||
+        value.startsWith(process.env.NEXT_PUBLIC_IMG_DOMAIN!),
       'Ảnh không hợp lệ'
     ),
   name: z

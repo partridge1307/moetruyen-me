@@ -13,46 +13,26 @@ export async function POST(req: Request) {
     const { cover, image, name, description, plainTextDescription } =
       TeamFormValidator.parse(await req.formData());
 
-    const user = await db.user.findUniqueOrThrow({
+    const team = await db.team.findUniqueOrThrow({
       where: {
-        id: sesison.user.id,
-        teamId: null,
+        ownerId: sesison.user.id,
       },
       select: {
         id: true,
-        verified: true,
-      },
-    });
-
-    if (!user.verified) {
-      return new Response('Verify is required', { status: 409 });
-    }
-
-    const createdTeam = await db.team.create({
-      data: {
-        image: '',
-        name,
-        // @ts-ignore
-        description,
-        plainTextDescription: plainTextDescription ?? `Team ${name}`,
-        ownerId: sesison.user.id,
-        member: {
-          connect: {
-            id: sesison.user.id,
-          },
-        },
+        cover: true,
+        image: true,
       },
     });
 
     let imagePromise, coverPromise;
     if (!!cover) {
       if (cover instanceof File) {
-        coverPromise = UploadTeamImage(cover, createdTeam.id, null, 'cover');
+        coverPromise = UploadTeamImage(cover, team.id, team.cover, 'cover');
       } else coverPromise = cover;
     }
 
     if (image instanceof File) {
-      imagePromise = UploadTeamImage(image, createdTeam.id, null, 'image');
+      imagePromise = UploadTeamImage(image, team.id, team.image, 'image');
     } else imagePromise = image;
 
     const [coverUploaded, imageUploaded] = await Promise.all([
@@ -62,11 +42,15 @@ export async function POST(req: Request) {
 
     await db.team.update({
       where: {
-        id: createdTeam.id,
+        id: team.id,
       },
       data: {
         cover: coverUploaded,
         image: imageUploaded,
+        name,
+        // @ts-ignore
+        description,
+        plainTextDescription: plainTextDescription ?? `Team ${name}`,
       },
     });
 
@@ -76,8 +60,7 @@ export async function POST(req: Request) {
       return new Response('Invalid', { status: 422 });
     }
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2025')
-        return new Response('Not found', { status: 404 });
+      return new Response('Not found', { status: 404 });
     }
 
     return new Response('Something went wrong', { status: 500 });

@@ -147,7 +147,7 @@ const MangaUpload = ({ tag }: { tag: Tags[] }) => {
           });
       }
 
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message === 'EXCEEDED_IMAGE_SIZE') {
         return toast({
           title: 'Quá kích cỡ',
           description: 'Chỉ nhận ảnh dưới 4MB',
