@@ -51,10 +51,12 @@ const ChapterUpload = ({ id }: { id: number }) => {
       const { chapterIndex, chapterName, image, volume } = values;
 
       const form = new FormData();
-      for (const img of image) {
+
+      const promises = image.map(async (img, index) => {
         const blob = await fetch(img.src).then((res) => res.blob());
-        form.append('images', blob, img.name);
-      }
+        form.append('images', blob, index.toString());
+      });
+      await Promise.all(promises);
 
       form.append('chapterIndex', `${chapterIndex}`);
       form.append('volume', `${volume}`);

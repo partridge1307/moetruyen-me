@@ -13,14 +13,16 @@ const asyncUploadChapter = async (
   chapterId: number
 ) => {
   try {
-    const promises = images.map(async (image) => {
-      const type = await fileTypeFromBuffer(await image.arrayBuffer());
-      if (!type) return;
+    const promises = images
+      .sort((a, b) => parseInt(a.name) - parseInt(b.name))
+      .map(async (image) => {
+        const type = await fileTypeFromBuffer(await image.arrayBuffer());
+        if (!type) return;
 
-      if (['image/png', 'image/jpeg', 'image/jpg'].includes(type?.mime)) {
-        return image;
-      }
-    });
+        if (['image/png', 'image/jpeg', 'image/jpg'].includes(type?.mime)) {
+          return image;
+        }
+      });
 
     const filteredFiles = (await Promise.all(promises)).filter(
       Boolean

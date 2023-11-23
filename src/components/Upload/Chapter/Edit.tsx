@@ -67,10 +67,10 @@ const ChapterEdit: FC<EditProps> = ({ chapter }) => {
 
       const promises = image.map(async (img, index) => {
         if (img.src.startsWith('blob')) {
-          form.append('images', `${index}`);
+          form.append('images', index.toString());
 
           const blob = await fetch(img.src).then((res) => res.blob());
-          form.append('files', blob, img.name);
+          form.append('files', blob, index.toString());
         } else {
           form.append('images', img.src);
         }

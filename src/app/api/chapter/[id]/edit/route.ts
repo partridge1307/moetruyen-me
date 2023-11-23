@@ -17,7 +17,7 @@ const asyncEditChapter = async (
     const promises = images.map(async (image) => {
       if (image.startsWith(process.env.NEXT_PUBLIC_IMG_DOMAIN!)) return image;
 
-      const file = files.shift();
+      const file = files.find((f) => f.name === image);
       if (!file) return;
 
       const type = await fileTypeFromBuffer(await file.arrayBuffer());
