@@ -167,6 +167,8 @@ const ImageCropModal = forwardRef<HTMLButtonElement, ImageCropModalProps>(
                     onLoad={onImageLoad}
                     style={{
                       maxHeight: '70vh',
+                      pointerEvents: 'none',
+                      userSelect: 'none',
                     }}
                   />
                 </ReactCrop>

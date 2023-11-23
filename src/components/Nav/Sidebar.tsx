@@ -71,7 +71,7 @@ const Sidebar: FC<SidebarProps> = ({ session }) => {
                   />
                 </div>
 
-                <Username user={session.user} className="mt-14 pl-4" />
+                <Username user={session.user} className="mt-12 pl-4" />
               </Link>
             </SheetClose>
 

@@ -10,7 +10,7 @@ interface BannerProps {
 
 const Banner: FC<BannerProps> = ({ user, className }) => {
   return (
-    <div className="relative aspect-video">
+    <div className="relative aspect-[2.39/1]">
       {user.banner ? (
         <Image
           fill

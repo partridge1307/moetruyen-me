@@ -170,7 +170,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
       >
         <div className="relative">
           <div
-            className="relative aspect-video"
+            className="relative aspect-[2.39/1]"
             role="button"
             onClick={(e) => {
               e.preventDefault();
@@ -217,10 +217,10 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
                   priority
                   src={avatarURL}
                   alt="Preview User Avatar"
-                  className="object-cover object-top hover:cursor-pointer rounded-full border-8 dark:border-zinc-900 dark:bg-zinc-900"
+                  className="object-cover object-top hover:cursor-pointer rounded-full border-[6px] dark:border-zinc-900 dark:bg-zinc-900"
                 />
               ) : (
-                <div className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-full border-8 dark:bg-zinc-900">
+                <div className="w-full h-full flex justify-center items-center hover:cursor-pointer rounded-full border-[6px] dark:bg-zinc-900">
                   <ImagePlus className="w-5 lg:w-6 h-5 lg:h-6" />
                 </div>
               )}
@@ -374,7 +374,7 @@ const UserProfile: FC<UserProfileProps> = ({ user }) => {
         <ImageCropModal
           ref={imageCropRef}
           image={currentTarget === 'AVATAR' ? avatarURL : bannerURL}
-          aspect={currentTarget === 'AVATAR' ? 1 / 1 : 16 / 9}
+          aspect={currentTarget === 'AVATAR' ? 1 / 1 : 2.39 / 1}
           setImageCropped={
             currentTarget === 'AVATAR' ? setAvatarURL : setBannerURL
           }
