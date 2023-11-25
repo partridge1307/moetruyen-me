@@ -108,13 +108,15 @@ const makeTempImagesFolder = async (
         Key: `chapter/${mangaId}/NEW_${chapterId}/${++index}.webp`,
       });
 
-      await sendCommand(() => contabo.send(copyCommand)).then(() => {
-        const deleteCommand = new DeleteObjectCommand({
-          Bucket: process.env.CB_BUCKET,
-          Key: OLD_KEY,
-        });
-        return contabo.send(deleteCommand);
-      });
+      await sendCommand(() => contabo.send(copyCommand));
+      await sendCommand(() =>
+        contabo.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.CB_BUCKET,
+            Key: OLD_KEY,
+          })
+        )
+      );
 
       const key = `${process.env.NEXT_PUBLIC_IMG_DOMAIN}/chapter/${mangaId}/${chapterId}/${index}.webp`;
       const existImage = dbImages.find((img) => img.startsWith(key));
@@ -149,13 +151,15 @@ const copyBackAndRemoveTemp = async (mangaId: number, chapterId: number) => {
       CopySource: `${process.env.CB_BUCKET}/${key}`,
       Key: `chapter/${mangaId}/${chapterId}/${extractedKey}`,
     });
-    await sendCommand(() => contabo.send(copyCommand)).then(() => {
-      const deleteCommand = new DeleteObjectCommand({
-        Bucket: process.env.CB_BUCKET,
-        Key: key,
-      });
-      return contabo.send(deleteCommand);
-    });
+    await sendCommand(() => contabo.send(copyCommand));
+    await sendCommand(() =>
+      contabo.send(
+        new DeleteObjectCommand({
+          Bucket: process.env.CB_BUCKET,
+          Key: key,
+        })
+      )
+    );
   });
 
   await Promise.all(promises);

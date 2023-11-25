@@ -24,7 +24,7 @@ const ChapterNameFormField: FC<ChapterNameFormFieldProps> = ({ form }) => {
           <FormLabel>Tên chap (Nếu có)</FormLabel>
           <FormMessage />
           <FormControl>
-            <Input placeholder="Tên chapter" {...field} />
+            <Input autoComplete="off" placeholder="Tên chapter" {...field} />
           </FormControl>
         </FormItem>
       )}

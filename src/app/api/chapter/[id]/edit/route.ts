@@ -49,7 +49,6 @@ const asyncEditChapter = async (
       },
     });
   } catch (error) {
-    console.log(error);
     await db.chapter.update({
       where: {
         id: chapterId,

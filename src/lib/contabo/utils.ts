@@ -56,7 +56,7 @@ const ListObjects = (key: string) => {
     Delimiter: '/',
     Prefix: key,
   });
-  return contabo.send(command);
+  return sendCommand(() => contabo.send(command));
 };
 
 export { generateKey, ListObjects, resizeImage, sendCommand };

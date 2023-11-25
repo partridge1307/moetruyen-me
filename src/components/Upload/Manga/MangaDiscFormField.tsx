@@ -24,11 +24,7 @@ const MangaDiscForm: FC<MangaDiscFormProps> = ({ form }) => {
           <FormLabel>Link Discord (nếu có)</FormLabel>
           <FormMessage />
           <FormControl>
-            <Input
-              autoComplete="off"
-              placeholder="https://discord.gg/"
-              {...field}
-            />
+            <Input placeholder="https://discord.gg/" {...field} />
           </FormControl>
         </FormItem>
       )}
