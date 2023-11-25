@@ -1,5 +1,7 @@
 const CopyPlugin = require('copy-webpack-plugin');
 
+const url = new URL(process.env.NEXTAUTH_URL);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -14,6 +16,9 @@ const nextConfig = {
   },
   experimental: {
     webpackBuildWorker: true,
+    serverActions: {
+      allowedOrigins: ['localhost:3000', url.hostname],
+    },
   },
   webpack: (config) => {
     config.plugins.push(

@@ -1,5 +1,6 @@
 :is(.dark) :where(.mantine-TagsInput-pill) {
-  @apply bg-zinc-700 text-white;
+  background-color: rgb(63, 63, 70);
+  color: rgb(255, 255, 255);
 }
 
 .mantine-Pill-remove.mantine-CloseButton-root {
@@ -32,5 +33,5 @@
 }
 
 :is(.dark) :where(.mantine-PinInput-input) {
-  color: white;
+  color: black;
 }

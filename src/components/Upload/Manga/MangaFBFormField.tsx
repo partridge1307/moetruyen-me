@@ -24,11 +24,7 @@ const MangaFBForm: FC<MangaFBFormProps> = ({ form }) => {
           <FormLabel>Link Facebook (nếu có)</FormLabel>
           <FormMessage />
           <FormControl>
-            <Input
-              autoComplete="off"
-              placeholder="https://facebook.com/"
-              {...field}
-            />
+            <Input placeholder="https://facebook.com/" {...field} />
           </FormControl>
         </FormItem>
       )}
