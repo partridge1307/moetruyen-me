@@ -19,6 +19,7 @@ const DataTableRowAction = dynamic(() => import('./RowAction'), {
 export type ChapterColumn = Pick<
   Chapter,
   | 'id'
+  | 'volume'
   | 'chapterIndex'
   | 'name'
   | 'images'
@@ -37,6 +38,14 @@ export const columns: ColumnDef<ChapterColumn>[] = [
     ),
     cell: ({ row }) => <div>{row.getValue('ID')}</div>,
     enableHiding: false,
+  },
+  {
+    id: 'volume',
+    accessorKey: 'volume',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Vol" />
+    ),
+    cell: ({ row }) => <div>{row.getValue('volume')}</div>,
   },
   {
     id: 'index',

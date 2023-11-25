@@ -34,6 +34,7 @@ const page: FC<pageProps> = async ({ params }) => {
     .chapter({
       select: {
         id: true,
+        volume: true,
         chapterIndex: true,
         name: true,
         images: true,
