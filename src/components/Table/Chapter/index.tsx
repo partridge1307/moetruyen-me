@@ -41,7 +41,7 @@ interface DataTableProps {
 
 function ChapterTable({ data }: DataTableProps) {
   const pathName = usePathname();
-  const interval = useInterval(() => clearCache(pathName), 5000);
+  const interval = useInterval(() => clearCache(pathName), 15000);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilter] = useState<ColumnFiltersState>([]);
