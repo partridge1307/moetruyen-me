@@ -105,6 +105,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
         mangaId: manga.id,
       },
       update: {
+        chapterId: manga.chapter[0].id,
         createdAt: new Date(Date.now()),
       },
       create: {

@@ -294,12 +294,15 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
         },
       });
 
-      const result = await fetch(`${process.env.BOT_SERVER}/api/private`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${jwtKey}`,
-        },
-      });
+      const result = await fetch(
+        `${process.env.BOT_SERVER}/api/private/notify`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${jwtKey}`,
+          },
+        }
+      );
 
       if (result.status !== 200) {
         if (result.status === 401) throw new Error('Unauthozied jwt');

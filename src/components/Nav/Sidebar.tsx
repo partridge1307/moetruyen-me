@@ -131,7 +131,7 @@ const Sidebar: FC<SidebarProps> = ({ session }) => {
         <footer className="flex justify-between items-center p-2 dark:bg-zinc-800">
           <div>
             <p className="text-lg">©Moetruyen</p>
-            <p className="text-sm">Version: 1.2.2</p>
+            <p className="text-sm">Version: 1.2.3</p>
           </div>
 
           <ThemeSwitch />
