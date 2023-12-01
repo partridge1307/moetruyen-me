@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 import { generateKey, resizeImage, sendCommand } from '../utils';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { ObjectCannedACL, PutObjectCommand } from '@aws-sdk/client-s3';
 import { contabo } from '../client';
 
 const UploadTeamImage = async (
@@ -30,6 +30,7 @@ const UploadTeamImage = async (
         Body: optimizedImage,
         Bucket: process.env.CB_BUCKET,
         Key: `team/${teamId}/${type === 'image' ? 'image.png' : 'cover.png'}`,
+        ACL: ObjectCannedACL.public_read,
       })
     )
   );

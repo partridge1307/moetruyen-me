@@ -4,6 +4,7 @@ import {
   DeleteObjectsCommand,
   DeleteObjectsCommandInput,
   ListObjectsV2Command,
+  ObjectCannedACL,
   PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
@@ -44,6 +45,7 @@ const UploadChapterImage = async (
           Body: image.buffer,
           Bucket: process.env.CB_BUCKET,
           Key: `chapter/${mangaId}/${chapterId}/${image.name}.webp`,
+          ACL: ObjectCannedACL.public_read,
         })
       )
     );
@@ -85,6 +87,7 @@ const makeTempImagesFolder = async (
         Bucket: process.env.CB_BUCKET,
         Body: buffer,
         Key: `chapter/${mangaId}/NEW_${chapterId}/${++index}.webp`,
+        ACL: ObjectCannedACL.public_read,
       });
 
       await sendCommand(() => contabo.send(command));
@@ -106,6 +109,7 @@ const makeTempImagesFolder = async (
         Bucket: process.env.CB_BUCKET,
         CopySource: `${process.env.CB_BUCKET}/${OLD_KEY}`,
         Key: `chapter/${mangaId}/NEW_${chapterId}/${++index}.webp`,
+        ACL: ObjectCannedACL.public_read,
       });
 
       await sendCommand(() => contabo.send(copyCommand));
@@ -150,6 +154,7 @@ const copyBackAndRemoveTemp = async (mangaId: number, chapterId: number) => {
       Bucket: process.env.CB_BUCKET,
       CopySource: `${process.env.CB_BUCKET}/${key}`,
       Key: `chapter/${mangaId}/${chapterId}/${extractedKey}`,
+      ACL: ObjectCannedACL.public_read,
     });
     await sendCommand(() => contabo.send(copyCommand));
     await sendCommand(() =>

@@ -1,4 +1,4 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { ObjectCannedACL, PutObjectCommand } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import { contabo } from '../client';
 import { generateKey, resizeImage, sendCommand } from '../utils';
@@ -29,6 +29,7 @@ const UploadUserImage = async (
         Body: optimizedImage,
         Bucket: process.env.CB_BUCKET,
         Key: `user/${type}/${userId}.${type === 'avatar' ? 'png' : 'webp'}`,
+        ACL: ObjectCannedACL.public_read,
       })
     )
   );
